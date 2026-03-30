@@ -1,0 +1,15 @@
+[package]
+name = "bonds"
+version = "0.1.0"
+edition = "2024"
+publish = true
+license-file = "LICENSE"
+
+[workspace]
+resolver = "3"
+members = ["api"]
+
+[[bin]]
+name = "dependencies"
+path = "bin/dependencies.rs"
+required-features = ["dependencies"]
