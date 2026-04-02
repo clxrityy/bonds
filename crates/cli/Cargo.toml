@@ -1,0 +1,12 @@
+[package]
+name = "bonds-cli"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "bond"          # the actual binary users run
+path = "src/main.rs"  # the source file for the binary
+
+[dependencies]
+bonds-core = { path = "../core" }
+clap = { workspace = true }

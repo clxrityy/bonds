@@ -1,15 +1,18 @@
-[package]
-name = "bonds"
-version = "0.1.0"
-edition = "2024"
-publish = true
-license-file = "LICENSE"
-
+# No [package] section -- this is purely a workspace manifest
 [workspace]
 resolver = "3"
-members = ["api"]
+members = [
+    "crates/core",
+    "crates/cli",
+    # "crates/app",  # uncomment later
+]
 
-[[bin]]
-name = "dependencies"
-path = "bin/dependencies.rs"
-required-features = ["dependencies"]
+# Share dependency versions across crates
+[workspace.dependencies]
+rusqlite = { version = "0.30", features = ["bundled", "chrono"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+clap = { version = "4", features = ["derive"] }
