@@ -1,7 +1,7 @@
 use crate::bond::Bond;
 use crate::error::BondError;
 use chrono::{DateTime, Utc};
-use rusqlite::{params, Connection};
+use rusqlite::{Connection, params};
 use serde_json;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -27,16 +27,7 @@ impl BondManager {
         }
 
         let conn = Connection::open(db_path)?;
-        conn.execute_batch(
-            "CREATE TABLE IF NOT EXISTS bonds (
-                id TEXT PRIMARY KEY,
-                source TEXT NOT NULL,
-                target TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                metadata TEXT
-            );",
-        )?;
-        Ok(Self { conn })
+        Self::from_connection(conn) // ← reuse the schema setup
     }
 
     /// List all bonds (most-recent first).
@@ -53,18 +44,22 @@ impl BondManager {
 
             let created_at = DateTime::parse_from_rfc3339(&created_at_str)
                 .map(|dt| dt.with_timezone(&Utc))
-                .map_err(|e| rusqlite::Error::FromSqlConversionFailure(
-                    3,
-                    rusqlite::types::Type::Text,
-                    Box::new(e),
-                ))?;
+                .map_err(|e| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        3,
+                        rusqlite::types::Type::Text,
+                        Box::new(e),
+                    )
+                })?;
 
             let metadata = match metadata_json {
-                Some(s) => Some(serde_json::from_str(&s).map_err(|e| rusqlite::Error::FromSqlConversionFailure(
-                    4,
-                    rusqlite::types::Type::Text,
-                    Box::new(e),
-                ))?),
+                Some(s) => Some(serde_json::from_str(&s).map_err(|e| {
+                    rusqlite::Error::FromSqlConversionFailure(
+                        4,
+                        rusqlite::types::Type::Text,
+                        Box::new(e),
+                    )
+                })?),
                 None => None,
             };
 
@@ -86,9 +81,9 @@ impl BondManager {
 
     /// Get a single bond by id.
     pub fn get_bond(&self, id: &str) -> Result<Bond, BondError> {
-        let mut stmt = self.conn.prepare(
-            "SELECT id, source, target, created_at, metadata FROM bonds WHERE id = ?1",
-        )?;
+        let mut stmt = self
+            .conn
+            .prepare("SELECT id, source, target, created_at, metadata FROM bonds WHERE id = ?1")?;
         let mut rows = stmt.query(params![id])?;
         if let Some(row) = rows.next()? {
             let id: String = row.get(0)?;
@@ -199,5 +194,128 @@ impl BondManager {
         self.conn
             .execute("DELETE FROM bonds WHERE id = ?1", params![id])?;
         Ok(bond)
+    }
+
+    /// Runs schema migration. Useful for testing with in-memory DBs.
+    pub fn from_connection(conn: Connection) -> Result<Self, BondError> {
+        conn.execute_batch(
+            "CREATE TABLE IF NOT EXISTS bonds (
+                id TEXT PRIMARY KEY,
+                source TEXT NOT NULL,
+                target TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                metadata TEXT
+            );",
+        )?;
+        Ok(Self { conn })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rusqlite::Connection;
+    use tempfile::TempDir;
+
+    /// Helper: creates a BondManager backed by in-memory SQLite.
+    fn test_manager() -> BondManager {
+        let conn = Connection::open_in_memory().unwrap();
+        BondManager::from_connection(conn).unwrap()
+    }
+
+    /// Helper: creates a real temp directory that acts as a bond source.
+    /// Returns (TempDir, PathBuf) -- hold onto TempDir so it doesn't drop.
+    fn temp_source() -> (TempDir, PathBuf) {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().to_path_buf();
+        (dir, path)
+    }
+
+    #[test]
+    fn list_bonds_empty() {
+        let mgr = test_manager();
+        let bonds = mgr.list_bonds().unwrap();
+        assert!(bonds.is_empty());
+    }
+
+    #[test]
+    fn create_and_get_bond() {
+        let mgr = test_manager();
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let bond = mgr.create_bond(&src_path, &tgt_path).unwrap();
+
+        // Verify it's in the DB
+        let fetched = mgr.get_bond(&bond.id).unwrap();
+        assert_eq!(fetched.id, bond.id);
+        assert_eq!(fetched.source, src_path);
+        assert_eq!(fetched.target, tgt_path);
+
+        // Verify the symlink actually exists
+        assert!(tgt_path.symlink_metadata().unwrap().file_type().is_symlink());
+    }
+
+    #[test]
+    fn create_bond_nonexistent_source() {
+        let mgr = test_manager();
+        let result = mgr.create_bond("/no/such/path", "/tmp/whatever");
+        assert!(matches!(result, Err(BondError::InvalidPath(_))));
+    }
+
+    #[test]
+    fn create_bond_target_already_exists() {
+        let mgr = test_manager();
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        // Target is the dir itself -- it already exists
+        let tgt_path = tgt_dir.path().to_path_buf();
+
+        let result = mgr.create_bond(&src_path, &tgt_path);
+        assert!(matches!(result, Err(BondError::AlreadyExists)));
+    }
+
+    #[test]
+    fn delete_bond_removes_symlink() {
+        let mgr = test_manager();
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let bond = mgr.create_bond(&src_path, &tgt_path).unwrap();
+        assert!(tgt_path.exists());
+
+        mgr.delete_bond(&bond.id, false).unwrap();
+        assert!(!tgt_path.exists());
+
+        // Also gone from DB
+        assert!(matches!(
+            mgr.get_bond(&bond.id),
+            Err(BondError::NotFound(_))
+        ));
+    }
+
+    #[test]
+    fn delete_bond_not_found() {
+        let mgr = test_manager();
+        let result = mgr.delete_bond("nonexistent-id", false);
+        assert!(matches!(result, Err(BondError::NotFound(_))));
+    }
+
+    #[test]
+    fn list_bonds_ordered_by_newest() {
+        let mgr = test_manager();
+        let (_src1, src1) = temp_source();
+        let (_src2, src2) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+
+        let bond1 = mgr.create_bond(&src1, tgt_dir.path().join("a")).unwrap();
+        let bond2 = mgr.create_bond(&src2, tgt_dir.path().join("b")).unwrap();
+
+        let bonds = mgr.list_bonds().unwrap();
+        // bond2 was created second, should appear first (newest-first order)
+        assert_eq!(bonds[0].id, bond2.id);
+        assert_eq!(bonds[1].id, bond1.id);
     }
 }

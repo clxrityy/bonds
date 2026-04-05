@@ -30,3 +30,32 @@ impl Bond {
         self.created_at.to_rfc3339()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_generates_unique_ids() {
+        let a = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
+        let b = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
+        assert_ne!(a.id, b.id); // UUID v4 should never collide
+    }
+
+    #[test]
+    fn created_at_rfc3339_roundtrips() {
+        let bond = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
+        let rfc = bond.created_at_rfc3339();
+        // Verify it parses back cleanly
+        let parsed = DateTime::parse_from_rfc3339(&rfc).unwrap();
+        assert_eq!(parsed.with_timezone(&Utc), bond.created_at);
+    }
+
+    #[test]
+    fn serializes_to_json() {
+        let bond = Bond::new(PathBuf::from("/src"), PathBuf::from("/tgt"));
+        let json = serde_json::to_string(&bond).unwrap();
+        let deserialized: Bond = serde_json::from_str(&json).unwrap();
+        assert_eq!(bond, deserialized);
+    }
+}
