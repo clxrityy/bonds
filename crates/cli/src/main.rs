@@ -3,7 +3,8 @@ mod commands;
 
 use clap::Parser;
 use commands::{
-    cmd_add, cmd_config_get, cmd_config_set, cmd_info, cmd_list, cmd_remove, cmd_update,
+    cmd_add, cmd_config_get, cmd_config_set, cmd_info, cmd_list, cmd_migrate, cmd_remove,
+    cmd_update,
 };
 
 fn main() {
@@ -28,15 +29,19 @@ fn main() {
                     source,
                     target,
                     contents,
-                    name
+                    name,
                 } => cmd_add(&manager, source, target, contents, name),
                 Commands::List => cmd_list(&manager),
                 Commands::Info { id } => cmd_info(&manager, &id),
                 Commands::Remove { id, with_target } => cmd_remove(&manager, &id, with_target),
                 Commands::Config { .. } => unreachable!(),
-                Commands::Update { id, source, target, name } => {
-                    cmd_update(&manager, &id, source, target, name)
-                }
+                Commands::Update {
+                    id,
+                    source,
+                    target,
+                    name,
+                } => cmd_update(&manager, &id, source, target, name),
+                Commands::Migrate { id, dest } => cmd_migrate(&manager, &id, dest),
             }
         }
     };

@@ -70,6 +70,14 @@ pub enum Commands {
         #[arg(long)]
         name: Option<String>,
     },
+
+    /// Move a bond's target to a new directory
+    Migrate {
+        /// Bond name or ID prefix
+        id: String,
+        /// Destination directory (defaults to configured default directory)
+        dest: Option<PathBuf>,
+    },
 }
 
 #[derive(Subcommand)]
