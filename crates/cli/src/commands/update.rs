@@ -6,6 +6,7 @@ pub fn cmd_update(
     id: &str,
     source: Option<PathBuf>,
     target: Option<PathBuf>,
+    name: Option<String>,
 ) -> Result<(), BondError> {
     if source.is_none() && target.is_none() {
         return Err(BondError::InvalidPath(
@@ -29,7 +30,7 @@ pub fn cmd_update(
         None => None,
     };
 
-    let bond = manager.update_bond(id, source, target)?;
+    let bond = manager.update_bond(id, source, target, name)?;
     println!("Bond updated: {}", &bond.id[..8]);
     println!("  {} -> {}", bond.source.display(), bond.target.display());
     Ok(())

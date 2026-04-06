@@ -15,6 +15,9 @@ pub enum BondError {
     #[error("Bond already exists")]
     AlreadyExists,
 
+    #[error("Target already exists: {0}")]
+    TargetExists(String),
+
     #[error("Bond not found: {0}")]
     NotFound(String),
 

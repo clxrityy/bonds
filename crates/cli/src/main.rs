@@ -28,13 +28,14 @@ fn main() {
                     source,
                     target,
                     contents,
-                } => cmd_add(&manager, source, target, contents),
+                    name
+                } => cmd_add(&manager, source, target, contents, name),
                 Commands::List => cmd_list(&manager),
                 Commands::Info { id } => cmd_info(&manager, &id),
                 Commands::Remove { id, with_target } => cmd_remove(&manager, &id, with_target),
                 Commands::Config { .. } => unreachable!(),
-                Commands::Update { id, source, target } => {
-                    cmd_update(&manager, &id, source, target)
+                Commands::Update { id, source, target, name } => {
+                    cmd_update(&manager, &id, source, target, name)
                 }
             }
         }

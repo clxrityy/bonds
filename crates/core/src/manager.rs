@@ -65,6 +65,7 @@ impl BondManager {
 
             Ok(Bond {
                 id,
+                name: None,
                 source: PathBuf::from(source),
                 target: PathBuf::from(target),
                 created_at,
@@ -82,10 +83,11 @@ impl BondManager {
     /// Parse a Bond from a rusqlite Row.
     fn bond_from_row(&self, row: &rusqlite::Row) -> Result<Bond, BondError> {
         let id: String = row.get(0).map_err(rusqlite::Error::from)?;
-        let source: String = row.get(1).map_err(rusqlite::Error::from)?;
-        let target: String = row.get(2).map_err(rusqlite::Error::from)?;
-        let created_at_str: String = row.get(3).map_err(rusqlite::Error::from)?;
-        let metadata_json: Option<String> = row.get(4).map_err(rusqlite::Error::from)?;
+        let name: Option<String> = row.get(1).map_err(rusqlite::Error::from)?;
+        let source: String = row.get(2).map_err(rusqlite::Error::from)?;
+        let target: String = row.get(3).map_err(rusqlite::Error::from)?;
+        let created_at_str: String = row.get(4).map_err(rusqlite::Error::from)?;
+        let metadata_json: Option<String> = row.get(5).map_err(rusqlite::Error::from)?;
 
         let created_at = DateTime::parse_from_rfc3339(&created_at_str)
             .map(|dt| dt.with_timezone(&Utc))
@@ -98,6 +100,7 @@ impl BondManager {
 
         Ok(Bond {
             id,
+            name,
             source: PathBuf::from(source),
             target: PathBuf::from(target),
             created_at,
@@ -105,22 +108,34 @@ impl BondManager {
         })
     }
 
-    /// Get a single bond by id.
-    pub fn get_bond(&self, id: &str) -> Result<Bond, BondError> {
+    /// Get a single bond by ID or name. ID can be a unique prefix.
+    pub fn get_bond(&self, identifier: &str) -> Result<Bond, BondError> {
+        // 1. Try exact name match
         let mut stmt = self.conn.prepare(
-            "SELECT id, source, target, created_at, metadata FROM bonds WHERE id LIKE ?1 || '%'",
+            "SELECT id, name, source, target, created_at, metadata FROM bonds WHERE name = ?1",
         )?;
-        let mut rows = stmt.query(params![id])?;
+        let mut rows = stmt.query(params![identifier])?;
+
+        if let Some(row) = rows.next()? {
+            return self.bond_from_row(row);
+        }
+        drop(rows);
+        drop(stmt);
+
+        // 2. Fall back to ID prefix match
+        let mut stmt = self.conn.prepare(
+        "SELECT id, name, source, target, created_at, metadata FROM bonds WHERE id LIKE ?1 || '%'",
+    )?;
+        let mut rows = stmt.query(params![identifier])?;
 
         let first = match rows.next()? {
             Some(row) => self.bond_from_row(row)?,
-            None => return Err(BondError::NotFound(id.to_string())),
+            None => return Err(BondError::NotFound(identifier.to_string())),
         };
 
-        // If there's a second match, the prefix is ambiguous
         if rows.next()?.is_some() {
             return Err(BondError::InvalidPath(format!(
-                "ambiguous ID prefix '{id}': try more characters"
+                "ambiguous ID prefix '{identifier}': try more characters"
             )));
         }
 
@@ -132,9 +147,21 @@ impl BondManager {
         &self,
         source: P,
         target: Q,
+        name: Option<String>,
     ) -> Result<Bond, BondError> {
         let src = source.as_ref().to_path_buf();
         let tgt = target.as_ref().to_path_buf();
+
+        // Validate name uniqueness if provided
+        if let Some(ref n) = name {
+            let mut stmt = self
+                .conn
+                .prepare("SELECT COUNT(*) FROM bonds WHERE name = ?1")?;
+            let count: i64 = stmt.query_row(params![n], |row| row.get(0))?;
+            if count > 0 {
+                return Err(BondError::AlreadyExists);
+            }
+        }
 
         if !src.exists() {
             return Err(BondError::InvalidPath(format!(
@@ -143,7 +170,18 @@ impl BondManager {
             )));
         }
         if tgt.exists() {
-            return Err(BondError::AlreadyExists);
+            // Allow targeting an empty directory (common after removing child bonds)
+            let is_empty_dir = tgt.is_dir()
+                && std::fs::read_dir(&tgt)
+                    .map(|mut d| d.next().is_none())
+                    .unwrap_or(false);
+
+            if !is_empty_dir {
+                return Err(BondError::TargetExists(format!("{}", tgt.display())));
+            }
+
+            // Remove the empty dir so the symlink can take its place
+            std::fs::remove_dir(&tgt)?;
         }
 
         if let Some(parent) = tgt.parent() {
@@ -162,7 +200,7 @@ impl BondManager {
             }
         }
 
-        let bond = Bond::new(src.clone(), tgt.clone());
+        let bond = Bond::new(src.clone(), tgt.clone(), name);
         let metadata_json: Option<String> = bond
             .metadata
             .as_ref()
@@ -170,15 +208,16 @@ impl BondManager {
             .transpose()?;
 
         self.conn.execute(
-            "INSERT INTO bonds (id, source, target, created_at, metadata) VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![
-                bond.id,
-                bond.source.to_string_lossy().to_string(),
-                bond.target.to_string_lossy().to_string(),
-                bond.created_at_rfc3339(),
-                metadata_json
-            ],
-        )?;
+        "INSERT INTO bonds (id, name, source, target, created_at, metadata) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![
+            bond.id,
+            bond.name,
+            bond.source.to_string_lossy().to_string(),
+            bond.target.to_string_lossy().to_string(),
+            bond.created_at_rfc3339(),
+            metadata_json
+        ],
+    )?;
 
         Ok(bond)
     }
@@ -190,6 +229,7 @@ impl BondManager {
         id: &str,
         new_source: Option<PathBuf>,
         new_target: Option<PathBuf>,
+        new_name: Option<String>,
     ) -> Result<Bond, BondError> {
         let mut bond = self.get_bond(id)?;
 
@@ -242,16 +282,20 @@ impl BondManager {
 
         // Update the DB record
         self.conn.execute(
-            "UPDATE bonds SET source = ?1, target = ?2 WHERE id = ?3",
+            "UPDATE bonds SET source = ?1, target = ?2, name = ?3 WHERE id = ?4",
             params![
                 source.to_string_lossy().to_string(),
                 target.to_string_lossy().to_string(),
+                new_name.as_ref().or(bond.name.as_ref()),
                 bond.id,
             ],
         )?;
 
         bond.source = source;
         bond.target = target;
+        if new_name.is_some() {
+            bond.name = new_name;
+        }
         Ok(bond)
     }
 
@@ -286,13 +330,18 @@ impl BondManager {
     pub fn from_connection(conn: Connection) -> Result<Self, BondError> {
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS bonds (
-                id TEXT PRIMARY KEY,
-                source TEXT NOT NULL,
-                target TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                metadata TEXT
-            );",
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            source TEXT NOT NULL,
+            target TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            metadata TEXT
+        );",
         )?;
+
+        // Migration: add name column (ignore error if it already exists)
+        let _ = conn.execute_batch("ALTER TABLE bonds ADD COLUMN name TEXT;");
+
         Ok(Self { conn })
     }
 }
@@ -331,7 +380,7 @@ mod tests {
         let tgt_dir = TempDir::new().unwrap();
         let tgt_path = tgt_dir.path().join("link");
 
-        let bond = mgr.create_bond(&src_path, &tgt_path).unwrap();
+        let bond = mgr.create_bond(&src_path, &tgt_path, None).unwrap();
 
         // Verify it's in the DB
         let fetched = mgr.get_bond(&bond.id).unwrap();
@@ -352,7 +401,7 @@ mod tests {
     #[test]
     fn create_bond_nonexistent_source() {
         let mgr = test_manager();
-        let result = mgr.create_bond("/no/such/path", "/tmp/whatever");
+        let result = mgr.create_bond("/no/such/path", "/tmp/whatever", None);
         assert!(matches!(result, Err(BondError::InvalidPath(_))));
     }
 
@@ -364,7 +413,7 @@ mod tests {
         // Target is the dir itself -- it already exists
         let tgt_path = tgt_dir.path().to_path_buf();
 
-        let result = mgr.create_bond(&src_path, &tgt_path);
+        let result = mgr.create_bond(&src_path, &tgt_path, None);
         assert!(matches!(result, Err(BondError::AlreadyExists)));
     }
 
@@ -375,7 +424,7 @@ mod tests {
         let tgt_dir = TempDir::new().unwrap();
         let tgt_path = tgt_dir.path().join("link");
 
-        let bond = mgr.create_bond(&src_path, &tgt_path).unwrap();
+        let bond = mgr.create_bond(&src_path, &tgt_path, None).unwrap();
         assert!(tgt_path.exists());
 
         mgr.delete_bond(&bond.id, false).unwrap();
@@ -402,8 +451,12 @@ mod tests {
         let (_src2, src2) = temp_source();
         let tgt_dir = TempDir::new().unwrap();
 
-        let bond1 = mgr.create_bond(&src1, tgt_dir.path().join("a")).unwrap();
-        let bond2 = mgr.create_bond(&src2, tgt_dir.path().join("b")).unwrap();
+        let bond1 = mgr
+            .create_bond(&src1, tgt_dir.path().join("a"), None)
+            .unwrap();
+        let bond2 = mgr
+            .create_bond(&src2, tgt_dir.path().join("b"), None)
+            .unwrap();
 
         let bonds = mgr.list_bonds().unwrap();
         // bond2 was created second, should appear first (newest-first order)

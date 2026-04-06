@@ -27,6 +27,9 @@ pub enum Commands {
         /// Bond each child of source as a separate bond into target
         #[arg(long)]
         contents: bool,
+        /// Give this bond a name for easy reference
+        #[arg(long)]
+        name: Option<String>,
     },
 
     /// List all bonds
@@ -63,6 +66,9 @@ pub enum Commands {
         /// New target path
         #[arg(long)]
         target: Option<PathBuf>,
+        /// Set or change the bond's name
+        #[arg(long)]
+        name: Option<String>,
     },
 }
 

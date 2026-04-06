@@ -6,6 +6,7 @@ pub fn cmd_add(
     source: PathBuf,
     target: Option<PathBuf>,
     contents: bool,
+    name: Option<String>,
 ) -> Result<(), BondError> {
     let source = source.canonicalize().map_err(|_| {
         BondError::InvalidPath(format!("cannot resolve source: {}", source.display()))
@@ -29,7 +30,7 @@ pub fn cmd_add(
         return add_contents(manager, &source, &target);
     }
 
-    let bond = manager.create_bond(&source, &target)?;
+    let bond = manager.create_bond(&source, &target, name)?;
     println!("Bond created: {}", bond.id);
     println!("  {} -> {}", bond.source.display(), bond.target.display());
     Ok(())
@@ -63,7 +64,7 @@ fn add_contents(
 
         let child_target = target.join(&child_name);
 
-        match manager.create_bond(&child, &child_target) {
+        match manager.create_bond(&child, &child_target, None) {
             Ok(bond) => {
                 println!("  {} -> {}", bond.source.display(), bond.target.display());
                 created += 1;

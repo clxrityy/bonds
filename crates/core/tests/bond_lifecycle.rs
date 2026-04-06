@@ -17,7 +17,7 @@ fn full_lifecycle_create_list_delete() {
     let tgt = tgt_dir.path().join("my_bond");
 
     // Create
-    let bond = mgr.create_bond(src.path(), &tgt).unwrap();
+    let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
     assert!(tgt.exists());
     assert!(tgt.symlink_metadata().unwrap().file_type().is_symlink());
 
@@ -42,7 +42,7 @@ fn symlink_resolves_to_source_contents() {
 
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
-    mgr.create_bond(src.path(), &tgt).unwrap();
+    mgr.create_bond(src.path(), &tgt, None).unwrap();
 
     // Reading through the symlink should see the source's contents
     let content = std::fs::read_to_string(tgt.join("hello.txt")).unwrap();
@@ -56,7 +56,7 @@ fn delete_with_target_removes_actual_files() {
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
 
-    let bond = mgr.create_bond(src.path(), &tgt).unwrap();
+    let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
     // First remove the symlink and replace with a real directory
     // (simulates someone who broke the symlink)
@@ -83,11 +83,11 @@ fn update_bond_target() {
     let new_tgt = tgt_dir.path().join("new_link");
 
     // Create a bond
-    let bond = mgr.create_bond(src.path(), &old_tgt).unwrap();
+    let bond = mgr.create_bond(src.path(), &old_tgt, None).unwrap();
     assert!(old_tgt.symlink_metadata().unwrap().file_type().is_symlink());
 
     // Update only target
-    let updated = mgr.update_bond(&bond.id, None, Some(new_tgt.clone())).unwrap();
+    let updated = mgr.update_bond(&bond.id, None, Some(new_tgt.clone()), None).unwrap();
     assert_eq!(updated.id, bond.id);                    // same bond
     assert_eq!(updated.target, new_tgt);                 // target changed
     assert_eq!(updated.source, bond.source);             // source unchanged
@@ -111,14 +111,14 @@ fn update_bond_source() {
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
 
-    let bond = mgr.create_bond(old_src.path(), &tgt).unwrap();
+    let bond = mgr.create_bond(old_src.path(), &tgt, None).unwrap();
 
     // Symlink currently points to old source
     assert!(tgt.join("a.txt").exists());
 
     // Update source
     let updated = mgr
-        .update_bond(&bond.id, Some(new_src.path().to_path_buf()), None)
+        .update_bond(&bond.id, Some(new_src.path().to_path_buf()), None, None)
         .unwrap();
     assert_eq!(updated.source, new_src.path());
 
@@ -134,10 +134,10 @@ fn update_bond_rejects_missing_source() {
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
 
-    let bond = mgr.create_bond(src.path(), &tgt).unwrap();
+    let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
     let bad_src = std::path::PathBuf::from("/nonexistent/path");
-    let err = mgr.update_bond(&bond.id, Some(bad_src), None).unwrap_err();
+    let err = mgr.update_bond(&bond.id, Some(bad_src), None, None).unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
     // Original bond should be untouched
@@ -151,14 +151,14 @@ fn update_bond_rejects_occupied_target() {
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
 
-    let bond = mgr.create_bond(src.path(), &tgt).unwrap();
+    let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
     // Create something at the new target path
     let occupied = tgt_dir.path().join("occupied");
     std::fs::create_dir(&occupied).unwrap();
 
     let err = mgr
-        .update_bond(&bond.id, None, Some(occupied))
+        .update_bond(&bond.id, None, Some(occupied), None)
         .unwrap_err();
     assert!(matches!(err, BondError::AlreadyExists));
 }

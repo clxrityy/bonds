@@ -5,7 +5,12 @@ use clap::Parser;
 fn parse_add_with_target() {
     let cli = Cli::try_parse_from(["bond", "add", "/src", "/tgt"]).unwrap();
     match cli.command {
-        Commands::Add { source, target } => {
+        Commands::Add {
+            source,
+            target,
+            contents: _,
+            name: _,
+        } => {
             assert_eq!(source.to_str().unwrap(), "/src");
             assert_eq!(target.unwrap().to_str().unwrap(), "/tgt");
         }
@@ -17,7 +22,12 @@ fn parse_add_with_target() {
 fn parse_add_without_target() {
     let cli = Cli::try_parse_from(["bond", "add", "/src"]).unwrap();
     match cli.command {
-        Commands::Add { source, target } => {
+        Commands::Add {
+            source,
+            target,
+            contents: _,
+            name: _,
+        } => {
             assert_eq!(source.to_str().unwrap(), "/src");
             assert!(target.is_none());
         }
@@ -56,10 +66,11 @@ fn parse_remove_with_target_flag() {
 fn parse_update_target_only() {
     let cli = Cli::try_parse_from(["bond", "update", "abc123", "--target", "/new"]).unwrap();
     match cli.command {
-        Commands::Update { id, source, target } => {
+        Commands::Update { id, source, target, name } => {
             assert_eq!(id, "abc123");
             assert!(source.is_none());
             assert_eq!(target.unwrap().to_str().unwrap(), "/new");
+            assert!(name.is_none());
         }
         _ => panic!("expected Update"),
     }
@@ -69,12 +80,14 @@ fn parse_update_target_only() {
 fn parse_update_both() {
     let cli = Cli::try_parse_from([
         "bond", "update", "abc123", "--source", "/s", "--target", "/t",
-    ]).unwrap();
+    ])
+    .unwrap();
     match cli.command {
-        Commands::Update { id, source, target } => {
+        Commands::Update { id, source, target, name } => {
             assert_eq!(id, "abc123");
             assert_eq!(source.unwrap().to_str().unwrap(), "/s");
             assert_eq!(target.unwrap().to_str().unwrap(), "/t");
+            assert!(name.is_none());
         }
         _ => panic!("expected Update"),
     }
@@ -84,7 +97,9 @@ fn parse_update_both() {
 fn parse_config_set() {
     let cli = Cli::try_parse_from(["bond", "config", "set", "default", "/bonds"]).unwrap();
     match cli.command {
-        Commands::Config { action: ConfigAction::Set { key, value } } => {
+        Commands::Config {
+            action: ConfigAction::Set { key, value },
+        } => {
             assert_eq!(key, "default");
             assert_eq!(value, "/bonds");
         }
@@ -96,7 +111,9 @@ fn parse_config_set() {
 fn parse_config_get() {
     let cli = Cli::try_parse_from(["bond", "config", "get", "default"]).unwrap();
     match cli.command {
-        Commands::Config { action: ConfigAction::Get { key } } => {
+        Commands::Config {
+            action: ConfigAction::Get { key },
+        } => {
             assert_eq!(key, "default");
         }
         _ => panic!("expected Config Get"),

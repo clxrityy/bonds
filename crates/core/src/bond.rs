@@ -7,6 +7,7 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Bond {
     pub id: String,
+    pub name: Option<String>,
     pub source: PathBuf,
     pub target: PathBuf,
     pub created_at: DateTime<Utc>,
@@ -15,9 +16,10 @@ pub struct Bond {
 
 impl Bond {
     /// Create a new Bond with a UUID and current timestamp.
-    pub fn new(source: PathBuf, target: PathBuf) -> Self {
+    pub fn new(source: PathBuf, target: PathBuf, name: Option<String>) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
+            name,
             source,
             target,
             created_at: Utc::now(),
@@ -37,14 +39,14 @@ mod tests {
 
     #[test]
     fn new_generates_unique_ids() {
-        let a = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
-        let b = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
+        let a = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"), Some("bond_a".to_string()));
+        let b = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"), Some("bond_b".to_string()));
         assert_ne!(a.id, b.id); // UUID v4 should never collide
     }
 
     #[test]
     fn created_at_rfc3339_roundtrips() {
-        let bond = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"));
+        let bond = Bond::new(PathBuf::from("/a"), PathBuf::from("/b"), Some("bond".to_string()));
         let rfc = bond.created_at_rfc3339();
         // Verify it parses back cleanly
         let parsed = DateTime::parse_from_rfc3339(&rfc).unwrap();
@@ -53,7 +55,7 @@ mod tests {
 
     #[test]
     fn serializes_to_json() {
-        let bond = Bond::new(PathBuf::from("/src"), PathBuf::from("/tgt"));
+        let bond = Bond::new(PathBuf::from("/src"), PathBuf::from("/tgt"), Some("bond".to_string()));
         let json = serde_json::to_string(&bond).unwrap();
         let deserialized: Bond = serde_json::from_str(&json).unwrap();
         assert_eq!(bond, deserialized);
