@@ -79,38 +79,52 @@ impl BondManager {
         Ok(out)
     }
 
+    /// Parse a Bond from a rusqlite Row.
+    fn bond_from_row(&self, row: &rusqlite::Row) -> Result<Bond, BondError> {
+        let id: String = row.get(0).map_err(rusqlite::Error::from)?;
+        let source: String = row.get(1).map_err(rusqlite::Error::from)?;
+        let target: String = row.get(2).map_err(rusqlite::Error::from)?;
+        let created_at_str: String = row.get(3).map_err(rusqlite::Error::from)?;
+        let metadata_json: Option<String> = row.get(4).map_err(rusqlite::Error::from)?;
+
+        let created_at = DateTime::parse_from_rfc3339(&created_at_str)
+            .map(|dt| dt.with_timezone(&Utc))
+            .map_err(|e| BondError::InvalidPath(format!("invalid timestamp: {}", e)))?;
+
+        let metadata = match metadata_json {
+            Some(s) => Some(serde_json::from_str(&s)?),
+            None => None,
+        };
+
+        Ok(Bond {
+            id,
+            source: PathBuf::from(source),
+            target: PathBuf::from(target),
+            created_at,
+            metadata,
+        })
+    }
+
     /// Get a single bond by id.
     pub fn get_bond(&self, id: &str) -> Result<Bond, BondError> {
-        let mut stmt = self
-            .conn
-            .prepare("SELECT id, source, target, created_at, metadata FROM bonds WHERE id = ?1")?;
+        let mut stmt = self.conn.prepare(
+            "SELECT id, source, target, created_at, metadata FROM bonds WHERE id LIKE ?1 || '%'",
+        )?;
         let mut rows = stmt.query(params![id])?;
-        if let Some(row) = rows.next()? {
-            let id: String = row.get(0)?;
-            let source: String = row.get(1)?;
-            let target: String = row.get(2)?;
-            let created_at_str: String = row.get(3)?;
-            let metadata_json: Option<String> = row.get(4)?;
 
-            let created_at = DateTime::parse_from_rfc3339(&created_at_str)
-                .map(|dt| dt.with_timezone(&Utc))
-                .map_err(|e| BondError::InvalidPath(format!("invalid timestamp: {}", e)))?;
+        let first = match rows.next()? {
+            Some(row) => self.bond_from_row(row)?,
+            None => return Err(BondError::NotFound(id.to_string())),
+        };
 
-            let metadata = match metadata_json {
-                Some(s) => Some(serde_json::from_str(&s)?),
-                None => None,
-            };
-
-            Ok(Bond {
-                id,
-                source: PathBuf::from(source),
-                target: PathBuf::from(target),
-                created_at,
-                metadata,
-            })
-        } else {
-            Err(BondError::NotFound(id.to_string()))
+        // If there's a second match, the prefix is ambiguous
+        if rows.next()?.is_some() {
+            return Err(BondError::InvalidPath(format!(
+                "ambiguous ID prefix '{id}': try more characters"
+            )));
         }
+
+        Ok(first)
     }
 
     /// Create a symlink bond and persist it.
@@ -192,7 +206,7 @@ impl BondManager {
         }
 
         self.conn
-            .execute("DELETE FROM bonds WHERE id = ?1", params![id])?;
+            .execute("DELETE FROM bonds WHERE id = ?1", params![bond.id])?;
         Ok(bond)
     }
 
@@ -254,7 +268,13 @@ mod tests {
         assert_eq!(fetched.target, tgt_path);
 
         // Verify the symlink actually exists
-        assert!(tgt_path.symlink_metadata().unwrap().file_type().is_symlink());
+        assert!(
+            tgt_path
+                .symlink_metadata()
+                .unwrap()
+                .file_type()
+                .is_symlink()
+        );
     }
 
     #[test]

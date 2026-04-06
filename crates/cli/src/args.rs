@@ -43,4 +43,26 @@ pub enum Commands {
         #[arg(long)]
         with_target: bool,
     },
+
+    /// View or modify configuration
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum ConfigAction {
+    /// Get the current value of a config key
+    Get {
+        /// Config key to read (e.g., "default")
+        key: String,
+    },
+    /// Set a config key to a new value
+    Set {
+        /// Config key to set (e.g., "default")
+        key: String,
+        /// New value
+        value: String,
+    },
 }

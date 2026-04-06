@@ -13,10 +13,17 @@ pub fn cmd_add(
     let target = match target {
         Some(t) => t,
         None => {
+            let config = bonds_core::BondsConfig::load().unwrap_or_default(); // fail gracefully; don't block add
+
             let name = source
                 .file_name()
                 .ok_or_else(|| BondError::InvalidPath("source has no file name".into()))?;
-            std::env::current_dir()?.join(name)
+
+            // Use configured default_target if set, else fall back to CWD
+            match config.default_target {
+                Some(default_dir) => default_dir.join(name),
+                None => std::env::current_dir()?.join(name),
+            }
         }
     };
 

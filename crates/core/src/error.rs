@@ -20,4 +20,8 @@ pub enum BondError {
 
     #[error("Invalid path: {0}")]
     InvalidPath(String),
+
+    /// Configuration file parse or write error
+    #[error("config error: {0}")]
+    Config(String),
 }
