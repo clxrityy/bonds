@@ -1,7 +1,6 @@
-mod args;
+use bonds_cli::args::{Cli, Commands, ConfigAction};
 mod commands;
 
-use args::{Cli, Commands, ConfigAction};
 use clap::Parser;
 use commands::{cmd_add, cmd_config_get, cmd_config_set, cmd_info, cmd_list, cmd_remove, cmd_update};
 
