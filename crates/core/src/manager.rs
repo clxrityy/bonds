@@ -33,49 +33,13 @@ impl BondManager {
     /// List all bonds (most-recent first).
     pub fn list_bonds(&self) -> Result<Vec<Bond>, BondError> {
         let mut stmt = self.conn.prepare(
-            "SELECT id, source, target, created_at, metadata FROM bonds ORDER BY created_at DESC",
-        )?;
-        let rows = stmt.query_map([], |row| {
-            let id: String = row.get(0)?;
-            let source: String = row.get(1)?;
-            let target: String = row.get(2)?;
-            let created_at_str: String = row.get(3)?;
-            let metadata_json: Option<String> = row.get(4)?;
-
-            let created_at = DateTime::parse_from_rfc3339(&created_at_str)
-                .map(|dt| dt.with_timezone(&Utc))
-                .map_err(|e| {
-                    rusqlite::Error::FromSqlConversionFailure(
-                        3,
-                        rusqlite::types::Type::Text,
-                        Box::new(e),
-                    )
-                })?;
-
-            let metadata = match metadata_json {
-                Some(s) => Some(serde_json::from_str(&s).map_err(|e| {
-                    rusqlite::Error::FromSqlConversionFailure(
-                        4,
-                        rusqlite::types::Type::Text,
-                        Box::new(e),
-                    )
-                })?),
-                None => None,
-            };
-
-            Ok(Bond {
-                id,
-                name: None,
-                source: PathBuf::from(source),
-                target: PathBuf::from(target),
-                created_at,
-                metadata,
-            })
-        })?;
+        "SELECT id, name, source, target, created_at, metadata FROM bonds ORDER BY created_at DESC",
+    )?;
+        let mut rows = stmt.query([])?;
 
         let mut out = Vec::new();
-        for r in rows {
-            out.push(r?);
+        while let Some(row) = rows.next()? {
+            out.push(self.bond_from_row(row)?);
         }
         Ok(out)
     }

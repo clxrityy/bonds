@@ -9,11 +9,12 @@ pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
     }
 
     for bond in &bonds {
-        let display_name = bond.name.as_deref().unwrap_or("-");
+        let label = match &bond.name {
+            Some(name) => format!("{name} ({id})", id = &bond.id[..8]),
+            None => bond.id[..8].to_string(),
+        };
         println!(
-            "{id}  {name}  {src} -> {tgt}  ({date})",
-            id = &bond.id[..8],
-            name = display_name,
+            "{label}  -  {src} -> {tgt}  ({date})",
             src = bond.source.display(),
             tgt = bond.target.display(),
             date = bond.created_at.format("%Y-%m-%d %H:%M"),
