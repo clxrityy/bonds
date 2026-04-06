@@ -24,6 +24,9 @@ pub enum Commands {
         source: PathBuf,
         /// The target location (defaults to current directory + source name)
         target: Option<PathBuf>,
+        /// Bond each child of source as a separate bond into target
+        #[arg(long)]
+        contents: bool,
     },
 
     /// List all bonds
