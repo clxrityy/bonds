@@ -3,7 +3,7 @@ mod commands;
 
 use args::{Cli, Commands, ConfigAction};
 use clap::Parser;
-use commands::{cmd_add, cmd_config_get, cmd_config_set, cmd_info, cmd_list, cmd_remove};
+use commands::{cmd_add, cmd_config_get, cmd_config_set, cmd_info, cmd_list, cmd_remove, cmd_update};
 
 fn main() {
     let cli = Cli::parse();
@@ -28,6 +28,7 @@ fn main() {
                 Commands::Info { id } => cmd_info(&manager, &id),
                 Commands::Remove { id, with_target } => cmd_remove(&manager, &id, with_target),
                 Commands::Config { .. } => unreachable!(),
+                Commands::Update { id, source, target } => cmd_update(&manager, &id, source, target),
             }
         }
     };

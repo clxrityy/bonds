@@ -183,6 +183,78 @@ impl BondManager {
         Ok(bond)
     }
 
+    /// Update a bond's source and/or target.
+    /// Replaces the symlink on disk and updates the DB record.
+    pub fn update_bond(
+        &self,
+        id: &str,
+        new_source: Option<PathBuf>,
+        new_target: Option<PathBuf>,
+    ) -> Result<Bond, BondError> {
+        let mut bond = self.get_bond(id)?;
+
+        let source = match new_source {
+            Some(s) => {
+                if !s.exists() {
+                    return Err(BondError::InvalidPath(format!(
+                        "source does not exist: {:?}",
+                        s
+                    )));
+                }
+                s
+            }
+            None => bond.source.clone(),
+        };
+
+        let target = new_target.unwrap_or_else(|| bond.target.clone());
+
+        // Nothing to do if both are unchanged
+        if source == bond.source && target == bond.target {
+            return Ok(bond);
+        }
+
+        // Remove the old symlink (if it still exists)
+        if bond.target.exists() || bond.target.symlink_metadata().is_ok() {
+            fs::remove_file(&bond.target)?;
+        }
+
+        // If target changed and something already exists at the new path, reject
+        if target != bond.target && target.exists() {
+            return Err(BondError::AlreadyExists);
+        }
+
+        // Create parent dirs for new target if needed
+        if let Some(parent) = target.parent() {
+            fs::create_dir_all(parent)?;
+        }
+
+        // Create the new symlink
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(&source, &target)?;
+        #[cfg(windows)]
+        {
+            if source.is_dir() {
+                std::os::windows::fs::symlink_dir(&source, &target)?;
+            } else {
+                std::os::windows::fs::symlink_file(&source, &target)?;
+            }
+        }
+
+        // Update the DB record
+        self.conn.execute(
+            "UPDATE bonds SET source = ?1, target = ?2 WHERE id = ?3",
+            params![
+                source.to_string_lossy().to_string(),
+                target.to_string_lossy().to_string(),
+                bond.id,
+            ],
+        )?;
+
+        bond.source = source;
+        bond.target = target;
+        Ok(bond)
+    }
+
     /// Delete a bond by id. If `remove_target` is true, non-symlink targets are removed too.
     pub fn delete_bond(&self, id: &str, remove_target: bool) -> Result<Bond, BondError> {
         let bond = self.get_bond(id)?;

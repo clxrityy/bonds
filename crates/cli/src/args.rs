@@ -49,6 +49,18 @@ pub enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+
+    /// Update an existing bond's source or target
+    Update {
+        /// Bond ID (or prefix)
+        id: String,
+        /// New source path
+        #[arg(long)]
+        source: Option<PathBuf>,
+        /// New target path
+        #[arg(long)]
+        target: Option<PathBuf>,
+    },
 }
 
 #[derive(Subcommand)]
