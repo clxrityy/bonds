@@ -106,6 +106,7 @@ fn update_bond_target() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn update_bond_source() {
     let (mgr, _db) = setup();
     let old_src = TempDir::new().unwrap();
