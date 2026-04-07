@@ -250,6 +250,6 @@ fn create_bond_into_empty_dir() {
     std::fs::create_dir(&tgt).unwrap();
 
     // Should succeed -- empty dir gets replaced by symlink
-    let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
+    let _bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
     assert!(tgt.symlink_metadata().unwrap().file_type().is_symlink());
 }

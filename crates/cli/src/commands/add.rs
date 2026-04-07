@@ -37,11 +37,7 @@ pub fn cmd_add(
 }
 
 /// Bond each child of `source` as a separate bond into `target`.
-fn add_contents(
-    manager: &BondManager,
-    source: &PathBuf,
-    target: &Path,
-) -> Result<(), BondError> {
+fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Result<(), BondError> {
     if !source.is_dir() {
         return Err(BondError::InvalidPath(format!(
             "--contents requires a directory, got: {}",
