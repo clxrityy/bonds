@@ -4,24 +4,24 @@ pub fn cmd_info(manager: &BondManager, id: &str) -> Result<(), BondError> {
     let bond = manager.get_bond(id)?;
 
     println!("Bond Details:");
-    println!("  ID:      {}", bond.id);
-    println!("  Source:  {}", bond.source.display());
-    println!("  Target:  {}", bond.target.display());
+    println!("  ID:      {}", bond.id());
+    println!("  Source:  {}", bond.source().display());
+    println!("  Target:  {}", bond.target().display());
     println!(
         "  Created: {}",
-        bond.created_at.format("%Y-%m-%d %H:%M:%S UTC")
+        bond.created_at().format("%Y-%m-%d %H:%M:%S UTC")
     );
 
-    if let Some(meta) = &bond.metadata {
+    if let Some(meta) = bond.metadata() {
         println!("  Metadata:");
         for (k, v) in meta {
             println!("    {k}: {v}");
         }
     }
 
-    let target_exists = bond.target.exists();
+    let target_exists = bond.target().exists();
     let is_symlink = bond
-        .target
+        .target()
         .symlink_metadata()
         .map(|m| m.file_type().is_symlink())
         .unwrap_or(false);

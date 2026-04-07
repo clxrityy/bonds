@@ -9,15 +9,15 @@ pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
     }
 
     for bond in &bonds {
-        let label = match &bond.name {
-            Some(name) => format!("{name} ({id})", id = &bond.id[..8]),
-            None => bond.id[..8].to_string(),
+        let label = match bond.name() {
+            Some(name) => format!("{name} ({id})", id = &bond.id()[..8]),
+            None => bond.id()[..8].to_string(),
         };
         println!(
             "{label}  -  {src} -> {tgt}  ({date})",
-            src = bond.source.display(),
-            tgt = bond.target.display(),
-            date = bond.created_at.format("%Y-%m-%d %H:%M"),
+            src = bond.source().display(),
+            tgt = bond.target().display(),
+            date = bond.created_at().format("%Y-%m-%d %H:%M"),
         );
     }
 

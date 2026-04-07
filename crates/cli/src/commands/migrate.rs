@@ -21,28 +21,28 @@ pub fn cmd_migrate(
     };
 
     // Preserve the existing target's basename
-    let basename = bond.target.file_name().ok_or_else(|| {
+    let basename = bond.target().file_name().ok_or_else(|| {
         BondError::InvalidPath(format!(
             "target has no file name: {}",
-            bond.target.display()
+            bond.target().display()
         ))
     })?;
 
     let new_target = dest_dir.join(basename);
 
     // No-op if already there
-    if new_target == bond.target {
+    if new_target == bond.target() {
         println!("Bond '{}' is already at {}", id, new_target.display());
         return Ok(());
     }
 
     // Delegate to update_bond -- it handles symlink removal, creation, and DB update
-    let updated = manager.update_bond(&bond.id, None, Some(new_target), None)?;
+    let updated = manager.update_bond(&bond.id(), None, Some(new_target), None)?;
     println!("Bond migrated: {}", id);
     println!(
         "  {} -> {}",
-        updated.source.display(),
-        updated.target.display()
+        updated.source().display(),
+        updated.target().display()
     );
     Ok(())
 }

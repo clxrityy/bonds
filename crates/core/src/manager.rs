@@ -55,7 +55,7 @@ impl BondManager {
 
         let created_at = DateTime::parse_from_rfc3339(&created_at_str)
             .map(|dt| dt.with_timezone(&Utc))
-            .map_err(|e| BondError::InvalidPath(format!("invalid timestamp: {}", e)))?;
+            .map_err(|e| BondError::InvalidTimestamp(e.to_string()))?;
 
         let metadata = match metadata_json {
             Some(s) => Some(serde_json::from_str(&s)?),
@@ -291,7 +291,7 @@ impl BondManager {
     }
 
     /// Runs schema migration. Useful for testing with in-memory DBs.
-    pub fn from_connection(conn: Connection) -> Result<Self, BondError> {
+    pub(crate) fn from_connection(conn: Connection) -> Result<Self, BondError> {
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS bonds (
             id TEXT PRIMARY KEY,

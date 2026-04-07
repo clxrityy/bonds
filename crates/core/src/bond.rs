@@ -1,17 +1,17 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Representation of a bond (source -> target)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Bond {
-    pub id: String,
-    pub name: Option<String>,
-    pub source: PathBuf,
-    pub target: PathBuf,
-    pub created_at: DateTime<Utc>,
-    pub metadata: Option<HashMap<String, String>>,
+    pub(crate) id: String,
+    pub(crate) name: Option<String>,
+    pub(crate) source: PathBuf,
+    pub(crate) target: PathBuf,
+    pub(crate) created_at: DateTime<Utc>,
+    pub(crate) metadata: Option<HashMap<String, String>>,
 }
 
 impl Bond {
@@ -30,6 +30,25 @@ impl Bond {
     /// Helper to serialize `created_at` for DB storage.
     pub fn created_at_rfc3339(&self) -> String {
         self.created_at.to_rfc3339()
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+    pub fn source(&self) -> &Path {
+        &self.source
+    }
+    pub fn target(&self) -> &Path {
+        &self.target
+    }
+    pub fn created_at(&self) -> DateTime<Utc> {
+        self.created_at
+    }
+    pub fn metadata(&self) -> Option<&HashMap<String, String>> {
+        self.metadata.as_ref()
     }
 }
 

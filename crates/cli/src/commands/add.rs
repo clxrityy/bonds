@@ -31,8 +31,12 @@ pub fn cmd_add(
     }
 
     let bond = manager.create_bond(&source, &target, name)?;
-    println!("Bond created: {}", bond.id);
-    println!("  {} -> {}", bond.source.display(), bond.target.display());
+    println!("Bond created: {}", bond.id());
+    println!(
+        "  {} -> {}",
+        bond.source().display(),
+        bond.target().display()
+    );
     Ok(())
 }
 
@@ -63,7 +67,11 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
 
         match manager.create_bond(&child, &child_target, None) {
             Ok(bond) => {
-                println!("  {} -> {}", bond.source.display(), bond.target.display());
+                println!(
+                    "  {} -> {}",
+                    bond.source().display(),
+                    bond.target().display()
+                );
                 created += 1;
             }
             Err(e) => {

@@ -1,3 +1,10 @@
+#![warn(missing_docs)]
+
+//! # bonds-core
+//!
+//! Core library for creating and managing bonds (symlink-based directory links)
+//! backed by SQLite persistence.
+
 pub mod bond;
 pub mod config;
 pub mod error;

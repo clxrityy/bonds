@@ -25,10 +25,10 @@ fn full_lifecycle_create_list_delete() {
     // List
     let bonds = mgr.list_bonds().unwrap();
     assert_eq!(bonds.len(), 1);
-    assert_eq!(bonds[0].id, bond.id);
+    assert_eq!(bonds[0].id(), bond.id());
 
     // Delete
-    mgr.delete_bond(&bond.id, false).unwrap();
+    mgr.delete_bond(&bond.id(), false).unwrap();
     assert!(!tgt.exists());
     assert!(mgr.list_bonds().unwrap().is_empty());
 }
@@ -68,12 +68,12 @@ fn delete_with_target_removes_actual_files() {
     std::fs::write(tgt.join("file.txt"), "data").unwrap();
 
     // Without --with-target, this should error
-    let err = mgr.delete_bond(&bond.id, false).unwrap_err();
+    let err = mgr.delete_bond(&bond.id(), false).unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
     // With --with-target, it should succeed and remove everything
-    let removed = mgr.delete_bond(&bond.id, true).unwrap();
-    assert_eq!(removed.id, bond.id);
+    let removed = mgr.delete_bond(&bond.id(), true).unwrap();
+    assert_eq!(removed.id(), bond.id());
     assert!(!tgt.exists());
 }
 
@@ -92,17 +92,17 @@ fn update_bond_target() {
 
     // Update only target
     let updated = mgr
-        .update_bond(&bond.id, None, Some(new_tgt.clone()), None)
+        .update_bond(&bond.id(), None, Some(new_tgt.clone()), None)
         .unwrap();
-    assert_eq!(updated.id, bond.id); // same bond
-    assert_eq!(updated.target, new_tgt); // target changed
-    assert_eq!(updated.source, bond.source); // source unchanged
+    assert_eq!(updated.id(), bond.id()); // same bond
+    assert_eq!(updated.target(), new_tgt); // target changed
+    assert_eq!(updated.source(), bond.source()); // source unchanged
     assert!(!old_tgt.exists()); // old symlink removed
     assert!(new_tgt.symlink_metadata().unwrap().file_type().is_symlink()); // new symlink exists
 
     // Verify DB is consistent
-    let fetched = mgr.get_bond(&bond.id).unwrap();
-    assert_eq!(fetched.target, new_tgt);
+    let fetched = mgr.get_bond(&bond.id()).unwrap();
+    assert_eq!(fetched.target(), new_tgt);
 }
 
 #[test]
@@ -125,9 +125,9 @@ fn update_bond_source() {
 
     // Update source
     let updated = mgr
-        .update_bond(&bond.id, Some(new_src.path().to_path_buf()), None, None)
+        .update_bond(&bond.id(), Some(new_src.path().to_path_buf()), None, None)
         .unwrap();
-    assert_eq!(updated.source, new_src.path());
+    assert_eq!(updated.source(), new_src.path());
 
     // Symlink now points to new source
     assert!(tgt.join("b.txt").exists());
@@ -146,7 +146,7 @@ fn update_bond_rejects_missing_source() {
 
     let bad_src = std::path::PathBuf::from("/nonexistent/path");
     let err = mgr
-        .update_bond(&bond.id, Some(bad_src), None, None)
+        .update_bond(&bond.id(), Some(bad_src), None, None)
         .unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
@@ -169,7 +169,7 @@ fn update_bond_rejects_occupied_target() {
     std::fs::create_dir(&occupied).unwrap();
 
     let err = mgr
-        .update_bond(&bond.id, None, Some(occupied), None)
+        .update_bond(&bond.id(), None, Some(occupied), None)
         .unwrap_err();
     assert!(matches!(err, BondError::AlreadyExists));
 }
@@ -185,15 +185,15 @@ fn create_and_lookup_by_name() {
     let bond = mgr
         .create_bond(src.path(), &tgt, Some("my-project".into()))
         .unwrap();
-    assert_eq!(bond.name.as_deref(), Some("my-project"));
+    assert_eq!(bond.name().as_deref(), Some("my-project"));
 
     // Lookup by name
     let found = mgr.get_bond("my-project").unwrap();
-    assert_eq!(found.id, bond.id);
+    assert_eq!(found.id(), bond.id());
 
     // Name should appear in list
     let all = mgr.list_bonds().unwrap();
-    assert_eq!(all[0].name.as_deref(), Some("my-project"));
+    assert_eq!(all[0].name().as_deref(), Some("my-project"));
 }
 
 #[test]
@@ -223,9 +223,9 @@ fn get_bond_by_prefix() {
     let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
     // First 8 chars should resolve
-    let prefix = &bond.id[..8];
+    let prefix = &bond.id()[..8];
     let found = mgr.get_bond(prefix).unwrap();
-    assert_eq!(found.id, bond.id);
+    assert_eq!(found.id(), bond.id());
 }
 
 #[test]
@@ -241,13 +241,13 @@ fn update_bond_name() {
         .unwrap();
 
     let updated = mgr
-        .update_bond(&bond.id, None, None, Some("new-name".into()))
+        .update_bond(&bond.id(), None, None, Some("new-name".into()))
         .unwrap();
-    assert_eq!(updated.name.as_deref(), Some("new-name"));
+    assert_eq!(updated.name().as_deref(), Some("new-name"));
 
     // Lookup by new name works
     let found = mgr.get_bond("new-name").unwrap();
-    assert_eq!(found.id, bond.id);
+    assert_eq!(found.id(), bond.id());
 }
 
 #[test]

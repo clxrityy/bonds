@@ -27,4 +27,10 @@ pub enum BondError {
     /// Configuration file parse or write error
     #[error("config error: {0}")]
     Config(String),
+
+    #[error("ambiguous identifier '{0}': use more characters")]
+    AmbiguousId(String),
+
+    #[error("invalid timestamp: {0}")]
+    InvalidTimestamp(String),
 }

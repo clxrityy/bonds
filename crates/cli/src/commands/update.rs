@@ -31,7 +31,11 @@ pub fn cmd_update(
     };
 
     let bond = manager.update_bond(id, source, target, name)?;
-    println!("Bond updated: {}", &bond.id[..8]);
-    println!("  {} -> {}", bond.source.display(), bond.target.display());
+    println!("Bond updated: {}", &bond.id()[..8]);
+    println!(
+        "  {} -> {}",
+        bond.source().display(),
+        bond.target().display()
+    );
     Ok(())
 }
