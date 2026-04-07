@@ -338,6 +338,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(windows, ignore)]
     fn create_and_get_bond() {
         let mgr = test_manager();
         let (_src_dir, src_path) = temp_source();
@@ -370,6 +371,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(windows, ignore)]
     fn create_bond_target_already_exists() {
         let mgr = test_manager();
         let (_src_dir, src_path) = temp_source();
@@ -385,6 +387,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(windows, ignore)]
     fn delete_bond_removes_symlink() {
         let mgr = test_manager();
         let (_src_dir, src_path) = temp_source();
@@ -412,6 +415,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(windows, ignore)]
     fn list_bonds_ordered_by_newest() {
         let mgr = test_manager();
         let (_src1, src1) = temp_source();

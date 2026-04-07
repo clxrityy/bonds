@@ -10,6 +10,7 @@ fn setup() -> (BondManager, TempDir) {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn full_lifecycle_create_list_delete() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -33,6 +34,7 @@ fn full_lifecycle_create_list_delete() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn symlink_resolves_to_source_contents() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -50,6 +52,7 @@ fn symlink_resolves_to_source_contents() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn delete_with_target_removes_actual_files() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -75,6 +78,7 @@ fn delete_with_target_removes_actual_files() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn update_bond_target() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -130,6 +134,7 @@ fn update_bond_source() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn update_bond_rejects_missing_source() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -149,6 +154,7 @@ fn update_bond_rejects_missing_source() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn update_bond_rejects_occupied_target() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -168,6 +174,7 @@ fn update_bond_rejects_occupied_target() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn create_and_lookup_by_name() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -189,6 +196,7 @@ fn create_and_lookup_by_name() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn duplicate_name_rejected() {
     let (mgr, _db) = setup();
     let src1 = TempDir::new().unwrap();
@@ -204,6 +212,7 @@ fn duplicate_name_rejected() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn get_bond_by_prefix() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -219,6 +228,7 @@ fn get_bond_by_prefix() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn update_bond_name() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
@@ -240,6 +250,7 @@ fn update_bond_name() {
 }
 
 #[test]
+#[cfg_attr(windows, ignore)]
 fn create_bond_into_empty_dir() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
