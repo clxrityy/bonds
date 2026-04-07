@@ -1,5 +1,5 @@
 use bonds_core::{BondError, BondManager};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub fn cmd_add(
     manager: &BondManager,
@@ -40,7 +40,7 @@ pub fn cmd_add(
 fn add_contents(
     manager: &BondManager,
     source: &PathBuf,
-    target: &PathBuf,
+    target: &Path,
 ) -> Result<(), BondError> {
     if !source.is_dir() {
         return Err(BondError::InvalidPath(format!(

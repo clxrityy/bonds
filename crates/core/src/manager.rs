@@ -46,12 +46,12 @@ impl BondManager {
 
     /// Parse a Bond from a rusqlite Row.
     fn bond_from_row(&self, row: &rusqlite::Row) -> Result<Bond, BondError> {
-        let id: String = row.get(0).map_err(rusqlite::Error::from)?;
-        let name: Option<String> = row.get(1).map_err(rusqlite::Error::from)?;
-        let source: String = row.get(2).map_err(rusqlite::Error::from)?;
-        let target: String = row.get(3).map_err(rusqlite::Error::from)?;
-        let created_at_str: String = row.get(4).map_err(rusqlite::Error::from)?;
-        let metadata_json: Option<String> = row.get(5).map_err(rusqlite::Error::from)?;
+        let id: String = row.get(0)?;
+        let name: Option<String> = row.get(1)?;
+        let source: String = row.get(2)?;
+        let target: String = row.get(3)?;
+        let created_at_str: String = row.get(4)?;
+        let metadata_json: Option<String> = row.get(5)?;
 
         let created_at = DateTime::parse_from_rfc3339(&created_at_str)
             .map(|dt| dt.with_timezone(&Utc))
@@ -168,7 +168,7 @@ impl BondManager {
         let metadata_json: Option<String> = bond
             .metadata
             .as_ref()
-            .map(|m| serde_json::to_string(m))
+            .map(serde_json::to_string)
             .transpose()?;
 
         self.conn.execute(
