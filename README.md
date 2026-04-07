@@ -5,12 +5,16 @@ A tool for creating and managing "bonds" between files and directories.
 > Build with [symlinks](https://en.wikipedia.org/wiki/Symbolic_link) and a [SQLite](https://www.sqlite.org/)
 >> Inspired by [GNU Stow](https://www.gnu.org/software/stow/)
 
+## Status
+
 - [x] Basic core & CLI
 - [ ] Library API
 - [ ] GUI application
 - [ ] Ecosystem & plugins
 
 ---
+
+### Usage
 
 - [Creating a bond](#creating-a-bond)
 - [Listing bonds](#listing-bonds)
