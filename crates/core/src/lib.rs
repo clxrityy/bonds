@@ -1,9 +1,9 @@
 pub mod bond;
+pub mod config;
 pub mod error;
 pub mod manager;
-pub mod config;
 
 pub use bond::Bond;
+pub use config::BondsConfig;
 pub use error::BondError;
 pub use manager::BondManager;
-pub use config::BondsConfig;

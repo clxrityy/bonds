@@ -7,7 +7,10 @@ pub fn cmd_info(manager: &BondManager, id: &str) -> Result<(), BondError> {
     println!("  ID:      {}", bond.id);
     println!("  Source:  {}", bond.source.display());
     println!("  Target:  {}", bond.target.display());
-    println!("  Created: {}", bond.created_at.format("%Y-%m-%d %H:%M:%S UTC"));
+    println!(
+        "  Created: {}",
+        bond.created_at.format("%Y-%m-%d %H:%M:%S UTC")
+    );
 
     if let Some(meta) = &bond.metadata {
         println!("  Metadata:");

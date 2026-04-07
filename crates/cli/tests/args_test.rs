@@ -66,7 +66,12 @@ fn parse_remove_with_target_flag() {
 fn parse_update_target_only() {
     let cli = Cli::try_parse_from(["bond", "update", "abc123", "--target", "/new"]).unwrap();
     match cli.command {
-        Commands::Update { id, source, target, name } => {
+        Commands::Update {
+            id,
+            source,
+            target,
+            name,
+        } => {
             assert_eq!(id, "abc123");
             assert!(source.is_none());
             assert_eq!(target.unwrap().to_str().unwrap(), "/new");
@@ -83,7 +88,12 @@ fn parse_update_both() {
     ])
     .unwrap();
     match cli.command {
-        Commands::Update { id, source, target, name } => {
+        Commands::Update {
+            id,
+            source,
+            target,
+            name,
+        } => {
             assert_eq!(id, "abc123");
             assert_eq!(source.unwrap().to_str().unwrap(), "/s");
             assert_eq!(target.unwrap().to_str().unwrap(), "/t");
@@ -125,4 +135,58 @@ fn parse_global_db_flag() {
     let cli = Cli::try_parse_from(["bond", "--db", "/tmp/test.db", "list"]).unwrap();
     assert_eq!(cli.db.unwrap().to_str().unwrap(), "/tmp/test.db");
     assert!(matches!(cli.command, Commands::List));
+}
+
+#[test]
+fn parse_add_contents() {
+    let cli = Cli::try_parse_from(["bond", "add", "/src", "/tgt", "--contents"]).unwrap();
+    match cli.command {
+        Commands::Add { contents, .. } => assert!(contents),
+        _ => panic!("expected Add"),
+    }
+}
+
+#[test]
+fn parse_add_with_name() {
+    let cli = Cli::try_parse_from(["bond", "add", "/src", "--name", "foo"]).unwrap();
+    match cli.command {
+        Commands::Add { name, .. } => assert_eq!(name.unwrap(), "foo"),
+        _ => panic!("expected Add"),
+    }
+}
+
+#[test]
+fn parse_update_with_name() {
+    let cli = Cli::try_parse_from(["bond", "update", "abc", "--name", "bar"]).unwrap();
+    match cli.command {
+        Commands::Update { id, name, .. } => {
+            assert_eq!(id, "abc");
+            assert_eq!(name.unwrap(), "bar");
+        }
+        _ => panic!("expected Update"),
+    }
+}
+
+#[test]
+fn parse_migrate_with_dest() {
+    let cli = Cli::try_parse_from(["bond", "migrate", "foo", "/new/dir"]).unwrap();
+    match cli.command {
+        Commands::Migrate { id, dest } => {
+            assert_eq!(id, "foo");
+            assert_eq!(dest.unwrap().to_str().unwrap(), "/new/dir");
+        }
+        _ => panic!("expected Migrate"),
+    }
+}
+
+#[test]
+fn parse_migrate_without_dest() {
+    let cli = Cli::try_parse_from(["bond", "migrate", "foo"]).unwrap();
+    match cli.command {
+        Commands::Migrate { id, dest } => {
+            assert_eq!(id, "foo");
+            assert!(dest.is_none());
+        }
+        _ => panic!("expected Migrate"),
+    }
 }

@@ -213,7 +213,7 @@ impl BondManager {
         let target = new_target.unwrap_or_else(|| bond.target.clone());
 
         // Nothing to do if both are unchanged
-        if source == bond.source && target == bond.target {
+        if source == bond.source && target == bond.target && new_name.is_none() {
             return Ok(bond);
         }
 
@@ -374,11 +374,14 @@ mod tests {
         let mgr = test_manager();
         let (_src_dir, src_path) = temp_source();
         let tgt_dir = TempDir::new().unwrap();
-        // Target is the dir itself -- it already exists
-        let tgt_path = tgt_dir.path().to_path_buf();
+        let tgt_path = tgt_dir.path().join("occupied");
+
+        // Create a non-empty directory at the target
+        std::fs::create_dir(&tgt_path).unwrap();
+        std::fs::write(tgt_path.join("file.txt"), "data").unwrap();
 
         let result = mgr.create_bond(&src_path, &tgt_path, None);
-        assert!(matches!(result, Err(BondError::AlreadyExists)));
+        assert!(matches!(result, Err(BondError::TargetExists(_))));
     }
 
     #[test]

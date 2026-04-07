@@ -44,7 +44,8 @@ fn add_contents(
 ) -> Result<(), BondError> {
     if !source.is_dir() {
         return Err(BondError::InvalidPath(format!(
-            "--contents requires a directory, got: {}", source.display()
+            "--contents requires a directory, got: {}",
+            source.display()
         )));
     }
 
