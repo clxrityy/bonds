@@ -98,9 +98,7 @@ impl BondManager {
         };
 
         if rows.next()?.is_some() {
-            return Err(BondError::InvalidPath(format!(
-                "ambiguous ID prefix '{identifier}': try more characters"
-            )));
+            return Err(BondError::AmbiguousId(identifier.to_string()));
         }
 
         Ok(first)
