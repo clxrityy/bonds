@@ -1,0 +1,83 @@
+site_name: Bonds Documentation
+site_description: Bonds CLI and library API documentation
+site_url: https://clxrityy.github.io/bonds/
+repo_url: https://github.com/clxrityy/bonds
+repo_name: clxrityy/bonds
+edit_uri: edit/master/docs/content/
+
+docs_dir: content
+
+theme:
+  name: material
+  language: en
+  custom_dir: overrides
+  logo: assets/img/logo.svg
+  favicon: assets/meta/favicon.ico
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.code.annotate
+    - search.highlight
+    - search.suggest
+
+  # Tune palette to your brand as needed
+  palette:
+    - scheme: default
+      primary: blue grey
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/extra.js
+
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - CLI: cli.md
+  - Library API:
+      - Overview: library/overview.md
+      - Metadata: library/metadata.md
+      - Events: library/events.md
+      - Querying: library/querying.md
+      - API Reference:
+        - bonds-core: library/core-api.md
+        - bonds-cli: library/cli-api.md
+  - Architecture: architecture.md
+  - Roadmap: roadmap.md
