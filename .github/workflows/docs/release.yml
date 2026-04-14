@@ -1,0 +1,151 @@
+name: Docs Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version label (e.g. v0.2.0)"
+        required: true
+        type: string
+      include_api:
+        description: "Build Rust API docs"
+        required: true
+        default: true
+        type: boolean
+      include_guides:
+        description: "Build MkDocs guides"
+        required: true
+        default: true
+        type: boolean
+      publish_latest:
+        description: "Also publish to /latest/"
+        required: true
+        default: true
+        type: boolean
+      profile:
+        description: "strict or fast"
+        required: true
+        default: "strict"
+        type: choice
+        options: [strict, fast]
+      dry_run:
+        description: "Build only; skip deploy"
+        required: true
+        default: false
+        type: boolean
+
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      # On manual runs: from input. On tag runs: use tag name.
+      VERSION: ${{ inputs.version || github.ref_name }}
+      DOCS_PROFILE: ${{ inputs.profile || 'strict' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Initialize site directory
+        run: mkdir -p site
+
+      - name: Build guides
+        # Build guides first so API copy step cannot be wiped by mkdocs output.
+        if: ${{ github.event_name == 'push' || inputs.include_guides == true }}
+        run: mkdocs build --strict -f docs/mkdocs.yml -d site
+
+      - name: Build API docs
+        if: ${{ github.event_name == 'push' || inputs.include_api == true }}
+        env:
+          RUSTDOCFLAGS: ${{ env.DOCS_PROFILE == 'strict' && '-D warnings' || '' }}
+        run: |
+          cargo doc --workspace --no-deps
+          mkdir -p site/api
+          cp -R target/doc/* site/api/
+
+      - name: Create API redirect
+        if: ${{ github.event_name == 'push' || inputs.include_api == true }}
+        run: |
+          cat > site/api/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Bonds API Docs</title>
+            </head>
+            <body>
+              <h1>Bonds API Docs</h1>
+              <ul>
+                <li><a href="./bonds_core/">core</a></li>
+                <li><a href="./bonds_cli/">cli</a></li>
+                <li><a href="./bond/">bond (binary)</a></li>
+              </ul>
+            </body>
+          </html>
+          HTML
+
+      - name: Add root redirect when only API is built
+        # If guides are intentionally excluded, keep / usable by redirecting to /api/.
+        if: >
+          (github.event_name == 'workflow_dispatch' &&
+          inputs.include_api == true &&
+          inputs.include_guides == false)
+        run: |
+          cat > site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=./api/" />
+              <title>Bonds Docs</title>
+            </head>
+            <body>
+              <p>Redirecting to <a href="./api/">API docs</a>...</p>
+            </body>
+          </html>
+          HTML
+
+      - name: Deploy versioned docs
+        if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          destination_dir: versions/${{ env.VERSION }}
+          keep_files: true
+
+      - name: Deploy latest alias
+        # Tag pushes publish latest automatically.
+        # Manual runs publish latest only when requested.
+        if: >
+          github.event_name == 'push' ||
+          (github.event_name == 'workflow_dispatch' &&
+          inputs.dry_run == false &&
+          inputs.publish_latest == true)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          destination_dir: latest
+          keep_files: true

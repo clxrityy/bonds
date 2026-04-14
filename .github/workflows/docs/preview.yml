@@ -1,0 +1,97 @@
+name: Docs Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    paths:
+      - "crates/core/**"
+      - "docs/**"
+      - "scripts/docs/**"
+      - ".github/workflows/docs-*.yml"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number for preview path (manual runs)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: docs-preview-${{ github.event.pull_request.number || inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Manual dispatch always allowed.
+    # For PR events, run only when labeled `docs-preview`.
+    # Also skip forked PR deployment to avoid permission failures.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        contains(github.event.pull_request.labels.*.name, 'docs-preview')
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build guide docs first
+        # Build guides into final site root.
+        run: mkdocs build --strict -f docs/mkdocs.yml -d site
+
+      - name: Build API docs
+        # Build rustdoc separately, then copy into /api.
+        run: |
+          cargo doc --workspace --no-deps
+          mkdir -p site/api
+          cp -R target/doc/* site/api/
+
+      - name: Add API index redirect
+        run: |
+          cat > site/api/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Bonds API Docs</title>
+            </head>
+            <body>
+              <h1>Bonds API Docs</h1>
+              <ul>
+                <li><a href="./bonds_core/">core</a></li>
+                <li><a href="./bonds_cli/">cli</a></li>
+                <li><a href="./bond/">bond (binary)</a></li>
+              </ul>
+            </body>
+          </html>
+          HTML
+
+      - name: Deploy preview to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          destination_dir: previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}
+          keep_files: true
+
+      - name: Comment preview URL
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            Docs preview:
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/pr-${{ github.event.pull_request.number }}/

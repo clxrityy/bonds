@@ -1,0 +1,70 @@
+name: Docs Check
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "crates/core/**"
+      - "docs/**"
+      - "scripts/docs/**"
+      - ".github/workflows/docs-*.yml"
+  push:
+    branches: [master]
+    paths:
+      - "crates/core/**"
+      - "docs/**"
+      - "scripts/docs/**"
+      - ".github/workflows/docs-*.yml"
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "strict or fast"
+        required: true
+        default: "strict"
+        type: choice
+        options: [strict, fast]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      DOCS_PROFILE: ${{ inputs.profile || 'strict' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build API docs (strict optionally)
+        env:
+          # In strict mode, rustdoc warnings fail the build.
+          RUSTDOCFLAGS: ${{ env.DOCS_PROFILE == 'strict' && '-D warnings' || '' }}
+        run: cargo doc --workspace --no-deps
+
+      - name: Run doctests
+        run: cargo test --workspace --doc
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build guide docs
+        # --strict fails on nav/link/reference warnings inside MkDocs.
+        run: mkdocs build --strict -f docs/mkdocs.yml -d site
+
+      - name: Link-check generated HTML
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --verbose --exclude-mail site/**/*.html
