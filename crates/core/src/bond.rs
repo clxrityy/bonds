@@ -31,22 +31,27 @@ impl Bond {
     pub fn created_at_rfc3339(&self) -> String {
         self.created_at.to_rfc3339()
     }
-
+    /// Returns the bond's unique identifier (UUID string).
     pub fn id(&self) -> &str {
         &self.id
     }
+    /// Returns the optional human-friendly bond name.
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
     }
+    /// Returns the source path this bond links from.
     pub fn source(&self) -> &Path {
         &self.source
     }
+    /// Returns the target symlink path this bond links to.
     pub fn target(&self) -> &Path {
         &self.target
     }
+    /// Returns the timestamp when the bond was created.
     pub fn created_at(&self) -> DateTime<Utc> {
         self.created_at
     }
+    /// Returns optional key/value metadata associated with this bond.
     pub fn metadata(&self) -> Option<&HashMap<String, String>> {
         self.metadata.as_ref()
     }
