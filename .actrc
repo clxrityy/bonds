@@ -1,0 +1,5 @@
+# Use x86_64 containers on Apple Silicon for best compatibility with marketplace actions.
+--container-architecture=linux/amd64
+--platform=ubuntu-latest=ghcr.io/catthehacker/ubuntu:full-latest
+--platform=ubuntu-24.04=ghcr.io/catthehacker/ubuntu:full-24.04
+--platform=ubuntu-22.04=ghcr.io/catthehacker/ubuntu:full-22.04
