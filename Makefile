@@ -1,0 +1,78 @@
+# ---------------------------------------
+# Self-documenting help target.
+# Parses ## comments on each target line.
+# ---------------------------------------
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+
+	@echo 'Available targets:'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+    | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+# ---------------------------------------
+# Setup targets.
+# ---------------------------------------
+setup-docs-venv: ## Setup .venv	for documentation generation
+	@python3 -m venv .venv
+	@.venv/bin/pip install -r docs/requirements.txt
+	bash -c "source .venv/bin/activate"
+
+# ---------------------------------------
+# Testing targets.
+# ---------------------------------------
+test: ## Run all tests
+	cargo test --workspace
+
+test-core: ## Run tests for the core library
+	cargo test -p bonds-core
+
+test-cli: ## Run tests for the CLI
+	cargo test -p bonds-cli
+
+test-docs:	## Run documentation tests for the workspace
+	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps
+	cargo test --workspace --doc
+
+test-docs-release: ## Trigger the documentation release workflow with test inputs.
+	@act workflow_dispatch -W .github/workflows/docs/release.yml \
+  --input version=v0.1.0 \
+  --input include_api=true \
+  --input include_guides=true \
+  --input publish_latest=false \
+  --input profile=strict \
+  --input dry_run=true
+
+# ---------------------------------------
+# Linting targets.
+# ---------------------------------------
+lint: ## Run all linters
+	cargo fmt --all --check
+	cargo clippy --workspace
+
+lint-fix: ## Run all linters and fix issues
+	cargo fmt --all
+	cargo clippy --workspace --fix
+
+lint-actions:	## Run linters with GitHub Actions annotations
+	@actionlint -config-file .github/actionlint.yaml -verbose
+
+# ---------------------------------------
+# Build targets.
+# ---------------------------------------
+build: ## Build all packages
+	cargo build --workspace
+
+# build-release: ## Build all packages in release mode
+#	cargo build --workspace --release
+
+# ---------------------------------------
+# Documentation targets.
+# ---------------------------------------
+docs-dev: setup-docs-venv ## Build documentation for all packages
+	rm -rf docs/site
+	.venv/bin/mkdocs build --strict -f docs/mkdocs.yml
+	cargo doc --workspace --no-deps
+	mkdir -p docs/site/api
+	cp -R target/doc/* docs/site/api/
+	@echo	'Documentation built at docs/site. Open docs/site/index.html to view.'
