@@ -37,7 +37,7 @@ pub fn cmd_migrate(
     }
 
     // Delegate to update_bond -- it handles symlink removal, creation, and DB update
-    let updated = manager.update_bond(&bond.id(), None, Some(new_target), None)?;
+    let updated = manager.update_bond(bond.id(), None, Some(new_target), None)?;
     println!("Bond migrated: {}", id);
     println!(
         "  {} -> {}",
