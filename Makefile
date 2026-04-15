@@ -3,11 +3,6 @@
 #	----------------------------------------
 VERSION ?= v0.1.0
 DOCS_PROFILE ?= strict
-# Tag + push a release for the current version.
-# Usage:
-#   make tag-release TAG=v0.1.0
-#   make tag-release TAG=core-v0.1.0
-#   make tag-release TAG=cli-v0.1.0
 TAG ?= $(VERSION)
 
 # ---------------------------------------
@@ -100,9 +95,23 @@ docs-dev: setup-docs-venv ## Build documentation for all packages
 #	---------------------------------------
 # Release targets.
 #	---------------------------------------
-tag-release: ## Create and push a git tag that triggers the release/publish workflows
-	@git tag -a $(TAG) -m "Release $(TAG)"
-	@git push origin $(TAG)
+tag-release: ## Tag + push a release for the current version. Usages: `make tag-release TAG=v0.1.0` `make tag-release TAG=core-v0.1.0` `make tag-release TAG=cli-v0.1.0`
+	@set -euo pipefail; \
+		if ! git diff --quiet || ! git diff --cached --quiet; then \
+				echo "Working tree has uncommitted changes; commit or stash first."; \
+    exit 1; \
+		fi; \
+   if git rev-parse -q --verify "refs/tags/$(TAG)" >/dev/null; then \
+    echo "Tag $(TAG) already exists locally."; \
+    exit 1; \
+  fi; \
+  if git ls-remote --exit-code --tags origin "refs/tags/$(TAG)" >/dev/null 2>&1; then \
+    echo "Tag $(TAG) already exists on origin."; \
+    exit 1; \
+  fi; \
+  echo "Creating and pushing tag $(TAG)"; \
+  git tag -a "$(TAG)" -m "Release $(TAG)"; \
+  git push origin "$(TAG)"
 
 # ---------------------------------------
 # Utility targets.
