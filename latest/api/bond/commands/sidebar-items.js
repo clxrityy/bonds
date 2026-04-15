@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["add","config","info","list","migrate","remove","update"]};

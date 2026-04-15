@@ -1,0 +1,2 @@
+createSrcSidebar('[["bond",["",[["commands",[],["add.rs","config.rs","info.rs","list.rs","migrate.rs","mod.rs","remove.rs","update.rs"]]],["main.rs"]]],["bonds_cli",["",[],["args.rs","lib.rs"]]],["bonds_core",["",[],["bond.rs","config.rs","error.rs","lib.rs","manager.rs"]]]]');
+//{"start":19,"fragment_lengths":[132,43,80]}
