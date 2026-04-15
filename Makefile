@@ -42,7 +42,7 @@ test-docs:	## Run documentation tests for the workspace
 	cargo test --workspace --doc
 
 test-docs-release: ## Trigger the documentation release workflow with test inputs. Usage: make test-docs-release VERSION=v0.1.0 DOCS_PROFILE=strict
-	@act workflow_dispatch -W .github/workflows/docs/release.yml \
+	@act workflow_dispatch -W .github/workflows/docs-release.yml \
  --input version=$(VERSION) \
  --input include_api=true \
  --input include_guides=true \
@@ -51,13 +51,13 @@ test-docs-release: ## Trigger the documentation release workflow with test input
  --input dry_run=true
 
 test-publish:	## Trigger the publish workflow with test inputs
-	@act workflow_dispatch -W .github/workflows/publish.yml --input target=all --input dry_run=true
+	@act workflow_dispatch -W .github/workflows/release/tag.yml --input target=all --input dry_run=true
 
 test-publish-core:	## Trigger the publish workflow for the core package with test inputs
-	@act workflow_dispatch -W .github/workflows/publish.yml --input target=core --input dry_run=true
+	@act workflow_dispatch -W .github/workflows/release/tag.yml --input target=core --input dry_run=true
 
 test-publish-cli:	## Trigger the publish workflow for the CLI package with test inputs
-	@act workflow_dispatch -W .github/workflows/publish.yml --input target=cli --input dry_run=true
+	@act workflow_dispatch -W .github/workflows/release/tag.yml --input target=cli --input dry_run=true
 
 # ---------------------------------------
 # Linting targets.
