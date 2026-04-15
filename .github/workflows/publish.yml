@@ -115,22 +115,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Always verify core package when requested.
           if [ "$PUBLISH_CORE" = "true" ]; then
             cargo package -p bonds-core --locked
           fi
 
-          # CLI package verification depends on bonds-core existing in crates.io.
           if [ "$PUBLISH_CLI" = "true" ]; then
             if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
               cargo package -p bonds-cli --locked
             elif [ "$PUBLISH_CORE" = "true" ]; then
-              # "all" flow before core is published in this run: do a compile-level sanity check.
-              echo "bonds-core ${CORE_VERSION} not on crates.io yet; skipping strict CLI package verify pre-publish."
+              echo "bonds-core ${CORE_VERSION} not on crates.io yet; using cargo check for bonds-cli preflight."
               cargo check -p bonds-cli --locked
             else
-              # "cli-only" flow must fail fast if core isn't published.
-              echo "::error::Cannot verify/publish bonds-cli: bonds-core ${CORE_VERSION} is not on crates.io."
+              echo "::error::Cannot verify bonds-cli because bonds-core ${CORE_VERSION} is not published yet."
               exit 1
             fi
           fi
