@@ -103,3 +103,11 @@ docs-dev: setup-docs-venv ## Build documentation for all packages
 tag-release: ## Create and push a git tag that triggers the release/publish workflows
 	@git tag -a $(TAG) -m "Release $(TAG)"
 	@git push origin $(TAG)
+
+# ---------------------------------------
+# Clean targets.
+# ---------------------------------------
+clean: ## Clean build artifacts and documentation
+	cargo clean
+	rm -rf docs/site
+	rm -rf .venv
