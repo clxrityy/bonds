@@ -49,7 +49,8 @@ jobs:
         run: pip install -r docs/requirements.txt
 
       - name: Build guide docs first
-        # Build guides into final site root.
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}/
         run: mkdocs build --strict -f docs/mkdocs.yml -d site
 
       - name: Build API docs

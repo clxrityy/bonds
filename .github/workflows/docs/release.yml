@@ -78,6 +78,26 @@ jobs:
         env:
           RUSTDOCFLAGS: ${{ env.DOCS_PROFILE == 'strict' && '-D warnings' || '' }}
         run: |
+          set -euo pipefail
+
+          # act sometimes doesn't expose PATH changes from setup actions exactly like GitHub runners.
+          # Load rustup env if present, and prepend the standard cargo bin path.
+          if [ -f "$HOME/.cargo/env" ]; then
+            . "$HOME/.cargo/env"
+          fi
+          export PATH="$HOME/.cargo/bin:$PATH"
+
+          # Fallback for local act images where cargo is still missing.
+          if ! command -v cargo >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+              | sh -s -- -y --profile minimal --default-toolchain stable
+            . "$HOME/.cargo/env"
+          fi
+
+          # Sanity check before building docs.
+          cargo --version
+          rustc --version
+
           cargo doc --workspace --no-deps
           mkdir -p site/api
           cp -R target/doc/* site/api/
