@@ -1,3 +1,9 @@
+# ----------------------------------------
+# Variables
+#	----------------------------------------
+VERSION ?= v0.1.0
+DOCS_PROFILE ?= strict
+
 # ---------------------------------------
 # Self-documenting help target.
 # Parses ## comments on each target line.
@@ -34,14 +40,14 @@ test-docs:	## Run documentation tests for the workspace
 	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps
 	cargo test --workspace --doc
 
-test-docs-release: ## Trigger the documentation release workflow with test inputs.
+test-docs-release: ## Trigger the documentation release workflow with test inputs. Usage: make test-docs-release VERSION=v0.1.0 DOCS_PROFILE=strict
 	@act workflow_dispatch -W .github/workflows/docs/release.yml \
-  --input version=v0.1.0 \
-  --input include_api=true \
-  --input include_guides=true \
-  --input publish_latest=false \
-  --input profile=strict \
-  --input dry_run=true
+ --input version=$(VERSION) \
+ --input include_api=true \
+ --input include_guides=true \
+ --input publish_latest=false \
+ --input profile=$(DOCS_PROFILE) \
+ --input dry_run=true
 
 # ---------------------------------------
 # Linting targets.
@@ -70,9 +76,8 @@ build: ## Build all packages
 # Documentation targets.
 # ---------------------------------------
 docs-dev: setup-docs-venv ## Build documentation for all packages
-	rm -rf docs/site
-	.venv/bin/mkdocs build --strict -f docs/mkdocs.yml
+	@rm -rf docs/site
+	SITE_URL=$${SITE_URL:-http://127.0.0.1:4173/} .venv/bin/mkdocs build --strict -f docs/mkdocs.yml
 	cargo doc --workspace --no-deps
 	mkdir -p docs/site/api
-	cp -R target/doc/* docs/site/api/
-	@echo	'Documentation built at docs/site. Open docs/site/index.html to view.'
+	@cp -R target/doc/* docs/site/api/
