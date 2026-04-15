@@ -74,7 +74,6 @@ nav:
   - CLI: cli.md
   - Library API:
       - Overview: library/overview.md
-      - Metadata: library/metadata.md
       - Events: library/events.md
       - Querying: library/querying.md
       - API Reference:
