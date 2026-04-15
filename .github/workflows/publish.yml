@@ -153,46 +153,24 @@ jobs:
           fi
 
       - name: Publish bonds-core
-        if: ${{ needs.plan.outputs.publish_core == 'true' && steps.core_exists.outputs.exists == 'false' }}
+        if: ${{ needs.plan.outputs.publish_core == 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p bonds-core --locked --token "$CARGO_REGISTRY_TOKEN"
 
       - name: Wait for bonds-core index propagation
         if: ${{ needs.plan.outputs.publish_core == 'true' && needs.plan.outputs.publish_cli == 'true' }}
-        env:
-          CORE_VERSION: ${{ needs.plan.outputs.core_version }}
         run: |
           set -euo pipefail
-          # crates.io indexing is eventually consistent; poll before publishing CLI.
-          for _ in {1..20}; do
-            if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
-              exit 0
-            fi
-            sleep 15
-          done
-          echo "bonds-core ${CORE_VERSION} was not visible on crates.io in time"
-          exit 1
-
-      - name: Check if bonds-cli already exists
-        id: cli_exists
-        if: ${{ needs.plan.outputs.publish_cli == 'true' }}
-        env:
-          CLI_VERSION: ${{ needs.plan.outputs.cli_version }}
-        run: |
-          set -euo pipefail
-          if curl -fsS "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}" >/dev/null; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          # crates.io is eventually consistent; give the index time to reflect the new core release.
+          sleep 60
 
       - name: Verify bonds-cli package now that core is indexed
         if: ${{ needs.plan.outputs.publish_cli == 'true' }}
         run: cargo package -p bonds-cli --locked
 
       - name: Publish bonds-cli
-        if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists == 'false' }}
+        if: ${{ needs.plan.outputs.publish_cli == 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p bonds-cli --locked --token "$CARGO_REGISTRY_TOKEN"
