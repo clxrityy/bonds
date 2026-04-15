@@ -8,7 +8,7 @@ DOCS_PROFILE ?= strict
 #   make tag-release TAG=v0.1.0
 #   make tag-release TAG=core-v0.1.0
 #   make tag-release TAG=cli-v0.1.0
-TAG ?= v$(VERSION)
+TAG ?= $(VERSION)
 
 # ---------------------------------------
 # Self-documenting help target.
@@ -103,6 +103,12 @@ docs-dev: setup-docs-venv ## Build documentation for all packages
 tag-release: ## Create and push a git tag that triggers the release/publish workflows
 	@git tag -a $(TAG) -m "Release $(TAG)"
 	@git push origin $(TAG)
+
+# ---------------------------------------
+# Utility targets.
+# ---------------------------------------
+show-tag: ## Show the tag that would be used
+	@echo $(TAG)
 
 # ---------------------------------------
 # Clean targets.
