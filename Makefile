@@ -3,6 +3,12 @@
 #	----------------------------------------
 VERSION ?= v0.1.0
 DOCS_PROFILE ?= strict
+# Tag + push a release for the current version.
+# Usage:
+#   make tag-release TAG=v0.1.0
+#   make tag-release TAG=core-v0.1.0
+#   make tag-release TAG=cli-v0.1.0
+TAG ?= v$(VERSION)
 
 # ---------------------------------------
 # Self-documenting help target.
@@ -90,3 +96,10 @@ docs-dev: setup-docs-venv ## Build documentation for all packages
 	cargo doc --workspace --no-deps
 	mkdir -p docs/site/api
 	@cp -R target/doc/* docs/site/api/
+
+#	---------------------------------------
+# Release targets.
+#	---------------------------------------
+tag-release: ## Create and push a git tag that triggers the release/publish workflows
+	@git tag -a $(TAG) -m "Release $(TAG)"
+	@git push origin $(TAG)
