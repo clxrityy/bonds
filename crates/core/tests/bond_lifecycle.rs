@@ -185,7 +185,7 @@ fn create_and_lookup_by_name() {
     let bond = mgr
         .create_bond(src.path(), &tgt, Some("my-project".into()))
         .unwrap();
-    assert_eq!(bond.name().as_deref(), Some("my-project"));
+    assert_eq!(bond.name(), Some("my-project"));
 
     // Lookup by name
     let found = mgr.get_bond("my-project").unwrap();
@@ -193,7 +193,7 @@ fn create_and_lookup_by_name() {
 
     // Name should appear in list
     let all = mgr.list_bonds().unwrap();
-    assert_eq!(all[0].name().as_deref(), Some("my-project"));
+    assert_eq!(all[0].name(), Some("my-project"));
 }
 
 #[test]
@@ -241,9 +241,9 @@ fn update_bond_name() {
         .unwrap();
 
     let updated = mgr
-        .update_bond(&bond.id(), None, None, Some("new-name".into()))
+        .update_bond(bond.id(), None, None, Some("new-name".into()))
         .unwrap();
-    assert_eq!(updated.name().as_deref(), Some("new-name"));
+    assert_eq!(updated.name(), Some("new-name"));
 
     // Lookup by new name works
     let found = mgr.get_bond("new-name").unwrap();
