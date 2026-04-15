@@ -3,6 +3,13 @@
 name = "bonds-core"
 version = "0.1.0"
 edition = "2024"
+description = "Core library for managing symlink-based bonds with SQLite persistence"
+license = "MIT"
+repository = "https://github.com/clxrityy/bonds"
+readme = "../../README.md"
+documentation = "https://clxrityy.github.io/bonds/latest/api/bonds_core/"
+keywords = ["symlink", "filesystem", "sqlite", "productivity"]
+categories = ["filesystem", "command-line-utilities"]
 
 [dependencies]
 rusqlite = { workspace = true }

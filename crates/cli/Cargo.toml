@@ -2,11 +2,19 @@
 name = "bonds-cli"
 version = "0.1.0"
 edition = "2024"
+description = "CLI for creating and managing symlink-based bonds"
+license = "MIT"
+repository = "https://github.com/clxrityy/bonds"
+readme = "../../README.md"
+documentation = "https://clxrityy.github.io/bonds/latest/api/bonds_cli/"
+keywords = ["cli", "symlink", "filesystem", "productivity"]
+categories = ["command-line-utilities", "filesystem"]
 
 [[bin]]
 name = "bond"          # the actual binary users run
 path = "src/main.rs"  # the source file for the binary
 
 [dependencies]
-bonds-core = { path = "../core" }
+# version is required for publishing; path keeps local workspace development smooth.
+bonds-core = { version = "0.1.0", path = "../core" }
 clap = { workspace = true }
