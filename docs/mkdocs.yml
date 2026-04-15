@@ -1,6 +1,7 @@
 site_name: Bonds Documentation
 site_description: Bonds CLI and library API documentation
-site_url: https://clxrityy.github.io/bonds/
+# Default points to latest; workflows can override per build context.
+site_url: !ENV SITE_URL
 repo_url: https://github.com/clxrityy/bonds
 repo_name: clxrityy/bonds
 edit_uri: edit/master/docs/content/
