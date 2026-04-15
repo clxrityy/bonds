@@ -51,7 +51,11 @@ test-docs-release: ## Trigger the documentation release workflow with test input
 
 test-publish:	## Trigger the publish workflow with test inputs
 	@act workflow_dispatch -W .github/workflows/publish.yml --input target=all --input dry_run=true
+
+test-publish-core:	## Trigger the publish workflow for the core package with test inputs
 	@act workflow_dispatch -W .github/workflows/publish.yml --input target=core --input dry_run=true
+
+test-publish-cli:	## Trigger the publish workflow for the CLI package with test inputs
 	@act workflow_dispatch -W .github/workflows/publish.yml --input target=cli --input dry_run=true
 
 # ---------------------------------------
