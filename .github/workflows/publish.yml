@@ -1,0 +1,202 @@
+name: Publish Crates
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which crate(s) to publish"
+        required: true
+        default: all
+        type: choice
+        options: [all, core, cli]
+      dry_run:
+        description: "Validate/package only; do not publish"
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "v*"      # publish both crates
+      - "core-v*" # publish core only
+      - "cli-v*"  # publish cli only
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-crates-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      publish_core: ${{ steps.plan.outputs.publish_core }}
+      publish_cli: ${{ steps.plan.outputs.publish_cli }}
+      core_version: ${{ steps.versions.outputs.core_version }}
+      cli_version: ${{ steps.versions.outputs.cli_version }}
+      docs_version: ${{ steps.plan.outputs.docs_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: versions
+        name: Read crate versions from Cargo.toml
+        run: |
+          # tomllib is built into Python 3.11+ on GitHub runners.
+          python - <<'PY'
+          import tomllib, pathlib, os
+          core = tomllib.loads(pathlib.Path("crates/core/Cargo.toml").read_text())["package"]["version"]
+          cli = tomllib.loads(pathlib.Path("crates/cli/Cargo.toml").read_text())["package"]["version"]
+          out = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          with out.open("a") as f:
+              f.write(f"core_version={core}\n")
+              f.write(f"cli_version={cli}\n")
+          PY
+
+      - id: plan
+        name: Resolve publish target
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_TARGET: ${{ inputs.target }}
+          CORE_VERSION: ${{ steps.versions.outputs.core_version }}
+          CLI_VERSION: ${{ steps.versions.outputs.cli_version }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            target="${INPUT_TARGET:-all}"
+          elif [[ "$REF_NAME" == core-v* ]]; then
+            target="core"
+          elif [[ "$REF_NAME" == cli-v* ]]; then
+            target="cli"
+          else
+            target="all"
+          fi
+
+          case "$target" in
+            core)
+              echo "publish_core=true" >> "$GITHUB_OUTPUT"
+              echo "publish_cli=false" >> "$GITHUB_OUTPUT"
+              echo "docs_version=core-v${CORE_VERSION}" >> "$GITHUB_OUTPUT"
+              ;;
+            cli)
+              echo "publish_core=false" >> "$GITHUB_OUTPUT"
+              echo "publish_cli=true" >> "$GITHUB_OUTPUT"
+              echo "docs_version=cli-v${CLI_VERSION}" >> "$GITHUB_OUTPUT"
+              ;;
+            all)
+              echo "publish_core=true" >> "$GITHUB_OUTPUT"
+              echo "publish_cli=true" >> "$GITHUB_OUTPUT"
+              if [ "$CORE_VERSION" = "$CLI_VERSION" ]; then
+                echo "docs_version=v${CORE_VERSION}" >> "$GITHUB_OUTPUT"
+              else
+                echo "docs_version=core-v${CORE_VERSION}+cli-v${CLI_VERSION}" >> "$GITHUB_OUTPUT"
+              fi
+              ;;
+            *)
+              echo "Unsupported target: $target"
+              exit 1
+              ;;
+          esac
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: plan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify package contents
+        env:
+          PUBLISH_CORE: ${{ needs.plan.outputs.publish_core }}
+          PUBLISH_CLI: ${{ needs.plan.outputs.publish_cli }}
+          CORE_VERSION: ${{ needs.plan.outputs.core_version }}
+        run: |
+          set -euo pipefail
+
+          # Always verify core package when requested.
+          if [ "$PUBLISH_CORE" = "true" ]; then
+            cargo package -p bonds-core --locked
+          fi
+
+          # CLI package verification depends on bonds-core existing in crates.io.
+          if [ "$PUBLISH_CLI" = "true" ]; then
+            if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
+              cargo package -p bonds-cli --locked
+            elif [ "$PUBLISH_CORE" = "true" ]; then
+              # "all" flow before core is published in this run: do a compile-level sanity check.
+              echo "bonds-core ${CORE_VERSION} not on crates.io yet; skipping strict CLI package verify pre-publish."
+              cargo check -p bonds-cli --locked
+            else
+              # "cli-only" flow must fail fast if core isn't published.
+              echo "::error::Cannot verify/publish bonds-cli: bonds-core ${CORE_VERSION} is not on crates.io."
+              exit 1
+            fi
+          fi
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [plan, verify]
+    if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Check if bonds-core already exists
+        id: core_exists
+        if: ${{ needs.plan.outputs.publish_core == 'true' }}
+        env:
+          CORE_VERSION: ${{ needs.plan.outputs.core_version }}
+        run: |
+          set -euo pipefail
+          if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish bonds-core
+        if: ${{ needs.plan.outputs.publish_core == 'true' && steps.core_exists.outputs.exists == 'false' }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p bonds-core --locked --token "$CARGO_REGISTRY_TOKEN"
+
+      - name: Wait for bonds-core index propagation
+        if: ${{ needs.plan.outputs.publish_core == 'true' && needs.plan.outputs.publish_cli == 'true' }}
+        env:
+          CORE_VERSION: ${{ needs.plan.outputs.core_version }}
+        run: |
+          set -euo pipefail
+          # crates.io indexing is eventually consistent; poll before publishing CLI.
+          for _ in {1..20}; do
+            if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "bonds-core ${CORE_VERSION} was not visible on crates.io in time"
+          exit 1
+
+      - name: Check if bonds-cli already exists
+        id: cli_exists
+        if: ${{ needs.plan.outputs.publish_cli == 'true' }}
+        env:
+          CLI_VERSION: ${{ needs.plan.outputs.cli_version }}
+        run: |
+          set -euo pipefail
+          if curl -fsS "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify bonds-cli package now that core is indexed
+        if: ${{ needs.plan.outputs.publish_cli == 'true' }}
+        run: cargo package -p bonds-cli --locked
+
+      - name: Publish bonds-cli
+        if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists == 'false' }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p bonds-cli --locked --token "$CARGO_REGISTRY_TOKEN"

@@ -49,6 +49,11 @@ test-docs-release: ## Trigger the documentation release workflow with test input
  --input profile=$(DOCS_PROFILE) \
  --input dry_run=true
 
+test-publish:	## Trigger the publish workflow with test inputs
+	@act workflow_dispatch -W .github/workflows/publish.yml --input target=all --input dry_run=true
+	@act workflow_dispatch -W .github/workflows/publish.yml --input target=core --input dry_run=true
+	@act workflow_dispatch -W .github/workflows/publish.yml --input target=cli --input dry_run=true
+
 # ---------------------------------------
 # Linting targets.
 # ---------------------------------------
