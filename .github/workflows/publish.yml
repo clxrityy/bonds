@@ -153,24 +153,37 @@ jobs:
           fi
 
       - name: Publish bonds-core
-        if: ${{ needs.plan.outputs.publish_core == 'true' }}
+        if: ${{ needs.plan.outputs.publish_core == 'true' && steps.core_exists.outputs.exists != 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p bonds-core --locked --token "$CARGO_REGISTRY_TOKEN"
 
       - name: Wait for bonds-core index propagation
-        if: ${{ needs.plan.outputs.publish_core == 'true' && needs.plan.outputs.publish_cli == 'true' }}
+        if: ${{ needs.plan.outputs.publish_core == 'true' && needs.plan.outputs.publish_cli == 'true' && steps.core_exists.outputs.exists != 'true' }}
         run: |
           set -euo pipefail
           # crates.io is eventually consistent; give the index time to reflect the new core release.
           sleep 60
 
-      - name: Verify bonds-cli package now that core is indexed
+      - name: Check if bonds-cli already exists
+        id: cli_exists
         if: ${{ needs.plan.outputs.publish_cli == 'true' }}
+        env:
+          CLI_VERSION: ${{ needs.plan.outputs.cli_version }}
+        run: |
+          set -euo pipefail
+          if curl -fsS "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify bonds-cli package now that core is indexed
+        if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists != 'true' }}
         run: cargo package -p bonds-cli --locked
 
       - name: Publish bonds-cli
-        if: ${{ needs.plan.outputs.publish_cli == 'true' }}
+        if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists != 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p bonds-cli --locked --token "$CARGO_REGISTRY_TOKEN"
