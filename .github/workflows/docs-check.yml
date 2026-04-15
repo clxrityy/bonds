@@ -67,4 +67,4 @@ jobs:
       - name: Link-check generated HTML
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --verbose --exclude-mail site/**/*.html
+          args: --no-progress --verbose site/**/*.html
