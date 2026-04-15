@@ -28,7 +28,7 @@ fn full_lifecycle_create_list_delete() {
     assert_eq!(bonds[0].id(), bond.id());
 
     // Delete
-    mgr.delete_bond(&bond.id(), false).unwrap();
+    mgr.delete_bond(bond.id(), false).unwrap();
     assert!(!tgt.exists());
     assert!(mgr.list_bonds().unwrap().is_empty());
 }
@@ -68,11 +68,11 @@ fn delete_with_target_removes_actual_files() {
     std::fs::write(tgt.join("file.txt"), "data").unwrap();
 
     // Without --with-target, this should error
-    let err = mgr.delete_bond(&bond.id(), false).unwrap_err();
+    let err = mgr.delete_bond(bond.id(), false).unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
     // With --with-target, it should succeed and remove everything
-    let removed = mgr.delete_bond(&bond.id(), true).unwrap();
+    let removed = mgr.delete_bond(bond.id(), true).unwrap();
     assert_eq!(removed.id(), bond.id());
     assert!(!tgt.exists());
 }
@@ -92,7 +92,7 @@ fn update_bond_target() {
 
     // Update only target
     let updated = mgr
-        .update_bond(&bond.id(), None, Some(new_tgt.clone()), None)
+        .update_bond(bond.id(), None, Some(new_tgt.clone()), None)
         .unwrap();
     assert_eq!(updated.id(), bond.id()); // same bond
     assert_eq!(updated.target(), new_tgt); // target changed
@@ -101,7 +101,7 @@ fn update_bond_target() {
     assert!(new_tgt.symlink_metadata().unwrap().file_type().is_symlink()); // new symlink exists
 
     // Verify DB is consistent
-    let fetched = mgr.get_bond(&bond.id()).unwrap();
+    let fetched = mgr.get_bond(bond.id()).unwrap();
     assert_eq!(fetched.target(), new_tgt);
 }
 
@@ -125,7 +125,7 @@ fn update_bond_source() {
 
     // Update source
     let updated = mgr
-        .update_bond(&bond.id(), Some(new_src.path().to_path_buf()), None, None)
+        .update_bond(bond.id(), Some(new_src.path().to_path_buf()), None, None)
         .unwrap();
     assert_eq!(updated.source(), new_src.path());
 
@@ -146,7 +146,7 @@ fn update_bond_rejects_missing_source() {
 
     let bad_src = std::path::PathBuf::from("/nonexistent/path");
     let err = mgr
-        .update_bond(&bond.id(), Some(bad_src), None, None)
+        .update_bond(bond.id(), Some(bad_src), None, None)
         .unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
@@ -169,7 +169,7 @@ fn update_bond_rejects_occupied_target() {
     std::fs::create_dir(&occupied).unwrap();
 
     let err = mgr
-        .update_bond(&bond.id(), None, Some(occupied), None)
+        .update_bond(bond.id(), None, Some(occupied), None)
         .unwrap_err();
     assert!(matches!(err, BondError::AlreadyExists));
 }
