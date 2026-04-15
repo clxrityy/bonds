@@ -146,17 +146,20 @@ jobs:
           CORE_VERSION: ${{ needs.plan.outputs.core_version }}
         run: |
           set -euo pipefail
-          if curl -fsS "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}" >/dev/null; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          status="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "User-Agent: bonds-release-workflow (${GITHUB_REPOSITORY})" \
+            "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}")"
+          case "$status" in
+            200) echo "exists=true" >> "$GITHUB_OUTPUT" ;;
+            404) echo "exists=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::Unexpected crates.io status for bonds-core: $status"; exit 1 ;;
+          esac
 
       - name: Publish bonds-core
         if: ${{ needs.plan.outputs.publish_core == 'true' && steps.core_exists.outputs.exists != 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p bonds-core --locked --token "$CARGO_REGISTRY_TOKEN"
+        run: cargo publish -p bonds-core --locked
 
       - name: Wait for bonds-core index propagation
         if: ${{ needs.plan.outputs.publish_core == 'true' && needs.plan.outputs.publish_cli == 'true' && steps.core_exists.outputs.exists != 'true' }}
@@ -172,11 +175,14 @@ jobs:
           CLI_VERSION: ${{ needs.plan.outputs.cli_version }}
         run: |
           set -euo pipefail
-          if curl -fsS "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}" >/dev/null; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          status="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "User-Agent: bonds-release-workflow (${GITHUB_REPOSITORY})" \
+            "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}")"
+          case "$status" in
+            200) echo "exists=true" >> "$GITHUB_OUTPUT" ;;
+            404) echo "exists=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::Unexpected crates.io status for bonds-cli: $status"; exit 1 ;;
+          esac
 
       - name: Verify bonds-cli package now that core is indexed
         if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists != 'true' }}
@@ -186,4 +192,4 @@ jobs:
         if: ${{ needs.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists != 'true' }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p bonds-cli --locked --token "$CARGO_REGISTRY_TOKEN"
+        run: cargo publish -p bonds-cli --locked
