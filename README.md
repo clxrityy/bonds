@@ -2,6 +2,8 @@
 
 A tool for creating and managing "bonds" between files and directories.
 
+[![Core Crates.io Version](https://img.shields.io/crates/v/bonds-core?style=flat&label=bonds-core)](https://clxrityy.github.io/bonds/latest/api/bonds_core/) [![CLI Crates.io Version](https://img.shields.io/crates/v/bonds-cli?style=flat&label=bonds-cli)](https://clxrityy.github.io/bonds/latest/api/bonds_cli/index.html)
+
 > Build with [symlinks](https://en.wikipedia.org/wiki/Symbolic_link) and a [SQLite](https://www.sqlite.org/)
 >> Inspired by [GNU Stow](https://www.gnu.org/software/stow/)
 
