@@ -1,5 +1,5 @@
 (function() {
-    const implementors = Object.fromEntries([["bonds_core",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.94.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"bonds_core/bond/struct.Bond.html\" title=\"struct bonds_core::bond::Bond\">Bond</a>",0]]]]);
+    const implementors = Object.fromEntries([["bonds_core",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.95.0/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"bonds_core/bond/struct.Bond.html\" title=\"struct bonds_core::bond::Bond\">Bond</a>",0]]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
