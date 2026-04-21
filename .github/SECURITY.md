@@ -4,8 +4,8 @@
 
 | Package | Version | Supported |
 | :------- | :-------: | :------------------: |
-| bonds-core | `0.1.0` | :white_check_mark: |
-| bonds-cli | `0.1.0` | :white_check_mark: |
+| bonds-core | `>=0.1.0` | :white_check_mark: |
+| bonds-cli | `>=0.1.0` | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
