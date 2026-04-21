@@ -112,6 +112,16 @@ tag-release: ## Tag + push a release for the current version. Usages: `make tag-
   echo "Creating and pushing tag $(TAG)"; \
   git tag -a "$(TAG)" -m "Release $(TAG)"; \
   git push origin "$(TAG)"
+docs-release: ## Trigger the documentation release workflow. Usage: `make docs-release VERSION=v0.1.0 DOCS_PROFILE=strict`
+	@act workflow_dispatch -W .github/workflows/docs-release.yml \
+	--input version=$(VERSION) \
+	--input include_api=true \
+	--input include_guides=true \
+	--input publish_latest=false \
+	--input profile=$(DOCS_PROFILE)
+
+publish: ## Trigger the publish workflow. Usage: `make publish VERSION=v0.1.0` `make publish TARGET=core VERSION=v0.1.0` `make publish TARGET=cli VERSION=v0.1.0`
+	@act workflow_dispatch -W .github/workflows/publish.yml --input target=$(TARGET) --input version=$(VERSION)
 
 # ---------------------------------------
 # Utility targets.
