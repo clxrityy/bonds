@@ -5,4 +5,3 @@
 The core library for the `bonds` ecosystem, providing the underlying logic and data management for creating and managing "bonds" between files and directories using symlinks and SQLite.
 
 ---
-
