@@ -6,7 +6,7 @@ description = "CLI for creating and managing symlink-based bonds"
 license-file = "../../LICENSE"
 repository = "https://github.com/clxrityy/bonds"
 readme = "README.md"
-documentation = "https://clxrityy.github.io/bonds/latest/api/bonds_cli/"
+documentation = "https://bonds.fyi/latest/api/bonds_cli/"
 keywords = ["cli", "symlink", "filesystem", "productivity"]
 categories = ["command-line-utilities", "filesystem"]
 
