@@ -50,7 +50,7 @@ jobs:
 
       - name: Build guide docs first
         env:
-          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}/
+          SITE_URL: https://bonds.fyi/previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}/
         run: mkdocs build --strict -f docs/mkdocs.yml -d site
 
       - name: Build API docs

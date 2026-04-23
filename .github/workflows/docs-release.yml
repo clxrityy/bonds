@@ -74,7 +74,7 @@ jobs:
         if: ${{ github.event_name == 'push' || inputs.include_guides == true }}
         env:
           # Canonical URLs point to the exact deployed version path.
-          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/versions/${{ env.VERSION }}/
+          SITE_URL: https://bonds.fyi/versions/${{ env.VERSION }}/
         run: mkdocs build --strict -f docs/mkdocs.yml -d site
 
       - name: Build API docs
