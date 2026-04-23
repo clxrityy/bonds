@@ -12,7 +12,8 @@ A tool for creating and managing "bonds" between files and directories.
 ## Status
 
 - [x] Basic core & CLI
-- [ ] Library API
+  - [x] API documentation
+  - [ ] Library API
 - [ ] GUI application
 - [ ] Ecosystem & plugins
 
