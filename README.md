@@ -1,5 +1,9 @@
 # bonds
 
+> [!TIP]
+>
+> ##### <img src="./docs/content/assets/img/logo.svg" alt="bonds logo" width="14" /> [bonds.fyi](https://bonds.fyi)
+
 A tool for creating and managing "bonds" between files and directories.
 
 [![Core Crates.io Version](https://img.shields.io/crates/v/bonds-core?style=flat&label=bonds-core)](https://bonds.fyi/latest/api/bonds_core/) [![CLI Crates.io Version](https://img.shields.io/crates/v/bonds-cli?style=flat&label=bonds-cli)](https://bonds.fyi/latest/api/bonds_cli/)
