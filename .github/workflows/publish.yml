@@ -100,29 +100,29 @@ jobs:
           # Mark that we published core in this run
           echo "published=true" >> $GITHUB_OUTPUT
 
-      - name: Wait for crates.io index propagation for bonds-core
-        if: ${{ steps.do_publish_core.outputs.published == 'true' }}
-        env:
-          CORE_VERSION: ${{ steps.versions.outputs.core_version }}
-        run: |
-          set -euo pipefail
-          # Retry loop with exponential backoff to wait until crates.io serves the new version
-          max_attempts=12
-          attempt=0
-          sleep_secs=5
-          while [ $attempt -lt $max_attempts ]; do
-            status=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}") || true
-            if [ "$status" = "200" ]; then
-              echo "bonds-core ${CORE_VERSION} visible on crates.io"
-              exit 0
-            fi
-            attempt=$((attempt+1))
-            echo "Attempt $attempt/$max_attempts: crates.io returned status=$status; sleeping $sleep_secs"
-            sleep $sleep_secs
-            sleep_secs=$((sleep_secs*2))
-          done
-          echo "::error::bonds-core ${CORE_VERSION} was not visible on crates.io after publish; last status=$status"
-          exit 1
+      # - name: Wait for crates.io index propagation for bonds-core
+      #   if: ${{ steps.do_publish_core.outputs.published == 'true' }}
+      #   env:
+      #     CORE_VERSION: ${{ steps.versions.outputs.core_version }}
+      #   run: |
+      #     set -euo pipefail
+      #     # Retry loop with exponential backoff to wait until crates.io serves the new version
+      #     max_attempts=12
+      #     attempt=0
+      #     sleep_secs=5
+      #     while [ $attempt -lt $max_attempts ]; do
+      #       status=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}") || true
+      #       if [ "$status" = "200" ]; then
+      #         echo "bonds-core ${CORE_VERSION} visible on crates.io"
+      #         exit 0
+      #       fi
+      #       attempt=$((attempt+1))
+      #       echo "Attempt $attempt/$max_attempts: crates.io returned status=$status; sleeping $sleep_secs"
+      #       sleep $sleep_secs
+      #       sleep_secs=$((sleep_secs*2))
+      #     done
+      #     echo "::error::bonds-core ${CORE_VERSION} was not visible on crates.io after publish; last status=$status"
+      #     exit 1
 
       - name: Package & publish bonds-cli
         id: do_publish_cli

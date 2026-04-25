@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened, labeled]
     paths:
       - "crates/core/**"
+      - "crates/cli/**"
       - "docs/**"
       - "scripts/docs/**"
       - ".github/workflows/docs-*.yml"
@@ -51,41 +52,41 @@ jobs:
       - name: Build guide docs first
         env:
           SITE_URL: https://bonds.fyi/previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}/
-        run: mkdocs build --strict -f docs/mkdocs.yml -d site
+        run: mkdocs build --strict -f docs/mkdocs.yml -d docs/site
 
       - name: Build API docs
         # Build rustdoc separately, then copy into /api.
         run: |
           cargo doc --workspace --no-deps
-          mkdir -p site/api
-          cp -R target/doc/* site/api/
+          mkdir -p docs/site/api
+          cp -R target/doc/* docs/site/api/
 
-      - name: Add API index redirect
-        run: |
-          cat > site/api/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8" />
-              <title>Bonds API Docs</title>
-            </head>
-            <body>
-              <h1>Bonds API Docs</h1>
-              <ul>
-                <li><a href="./bonds_core/">core</a></li>
-                <li><a href="./bonds_cli/">cli</a></li>
-                <li><a href="./bond/">bond (binary)</a></li>
-              </ul>
-            </body>
-          </html>
-          HTML
+      # - name: Add API index redirect
+      #   run: |
+      #     cat > docs/site/api/index.html <<'HTML'
+      #     <!doctype html>
+      #     <html lang="en">
+      #       <head>
+      #         <meta charset="utf-8" />
+      #         <title>Bonds API Docs</title>
+      #       </head>
+      #       <body>
+      #         <h1>Bonds API Docs</h1>
+      #         <ul>
+      #           <li><a href="./bonds_core/">core</a></li>
+      #           <li><a href="./bonds_cli/">cli</a></li>
+      #           <li><a href="./bond/">bond (binary)</a></li>
+      #         </ul>
+      #       </body>
+      #     </html>
+      #     HTML
 
       - name: Deploy preview to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: site
+          publish_dir: docs/site
           destination_dir: previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}
           keep_files: true
 
@@ -95,4 +96,4 @@ jobs:
         with:
           message: |
             Docs preview:
-            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/pr-${{ github.event.pull_request.number }}/
+            https://bonds.fyi/previews/pr-${{ github.event.pull_request.number }}/
