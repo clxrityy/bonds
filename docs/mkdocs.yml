@@ -1,4 +1,4 @@
-site_name: Bonds Documentation
+site_name: Bonds
 site_description: Bonds CLI and library API documentation
 # Default points to latest; workflows can override per build context.
 site_url: !ENV SITE_URL
