@@ -62,7 +62,7 @@ jobs:
 
       - name: Build guide docs
         # --strict fails on nav/link/reference warnings inside MkDocs.
-        run: mkdocs build --strict -f docs/mkdocs.yml -d docs/site
+        run: mkdocs build --strict -f docs/mkdocs.yml
 
       - name: Link-check generated HTML
         uses: lycheeverse/lychee-action@v2

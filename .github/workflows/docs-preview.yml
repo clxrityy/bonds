@@ -52,7 +52,7 @@ jobs:
       - name: Build guide docs first
         env:
           SITE_URL: https://bonds.fyi/previews/pr-${{ github.event.pull_request.number || inputs.pr_number }}/
-        run: mkdocs build --strict -f docs/mkdocs.yml -d docs/site
+        run: mkdocs build --strict -f docs/mkdocs.yml
 
       - name: Build API docs
         # Build rustdoc separately, then copy into /api.

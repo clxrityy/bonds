@@ -75,7 +75,7 @@ jobs:
         env:
           # Canonical URLs point to the exact deployed version path.
           SITE_URL: https://bonds.fyi/versions/${{ env.VERSION }}/
-        run: mkdocs build --strict -f docs/mkdocs.yml -d docs/site
+        run: mkdocs build --strict -f docs/mkdocs.yml
 
       - name: Verify guide docs output
         if: ${{ github.event_name == 'push' || inputs.include_guides == true || inputs.include_guides == 'true' }}
