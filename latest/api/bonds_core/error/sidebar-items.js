@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["BondError"]};
+window.SIDEBAR_ITEMS = {"enum":["BondError","ErrorKind"]};

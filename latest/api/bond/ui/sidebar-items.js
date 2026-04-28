@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BLUE_BOLD","CYAN","CYAN_BOLD","DIM","GREEN_BOLD","MAGENTA","RED_BOLD","RESET","YELLOW_BOLD"],"fn":["colors_enabled","dim","error","error_prefix","format_context_error","format_error","heading","id","info","key","paint","path","status_bad","status_ok","status_warn","style_for","success","warning"]};
