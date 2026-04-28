@@ -14,7 +14,7 @@ pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
             Some(name) => format!("{name} ({id})", id = &bond.id()[..8]),
             None => bond.id()[..8].to_string(),
         };
-        ui::info(&format!(
+        ui::info(format!(
             "{label}  -  {src} -> {tgt}  ({date})",
             src = bond.source().display(),
             tgt = bond.target().display(),
@@ -22,6 +22,6 @@ pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
         ));
     }
 
-    ui::info(&format!("\n{} bond(s) total.", bonds.len()));
+    ui::info(format!("\n{} bond(s) total.", bonds.len()));
     Ok(())
 }

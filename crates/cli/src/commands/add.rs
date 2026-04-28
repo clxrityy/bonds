@@ -32,8 +32,8 @@ pub fn cmd_add(
     }
 
     let bond = manager.create_bond(&source, &target, name)?;
-    ui::success(&format!("Bond created: {}", bond.id()));
-    ui::info(&format!(
+    ui::success(format!("Bond created: {}", bond.id()));
+    ui::info(format!(
         "  {} -> {}",
         bond.source().display(),
         bond.target().display()
@@ -44,7 +44,7 @@ pub fn cmd_add(
 /// Bond each child of `source` as a separate bond into `target`.
 fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Result<(), BondError> {
     if !source.is_dir() {
-        ui::error(&format!(
+        ui::error(format!(
             "--contents requires a directory, got: {}",
             source.display()
         ));
@@ -71,7 +71,7 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
 
         match manager.create_bond(&child, &child_target, None) {
             Ok(bond) => {
-                ui::success(&format!(
+                ui::success(format!(
                     "  {} -> {}",
                     bond.source().display(),
                     bond.target().display()
@@ -79,13 +79,13 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
                 created += 1;
             }
             Err(e) => {
-                ui::warning(&format!("  skip {}: {}", child_name.to_string_lossy(), e));
+                ui::warning(format!("  skip {}: {}", child_name.to_string_lossy(), e));
                 failed += 1;
             }
         }
     }
 
-    ui::info(&format!("\n{created} bond(s) created, {failed} skipped."));
+    ui::info(format!("\n{created} bond(s) created, {failed} skipped."));
 
     if created == 0 && failed > 0 {
         ui::error("No bonds were created. All entries failed.");

@@ -32,8 +32,8 @@ pub fn cmd_update(
     };
 
     let bond = manager.update_bond(id, source, target, name)?;
-    ui::success(&format!("Bond updated: {}", &bond.id()[..8]));
-    ui::info(&format!(
+    ui::success(format!("Bond updated: {}", &bond.id()[..8]));
+    ui::info(format!(
         "  {} -> {}",
         bond.source().display(),
         bond.target().display()

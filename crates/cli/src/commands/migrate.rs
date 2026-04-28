@@ -33,7 +33,7 @@ pub fn cmd_migrate(
 
     // No-op if already there
     if new_target == bond.target() {
-        ui::info(&format!(
+        ui::info(format!(
             "Bond '{}' is already at {}",
             id,
             new_target.display()
@@ -43,8 +43,8 @@ pub fn cmd_migrate(
 
     // Delegate to update_bond -- it handles symlink removal, creation, and DB update
     let updated = manager.update_bond(bond.id(), None, Some(new_target), None)?;
-    ui::success(&format!("Bond migrated: {}", id));
-    ui::info(&format!(
+    ui::success(format!("Bond migrated: {}", id));
+    ui::info(format!(
         "  {} -> {}",
         updated.source().display(),
         updated.target().display()
