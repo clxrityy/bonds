@@ -121,7 +121,7 @@ docs-release: ## Trigger the documentation release workflow. Usage: `make docs-r
 	--input profile=$(DOCS_PROFILE)
 
 publish: ## Trigger the publish workflow. Usage: `make publish VERSION=v0.1.0` `make publish TARGET=core VERSION=v0.1.0` `make publish TARGET=cli VERSION=v0.1.0`
-	@act workflow_dispatch -W .github/workflows/publish.yml --input target=$(TARGET) --input version=$(VERSION)
+	@act workflow_dispatch -j publish --input target=$(TARGET) --input version=$(VERSION)
 
 # ---------------------------------------
 # Utility targets.
