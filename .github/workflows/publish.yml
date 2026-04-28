@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v2
         with:
           toolchain: stable
           override: true
@@ -34,8 +34,8 @@ jobs:
           # Read versions from each crate's Cargo.toml (searching the [package] section)
           CORE_VERSION=$(awk -F\" '/\[package\]/{p=1} p && /^version/ {print $2; exit}' crates/core/Cargo.toml)
           CLI_VERSION=$(awk -F\" '/\[package\]/{p=1} p && /^version/ {print $2; exit}' crates/cli/Cargo.toml)
-          echo "core_version=$CORE_VERSION" >> $GITHUB_OUTPUT
-          echo "cli_version=$CLI_VERSION" >> $GITHUB_OUTPUT
+          echo "core_version=$CORE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "cli_version=$CLI_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Determine publish plan from tag
         id: plan
@@ -53,8 +53,8 @@ jobs:
           if [[ "$TAG" == core-v* ]]; then PUBLISH_CORE=true; fi
           if [[ "$TAG" == cli-v* ]]; then PUBLISH_CLI=true; fi
           if [[ "$TAG" == v* ]]; then PUBLISH_CORE=true; PUBLISH_CLI=true; fi
-          echo "publish_core=$PUBLISH_CORE" >> $GITHUB_OUTPUT
-          echo "publish_cli=$PUBLISH_CLI" >> $GITHUB_OUTPUT
+          echo "publish_core=$PUBLISH_CORE" >> "$GITHUB_OUTPUT"
+          echo "publish_cli=$PUBLISH_CLI" >> "$GITHUB_OUTPUT"
 
       - name: Check if bonds-core exists on crates.io
         id: core_exists
@@ -65,11 +65,11 @@ jobs:
           set -euo pipefail
           # Get the HTTP status without failing on non-2xx
           status=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/bonds-core/${CORE_VERSION}") || true
-          echo "status=$status" >> $GITHUB_OUTPUT
+          echo "status=$status" >> "$GITHUB_OUTPUT"
           if [ "$status" = "200" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Check if bonds-cli exists on crates.io
@@ -80,11 +80,11 @@ jobs:
         run: |
           set -euo pipefail
           status=$(curl -s -o /dev/null -w "%{http_code}" "https://crates.io/api/v1/crates/bonds-cli/${CLI_VERSION}") || true
-          echo "status=$status" >> $GITHUB_OUTPUT
+          echo "status=$status" >> "$GITHUB_OUTPUT"
           if [ "$status" = "200" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Package & publish bonds-core
@@ -98,7 +98,7 @@ jobs:
           cargo package -p bonds-core --locked
           cargo publish -p bonds-core --locked --token "$CARGO_REGISTRY_TOKEN"
           # Mark that we published core in this run
-          echo "published=true" >> $GITHUB_OUTPUT
+          echo "published=true" >> "$GITHUB_OUTPUT"
 
       # - name: Wait for crates.io index propagation for bonds-core
       #   if: ${{ steps.do_publish_core.outputs.published == 'true' }}
@@ -134,7 +134,7 @@ jobs:
           # If core was published earlier in this run, the wait step ensured it's visible.
           cargo package -p bonds-cli --locked
           cargo publish -p bonds-cli --locked --token "$CARGO_REGISTRY_TOKEN"
-          echo "published=true" >> $GITHUB_OUTPUT
+          echo "published=true" >> "$GITHUB_OUTPUT"
 
       - name: Fail early if CLI cannot be verified
         if: ${{ steps.plan.outputs.publish_cli == 'true' && steps.cli_exists.outputs.exists != 'true' && steps.core_exists.outputs.exists != 'true' && steps.do_publish_core.outputs.published != 'true' }}
