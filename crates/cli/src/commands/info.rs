@@ -1,5 +1,5 @@
-use bonds_core::{BondError, BondManager};
 use bonds_cli::ui;
+use bonds_core::{BondError, BondManager};
 
 pub fn cmd_info(manager: &BondManager, id: &str) -> Result<(), BondError> {
     let bond = manager.get_bond(id)?;

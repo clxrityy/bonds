@@ -1,5 +1,5 @@
-use bonds_core::{BondError, BondManager};
 use bonds_cli::ui;
+use bonds_core::{BondError, BondManager};
 
 pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
     let bonds = manager.list_bonds()?;

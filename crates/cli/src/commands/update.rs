@@ -1,6 +1,6 @@
+use bonds_cli::ui;
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
-use bonds_cli::ui;
 
 pub fn cmd_update(
     manager: &BondManager,

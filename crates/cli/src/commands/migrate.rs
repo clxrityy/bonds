@@ -1,6 +1,6 @@
+use bonds_cli::ui;
 use bonds_core::{BondError, BondManager, BondsConfig};
 use std::path::PathBuf;
-use bonds_cli::ui;
 
 pub fn cmd_migrate(
     manager: &BondManager,
@@ -33,7 +33,11 @@ pub fn cmd_migrate(
 
     // No-op if already there
     if new_target == bond.target() {
-        ui::info(&format!("Bond '{}' is already at {}", id, new_target.display()));
+        ui::info(&format!(
+            "Bond '{}' is already at {}",
+            id,
+            new_target.display()
+        ));
         return Ok(());
     }
 

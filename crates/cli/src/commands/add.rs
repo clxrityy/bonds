@@ -1,5 +1,5 @@
 use bonds_cli::ui;
-use bonds_core::{BondManager, BondError};
+use bonds_core::{BondError, BondManager};
 use std::path::{Path, PathBuf};
 
 pub fn cmd_add(
@@ -48,7 +48,9 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
             "--contents requires a directory, got: {}",
             source.display()
         ));
-        return Err(BondError::InvalidPath("--contents requires a directory".into()));
+        return Err(BondError::InvalidPath(
+            "--contents requires a directory".into(),
+        ));
     }
 
     let mut created = 0u32;
