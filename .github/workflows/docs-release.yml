@@ -71,11 +71,17 @@ jobs:
         run: rm -rf docs/site && mkdir -p docs/site
 
       - name: Build guides
-        # if: ${{ github.event_name == 'push' || inputs.include_guides == true || inputs.include_guides == 'true' }}
+        if: ${{ github.event_name == 'push' || inputs.include_guides == true || inputs.include_guides == 'true' }}
         env:
           # Canonical URLs point to the exact deployed version path.
           SITE_URL: https://bonds.fyi/versions/${{ env.VERSION }}/
-        run: mkdocs build --strict -f docs/mkdocs.yml
+        run: mkdocs build --strict -f docs/mkdocs.yml -d docs/site
+
+      - name: Verify guide docs output
+        if: ${{ github.event_name == 'push' || inputs.include_guides == true || inputs.include_guides == 'true' }}
+        run: |
+          test -f docs/site/index.html
+          test -d docs/site/assets
 
       - name: Build API docs
         if: ${{ github.event_name == 'push' || inputs.include_api == true || inputs.include_api == 'true' }}
@@ -137,7 +143,7 @@ jobs:
       #     HTML
 
       - name: Deploy versioned docs
-        if: ${{ github.event_name == 'push' || inputs.dry_run == false }}
+        if: ${{ github.event_name == 'push' || inputs.dry_run == false || inputs.dry_run == 'false' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -152,8 +158,8 @@ jobs:
         if: >
           github.event_name == 'push' ||
           (github.event_name == 'workflow_dispatch' &&
-          inputs.dry_run == false &&
-          inputs.publish_latest == true)
+          (inputs.dry_run == false || inputs.dry_run == 'false') &&
+          (inputs.publish_latest == true || inputs.publish_latest == 'true'))
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
