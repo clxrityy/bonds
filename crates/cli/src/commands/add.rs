@@ -1,4 +1,5 @@
-use bonds_core::{BondError, BondManager};
+use bonds_cli::ui;
+use bonds_core::{BondManager, BondError};
 use std::path::{Path, PathBuf};
 
 pub fn cmd_add(
@@ -31,22 +32,23 @@ pub fn cmd_add(
     }
 
     let bond = manager.create_bond(&source, &target, name)?;
-    println!("Bond created: {}", bond.id());
-    println!(
+    ui::success(&format!("Bond created: {}", bond.id()));
+    ui::info(&format!(
         "  {} -> {}",
         bond.source().display(),
         bond.target().display()
-    );
+    ));
     Ok(())
 }
 
 /// Bond each child of `source` as a separate bond into `target`.
 fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Result<(), BondError> {
     if !source.is_dir() {
-        return Err(BondError::InvalidPath(format!(
+        ui::error(&format!(
             "--contents requires a directory, got: {}",
             source.display()
-        )));
+        ));
+        return Err(BondError::InvalidPath("--contents requires a directory".into()));
     }
 
     let mut created = 0u32;
@@ -67,23 +69,24 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
 
         match manager.create_bond(&child, &child_target, None) {
             Ok(bond) => {
-                println!(
+                ui::success(&format!(
                     "  {} -> {}",
                     bond.source().display(),
                     bond.target().display()
-                );
+                ));
                 created += 1;
             }
             Err(e) => {
-                eprintln!("  skip {}: {}", child_name.to_string_lossy(), e);
+                ui::warning(&format!("  skip {}: {}", child_name.to_string_lossy(), e));
                 failed += 1;
             }
         }
     }
 
-    println!("\n{created} bond(s) created, {failed} skipped.");
+    ui::info(&format!("\n{created} bond(s) created, {failed} skipped."));
 
     if created == 0 && failed > 0 {
+        ui::error("No bonds were created. All entries failed.");
         return Err(BondError::InvalidPath("no bonds were created".into()));
     }
 

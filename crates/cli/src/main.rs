@@ -1,5 +1,6 @@
 use bonds_cli::args::{Cli, Commands, ConfigAction};
 mod commands;
+mod ui;
 
 use clap::Parser;
 use commands::{
@@ -16,14 +17,19 @@ fn main() {
             ConfigAction::Set { key, value } => cmd_config_set(&key, &value),
         },
         cmd => {
-            // Only init DB for commands that need it
+            // Only init DB for commands that need it.
             let manager = match bonds_core::BondManager::new(cli.db) {
                 Ok(m) => m,
                 Err(e) => {
-                    eprintln!("Failed to initialize bond manager: {e}");
+                    // Use the same color path as all other errors.
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
                     std::process::exit(1);
                 }
             };
+
             match cmd {
                 Commands::Add {
                     source,
@@ -47,7 +53,8 @@ fn main() {
     };
 
     if let Err(e) = result {
-        eprintln!("Error: {e}");
+        // One place for every command failure.
+        eprintln!("{}", ui::format_error(&e));
         std::process::exit(1);
     }
 }

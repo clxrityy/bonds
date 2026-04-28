@@ -31,5 +31,5 @@ pub mod manager;
 
 pub use bond::Bond;
 pub use config::BondsConfig;
-pub use error::BondError;
+pub use error::{BondError, ErrorKind};
 pub use manager::BondManager;

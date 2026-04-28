@@ -1,21 +1,22 @@
 use bonds_core::{BondError, BondManager};
+use bonds_cli::ui;
 
 pub fn cmd_info(manager: &BondManager, id: &str) -> Result<(), BondError> {
     let bond = manager.get_bond(id)?;
 
-    println!("Bond Details:");
-    println!("  ID:      {}", bond.id());
-    println!("  Source:  {}", bond.source().display());
-    println!("  Target:  {}", bond.target().display());
-    println!(
+    ui::heading("Bond Details:");
+    ui::info(&format!("  ID:      {}", bond.id()));
+    ui::info(&format!("  Source:  {}", bond.source().display()));
+    ui::info(&format!("  Target:  {}", bond.target().display()));
+    ui::info(&format!(
         "  Created: {}",
         bond.created_at().format("%Y-%m-%d %H:%M:%S UTC")
-    );
+    ));
 
     if let Some(meta) = bond.metadata() {
-        println!("  Metadata:");
+        ui::info("  Metadata:");
         for (k, v) in meta {
-            println!("    {k}: {v}");
+            ui::info(&format!("    {k}: {v}"));
         }
     }
 

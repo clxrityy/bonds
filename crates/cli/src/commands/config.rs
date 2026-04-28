@@ -1,3 +1,4 @@
+use bonds_cli::ui;
 use bonds_core::{BondError, BondsConfig};
 use std::path::PathBuf;
 
@@ -6,11 +7,11 @@ pub fn cmd_config_get(key: &str) -> Result<(), BondError> {
 
     match key {
         "default" => match config.default_target {
-            Some(p) => println!("{}", p.display()),
-            None => println!("(not set)"),
+            Some(p) => ui::key(&format!("{}", p.display())),
+            None => ui::info("(not set)"),
         },
         _ => return Err(BondError::Config(format!("unknown config key: {key}"))),
-    }
+    };
 
     Ok(())
 }
@@ -28,7 +29,7 @@ pub fn cmd_config_set(key: &str, value: &str) -> Result<(), BondError> {
 
             config.default_target = Some(path.clone());
             config.save()?;
-            println!("default_target set to: {}", path.display());
+            ui::success(&format!("default_target set to: {}", path.display()));
         }
         _ => return Err(BondError::Config(format!("unknown config key: {key}"))),
     }

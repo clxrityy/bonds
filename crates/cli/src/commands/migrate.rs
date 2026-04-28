@@ -1,5 +1,6 @@
 use bonds_core::{BondError, BondManager, BondsConfig};
 use std::path::PathBuf;
+use bonds_cli::ui;
 
 pub fn cmd_migrate(
     manager: &BondManager,
@@ -32,17 +33,17 @@ pub fn cmd_migrate(
 
     // No-op if already there
     if new_target == bond.target() {
-        println!("Bond '{}' is already at {}", id, new_target.display());
+        ui::info(&format!("Bond '{}' is already at {}", id, new_target.display()));
         return Ok(());
     }
 
     // Delegate to update_bond -- it handles symlink removal, creation, and DB update
     let updated = manager.update_bond(bond.id(), None, Some(new_target), None)?;
-    println!("Bond migrated: {}", id);
-    println!(
+    ui::success(&format!("Bond migrated: {}", id));
+    ui::info(&format!(
         "  {} -> {}",
         updated.source().display(),
         updated.target().display()
-    );
+    ));
     Ok(())
 }

@@ -1,5 +1,6 @@
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
+use bonds_cli::ui;
 
 pub fn cmd_update(
     manager: &BondManager,
@@ -31,11 +32,11 @@ pub fn cmd_update(
     };
 
     let bond = manager.update_bond(id, source, target, name)?;
-    println!("Bond updated: {}", &bond.id()[..8]);
-    println!(
+    ui::success(&format!("Bond updated: {}", &bond.id()[..8]));
+    ui::info(&format!(
         "  {} -> {}",
         bond.source().display(),
         bond.target().display()
-    );
+    ));
     Ok(())
 }
