@@ -28,17 +28,17 @@ theme:
   # Tune palette to your brand as needed
   palette:
     - scheme: default
-      primary: blue grey
-      accent: indigo
+      primary: indigo grey
+      accent: teal
       toggle:
         icon: material/weather-night
-        name: Switch to dark mode
-    - scheme: slate
+        name: Switch to blue mode
+    - scheme: blue
       primary: blue grey
       accent: indigo
       toggle:
         icon: material/weather-sunny
-        name: Switch to light mode
+        name: Switch to default mode
 
 markdown_extensions:
   - admonition
