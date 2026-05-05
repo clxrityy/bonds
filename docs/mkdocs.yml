@@ -70,7 +70,6 @@ extra_javascript:
 
 nav:
   - Overview: index.md
-  - Getting Started: getting-started.md
   - CLI: cli.md
   - Library API:
       - Overview: library/overview.md
