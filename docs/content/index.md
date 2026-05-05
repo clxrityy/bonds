@@ -6,8 +6,10 @@ Bonds is a tool for creating and managing "bonds" between directories using syml
 
 **Bonds provides:**
 
-- A CLI ([`bonds-cli`](https://crates.io/crates/bonds-cli)) for managing symlink-based bonds.
-- A Rust library ([`bonds-core`](https://crates.io/crates/bonds-core)) for programmatic integration.
+[![Core Crates.io Version](https://img.shields.io/crates/v/bonds-core?style=flat&label=bonds-core)](https://crates.io/crates/bonds-core) [![CLI Crates.io Version](https://img.shields.io/crates/v/bonds-cli?style=flat&label=bonds-cli)](https://crates.io/crates/bonds-cli)
+
+- A CLI ([`bonds-cli`](https://bonds.fyi/latest/api/bonds_cli/)) for managing symlink-based bonds.
+- A Rust library ([`bonds-core`](https://bonds.fyi/latest/api/bonds_core/)) for programmatic integration.
 
 ```bash
 # Install the CLI globally
