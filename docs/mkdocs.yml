@@ -47,7 +47,11 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
   - pymdownx.highlight:
       anchor_linenums: true
@@ -69,7 +73,7 @@ extra_javascript:
   - assets/javascripts/extra.js
 
 nav:
-  - Overview: index.md
+  - Home: index.md
   - CLI: cli.md
   - Library API:
       - Overview: library/overview.md
