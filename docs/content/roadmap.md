@@ -42,7 +42,7 @@ Expose `bonds-core` & `bonds-cli` as a proper public API so developers can integ
 
 ## Phase 3: GUI Application ✘
 
-Tauri-based desktop app, depends on [Phase 2](#phase-2-library-api)'s API.
+Tauri-based desktop app, depends on [Phase 2](#phase-2-library-api-)'s API.
 
 - ✘ Scaffold `crates/app` (Tauri)
 - ✘ Bond viewer (sorted by recently updated)
