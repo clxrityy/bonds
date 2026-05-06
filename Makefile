@@ -6,6 +6,7 @@ VERSION_TARGET	?= all
 SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
 TAG ?= $(VERSION)
+TARGET ?= VERSION_TARGET
 
 # ---------------------------------------
 # Self-documenting help target.
