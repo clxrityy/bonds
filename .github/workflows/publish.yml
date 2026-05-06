@@ -10,6 +10,9 @@ concurrency:
   group: publish-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Publish crates (core then cli)
