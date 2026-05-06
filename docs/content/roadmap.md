@@ -35,7 +35,7 @@ The primary, usable product. Everything in this phase should work from the termi
 Expose `bonds-core` & `bonds-cli` as a proper public API so developers can integrate it.
 
 - ✔ **Stabilize and document the public API surface**
-- ✘ Add metadata read/write operations
+- ✔ **Add metadata read/write operations**
 - ✘ Hooks/events system (bond created, deleted, broken, etc.)
 - ✘ Query bonds by source, target, or metadata
 - ✘ API documentation + usage examples
