@@ -4,6 +4,8 @@ use std::io::IsTerminal;
 use bonds_core::BondError;
 use bonds_core::error::ErrorKind;
 
+/// The `ui` module provides functions for formatting error messages and other user-facing output in a consistent and visually appealing way. It is used throughout the CLI application to ensure that all messages are presented in a clear and user-friendly manner.
+
 const RESET: &str = "\x1b[0m";
 const GREEN_BOLD: &str = "\x1b[1;32m";
 const YELLOW_BOLD: &str = "\x1b[1;33m";
@@ -48,16 +50,19 @@ fn style_for(kind: ErrorKind) -> &'static str {
     }
 }
 
+/// Prints a user-facing message for an error, with a prefix indicating the error type.
 pub fn error_prefix(kind: ErrorKind) -> String {
     // Keep the label stable; only the color changes by category.
     paint("Error:", style_for(kind))
 }
 
+/// Formats an error message for display to the user, including a colored prefix based on the error kind.
 pub fn format_error(err: &BondError) -> String {
     // Used for the final top-level command failure.
     format!("{} {}", error_prefix(err.kind()), err)
 }
 
+/// Formats an error message with additional context for display to the user, including a colored prefix based on the error kind. This is useful for providing more information about the error, such as where it occurred or what operation was being attempted when the error happened.
 pub fn format_context_error(context: &str, err: &BondError) -> String {
     // Useful for startup/init failures where extra context helps.
     format!("{} {}: {}", error_prefix(err.kind()), context, err)

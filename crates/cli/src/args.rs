@@ -7,6 +7,8 @@ use std::path::PathBuf;
     version,
     about = "Manage directory bonds (symlinks with tracking)"
 )]
+
+/// The `Cli` struct defines the command-line interface for the bonds CLI application. It uses the `clap` crate to parse command-line arguments and subcommands. The `db` field allows users to specify a custom path to the database file, while the `command` field represents the specific action that the user wants to perform, such as adding a new bond, listing existing bonds, or managing configuration. Each command is defined as a variant of the `Commands` enum, which further organizes related actions into subcommands for better usability and clarity.
 pub struct Cli {
     /// Path to the database file (overrides default ~/.bonds/bonds.db)
     #[arg(long, global = true)]
@@ -17,6 +19,7 @@ pub struct Cli {
     pub command: Commands,
 }
 
+/// The `Commands` enum defines the various commands that the bonds CLI application supports. Each variant corresponds to a specific action that can be performed on the bonds, such as adding a new bond, listing existing bonds, updating bond information, and managing metadata. Some commands have their own subcommands for more granular actions, such as the `Config` and `Metadata` commands. This structure allows for a clear and organized command-line interface, making it easier for users to understand and use the available functionality of the CLI application.
 #[derive(Subcommand)]
 pub enum Commands {
     /// Create a new bond from source to target
@@ -87,6 +90,7 @@ pub enum Commands {
     },
 }
 
+/// Subcommands for the `config` command, which allows users to get or set configuration values for the bonds CLI application. The `Get` variant retrieves the current value of a specified configuration key, while the `Set` variant updates a configuration key with a new value. This allows users to customize the behavior of the CLI application by modifying its configuration settings.
 #[derive(Subcommand)]
 pub enum ConfigAction {
     /// Get the current value of a config key
@@ -103,6 +107,7 @@ pub enum ConfigAction {
     },
 }
 
+/// Subcommands for the `metadata` command, which allows users to get, set, or remove metadata key-value pairs associated with a specific bond. The `Get` variant retrieves the value of a specified metadata key for a given bond, or all metadata if no key is provided. The `Set` variant updates or adds a metadata key-value pair for a specified bond. The `Remove` variant deletes a specific metadata key from a given bond. This functionality enables users to manage additional information about their bonds in a flexible way.
 #[derive(Subcommand)]
 pub enum MetadataAction {
     /// Print metadata; pass key to read a single value

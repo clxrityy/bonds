@@ -3,6 +3,11 @@ use std::collections::HashMap;
 use bonds_cli::ui;
 use bonds_core::{BondError, BondManager};
 
+/// Metadata command handler for the `get` action, which retrieves and displays metadata associated with a specific bond. If a metadata key is provided, it retrieves the value for that key; otherwise, it lists all metadata key-value pairs for the bond. The command handles cases where metadata is not set or when a specific key is not found, providing appropriate user feedback in each case.
+/// **Example usage:**
+/// ```bash
+/// bond metadata get <id | name> [key]
+/// ```
 pub fn cmd_metadata_get(
     manager: &BondManager,
     id: &str,
@@ -45,6 +50,11 @@ pub fn cmd_metadata_get(
     Ok(())
 }
 
+/// Metadata command handler for the `set` action, which updates or adds a metadata key-value pair for a specific bond. The command retrieves the bond, updates the metadata with the provided key and value, and saves the changes using the bond manager. It provides user feedback on the success of the operation and displays the updated metadata key and value.
+/// **Example usage:**
+/// ```bash
+/// bond metadata set <id | name> <key> <value>
+/// ```
 pub fn cmd_metadata_set(
     manager: &BondManager,
     id: &str,
@@ -64,6 +74,11 @@ pub fn cmd_metadata_set(
     Ok(())
 }
 
+/// Metadata command handler for the `remove` action, which deletes a specific metadata key from a bond. The command retrieves the bond, checks for the existence of the metadata key, and removes it if found. If the key is not found, it returns an error. After removal, it updates the bond's metadata and provides user feedback on the success of the operation, including the removed key. If the metadata map becomes empty after removal, it stores `None` to keep the database representation clean.
+/// **Example usage:**
+/// ```bash
+/// bond metadata remove <id | name> <key>
+/// ```
 pub fn cmd_metadata_remove(manager: &BondManager, id: &str, key: &str) -> Result<(), BondError> {
     let bond = manager.get_bond(id)?;
 

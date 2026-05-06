@@ -2,6 +2,11 @@ use bonds_cli::ui;
 use bonds_core::{BondError, BondManager, BondsConfig};
 use std::path::PathBuf;
 
+/// Migrate command handler, which moves the target of a bond to a new location. The command retrieves the bond by its ID or name, resolves the destination directory (either from the provided argument or from the default configuration), and constructs the new target path by preserving the basename of the existing target. If the bond is already at the destination, it informs the user and exits without making changes. Otherwise, it delegates to the bond manager's `update_bond` method to handle the migration, which includes updating symlinks and the database record. Upon successful migration, it provides user feedback with details of the old and new target paths.
+/// **Example usage:**
+/// ```bash
+/// bond migrate <id | name> [destination]
+/// ```
 pub fn cmd_migrate(
     manager: &BondManager,
     id: &str,

@@ -2,6 +2,11 @@ use bonds_cli::ui;
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
 
+/// Update command handler, which modifies the source path, target path, or name of an existing bond. The command accepts optional parameters for the source and target, allowing users to update any combination of these attributes. It validates that at least one of the source or target is provided and resolves the paths to absolute form. The command then calls the bond manager's `update_bond` method to apply the changes and provides user feedback on the success of the operation, including details of the updated bond's source and target paths.
+/// **Example usage:**
+/// ```bash
+/// bond update <id | name> [--source <new_source>] [--target <new_target>]
+/// ```
 pub fn cmd_update(
     manager: &BondManager,
     id: &str,

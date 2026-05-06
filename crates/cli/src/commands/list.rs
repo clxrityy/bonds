@@ -1,6 +1,11 @@
 use bonds_cli::ui;
 use bonds_core::{BondError, BondManager};
 
+/// Command handler for the `list` command, which retrieves and displays a list of all existing bonds managed by the bond manager. The command formats the output to show each bond's ID, source path, target path, and creation date in a user-friendly manner. If no bonds are found, it provides a warning message to the user. This command allows users to quickly see an overview of all their bonds and their key details.
+/// **Example usage:**
+/// ```bash
+/// bond list
+/// ```
 pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
     let bonds = manager.list_bonds()?;
 
