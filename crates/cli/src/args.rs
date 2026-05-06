@@ -12,6 +12,7 @@ pub struct Cli {
     #[arg(long, global = true)]
     pub db: Option<PathBuf>,
 
+    /// Command to execute
     #[command(subcommand)]
     pub command: Commands,
 }
@@ -78,6 +79,12 @@ pub enum Commands {
         /// Destination directory (defaults to configured default directory)
         dest: Option<PathBuf>,
     },
+
+    /// Read or modify metadata for a bond
+    Metadata {
+        #[command(subcommand)]
+        action: MetadataAction,
+    },
 }
 
 #[derive(Subcommand)]
@@ -93,5 +100,32 @@ pub enum ConfigAction {
         key: String,
         /// New value
         value: String,
+    },
+}
+
+#[derive(Subcommand)]
+pub enum MetadataAction {
+    /// Print metadata; pass key to read a single value
+    Get {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Optional metadata key
+        key: Option<String>,
+    },
+    /// Set (upsert) one metadata key/value
+    Set {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Metadata key
+        key: String,
+        /// Metadata value
+        value: String,
+    },
+    /// Remove one metadata key
+    Remove {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Metadata key to remove
+        key: String,
     },
 }
