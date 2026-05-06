@@ -23,7 +23,7 @@ help: ## Show this help message
 # ---------------------------------------
 # Setup targets.
 # ---------------------------------------
-setup-docs-venv: ## Setup .venv	for documentation generation
+setup-docs: ## Setup .venv	for documentation generation
 	@python3 -m venv .venv
 	@.venv/bin/pip install -r docs/requirements.txt
 	bash -c "source .venv/bin/activate"
@@ -88,7 +88,7 @@ build: ## Build all packages
 # ---------------------------------------
 # Documentation targets.
 # ---------------------------------------
-docs-dev: setup-docs-venv ## Build documentation for all packages
+docs-dev: setup-docs ## Build documentation for all packages
 	@rm -rf docs/site
 	SITE_URL=$${SITE_URL:-http://127.0.0.1:4173/} .venv/bin/mkdocs build --strict -f docs/mkdocs.yml
 	cargo doc --workspace --no-deps
