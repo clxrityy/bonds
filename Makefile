@@ -1,7 +1,7 @@
 # ----------------------------------------
 # Variables
 #	----------------------------------------
-VERSION ?= v0.1.0
+VERSION ?= v0.1.4
 DOCS_PROFILE ?= strict
 TAG ?= $(VERSION)
 
