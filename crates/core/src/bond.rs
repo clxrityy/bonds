@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Representation of a bond (source -> target)
+/// The `Bond` struct encapsulates the properties of a bond, including its unique identifier, optional name, source and target paths, creation timestamp, and optional metadata. It provides methods for creating new bonds, accessing its fields, and serializing the creation timestamp for database storage. The struct is designed to be easily serializable to JSON for storage in a SQLite database and includes tests to ensure the uniqueness of IDs, correct serialization/deserialization, and proper handling of timestamps.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Bond {
     pub(crate) id: String,

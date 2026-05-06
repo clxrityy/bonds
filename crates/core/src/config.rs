@@ -23,6 +23,7 @@ impl BondsConfig {
     }
 
     /// Load config from disk; returns Default::default() if the file doesn't exist yet.
+    /// Errors if the file exists but can't be read or parsed.
     pub fn load() -> Result<Self, BondError> {
         let path = Self::config_path();
         if !path.exists() {
@@ -34,6 +35,7 @@ impl BondsConfig {
     }
 
     /// Save config to disk, creating ~/.bonds/ if needed.
+    /// Errors if the file can't be written.
     pub fn save(&self) -> Result<(), BondError> {
         let path = Self::config_path();
         if let Some(parent) = path.parent() {

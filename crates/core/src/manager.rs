@@ -8,6 +8,7 @@ use std::fs;
 use std::path::{Path, PathBuf}; // Metadata map type for API methods
 
 /// SQLite-backed manager for Bonds.
+/// The `BondManager` struct provides high-level methods for managing the lifecycle of bonds, including creating, retrieving, updating, and deleting bonds. It handles the underlying SQLite database connection and schema management, as well as the filesystem operations required to create and update symlinks. The manager ensures that bond records are kept in sync with the actual state of the filesystem and provides error handling for various edge cases, such as invalid paths or conflicts with existing files.
 pub struct BondManager {
     conn: Connection,
 }
@@ -74,6 +75,8 @@ impl BondManager {
     }
 
     /// Get a single bond by ID or name. ID can be a unique prefix.
+    /// First tries exact name match, then falls back to ID prefix match. Errors if not found or if ID prefix is ambiguous.
+    /// This method is used by CLI commands that accept either an ID or name as an identifier for a bond.
     pub fn get_bond(&self, identifier: &str) -> Result<Bond, BondError> {
         // 1. Try exact name match
         let mut stmt = self.conn.prepare(
@@ -106,6 +109,7 @@ impl BondManager {
     }
 
     /// Create a symlink bond and persist it (no metadata).
+    /// This is the main method used by CLI commands to create bonds, and it keeps the signature simple for that use case. Library users who want metadata can call `create_bond_with_metadata` instead.
     pub fn create_bond<P: AsRef<Path>, Q: AsRef<Path>>(
         &self,
         source: P,
@@ -117,6 +121,7 @@ impl BondManager {
     }
 
     /// Create a symlink bond with metadata and persist it.
+    /// This method is intended for library users who want to set metadata at creation time. It has a more complex signature than `create_bond`, but it avoids the need for a separate "update metadata" call after creation.
     pub fn create_bond_with_metadata<P: AsRef<Path>, Q: AsRef<Path>>(
         &self,
         source: P,
@@ -129,6 +134,7 @@ impl BondManager {
     }
 
     /// Shared implementation used by both create methods.
+    /// This method performs the actual work of validating paths, creating the symlink, and inserting the record into the database. It is not exposed publicly because it has a more complex signature that includes metadata, which is not needed for the common CLI use case.
     fn create_bond_internal<P: AsRef<Path>, Q: AsRef<Path>>(
         &self,
         source: P,
@@ -211,6 +217,7 @@ impl BondManager {
 
     /// Update a bond's source and/or target.
     /// Replaces the symlink on disk and updates the DB record.
+    /// This method is used by the CLI update command to modify the source or target paths of an existing bond. It validates the new paths, ensures that the target path does not conflict with existing files, updates the symlink on disk, and then updates the corresponding record in the SQLite database. The method returns the updated Bond object after successful completion.
     pub fn update_bond(
         &self,
         id: &str,
@@ -287,6 +294,7 @@ impl BondManager {
     }
 
     /// Replace a bond's metadata. Pass `None` to clear metadata entirely.
+    /// This method is used by the CLI command to update the metadata of an existing bond. It accepts a bond identifier (ID or name) and a new metadata map, which can be set to `None` to clear existing metadata. The method updates the metadata in the SQLite database and returns the updated Bond object with the new metadata. This allows users to manage custom key/value pairs associated with their bonds without affecting the source or target paths.
     pub fn update_bond_metadata(
         &self,
         identifier: &str,
@@ -308,6 +316,7 @@ impl BondManager {
     }
 
     /// Delete a bond by id. If `remove_target` is true, non-symlink targets are removed too.
+    /// This method is used by the CLI delete command to remove an existing bond. It first retrieves the bond by its identifier, checks if the target path exists, and if it does, it determines whether it's a symlink or a regular file/directory. If it's a symlink, it removes it. If it's not a symlink and `remove_target` is true, it removes the file or directory at the target path. Finally, it deletes the bond record from the SQLite database and returns the deleted Bond object. This allows users to clean up bonds and optionally remove the target files/directories they point to.
     pub fn delete_bond(&self, id: &str, remove_target: bool) -> Result<Bond, BondError> {
         let bond = self.get_bond(id)?;
 
@@ -335,6 +344,7 @@ impl BondManager {
     }
 
     /// Runs schema migration. Useful for testing with in-memory DBs.
+    /// This method is called internally when creating a BondManager from a rusqlite Connection. It ensures that the necessary tables and columns exist in the database, creating them if they are missing. This allows the application to work with both new and existing databases without requiring manual migration steps. The method handles the creation of the `bonds` table and the addition of new columns for name and metadata, while ignoring errors if those columns already exist (which can happen when connecting to an older database).
     pub(crate) fn from_connection(conn: Connection) -> Result<Self, BondError> {
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS bonds (

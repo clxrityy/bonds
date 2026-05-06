@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 /// Coarse error categories used by the CLI to pick a color.
+/// This is not an exhaustive list of all error cases, just broad buckets for consistent CLI rendering.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ErrorKind {
     /// User provided invalid or unusable data (e.g. path, timestamp, identifier).
@@ -16,6 +17,7 @@ pub enum ErrorKind {
 }
 
 /// Errors surfaced by the API
+/// This is the main error type returned by all public methods in this crate. It wraps various underlying error types (IO, SQLite, serialization) as well as domain-specific errors like NotFound or AlreadyExists. The `kind()` method allows callers to categorize errors for consistent CLI rendering.
 #[derive(Error, Debug)]
 pub enum BondError {
     /// Filesystem or OS I/O failure.
@@ -61,6 +63,7 @@ pub enum BondError {
 
 impl BondError {
     /// Return a broad category so the CLI can render the error consistently.
+    /// This is not meant to be an exhaustive categorization of all error cases, just a few buckets that map to different CLI colors and exit codes.
     pub fn kind(&self) -> ErrorKind {
         match self {
             Self::InvalidPath(_) | Self::InvalidTimestamp(_) | Self::AmbiguousId(_) => {
