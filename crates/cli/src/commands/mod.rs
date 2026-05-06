@@ -1,12 +1,19 @@
-mod add; /// Handler for the `add` CLI command to create new bonds.
-mod config; /// Handlers for the `config` CLI subcommands to get/set user configuration.
-mod info; /// Handler for the `info` CLI command to display details of a specific bond.
-mod list; /// Handler for the `list` CLI command to display all existing bonds.
-mod metadata; /// Handlers for the `metadata` CLI subcommands to manage bond metadata key/value pairs.
-mod migrate; /// Handler for the `migrate` CLI command to perform database schema migrations.
-mod remove; /// Handler for the `remove` CLI command to delete existing bonds.
-mod update; /// Handler for the `update` CLI command to modify the source/target paths or name of an existing bond.
-
+mod add;
+/// Handler for the `add` CLI command to create new bonds.
+mod config;
+/// Handlers for the `config` CLI subcommands to get/set user configuration.
+mod info;
+/// Handler for the `info` CLI command to display details of a specific bond.
+mod list;
+/// Handler for the `list` CLI command to display all existing bonds.
+mod metadata;
+/// Handlers for the `metadata` CLI subcommands to manage bond metadata key/value pairs.
+mod migrate;
+/// Handler for the `migrate` CLI command to perform database schema migrations.
+mod remove;
+/// Handler for the `remove` CLI command to delete existing bonds.
+mod update;
+/// Handler for the `update` CLI command to modify the source/target paths or name of an existing bond.
 pub use add::cmd_add;
 pub use config::{cmd_config_get, cmd_config_set};
 pub use info::cmd_info;
