@@ -1,4 +1,5 @@
 use bonds_core::{BondError, BondManager};
+use std::collections::HashMap;
 use tempfile::TempDir;
 
 /// Integration helper: manager with a real file-backed DB in a temp dir.
@@ -264,4 +265,36 @@ fn create_bond_into_empty_dir() {
     // Should succeed -- empty dir gets replaced by symlink
     let _bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
     assert!(tgt.symlink_metadata().unwrap().file_type().is_symlink());
+}
+
+#[test]
+#[cfg_attr(windows, ignore)]
+fn metadata_persists_after_manager_reopen() {
+    let db_dir = TempDir::new().unwrap();
+    let db_path = db_dir.path().join("test.db");
+
+    let mgr = BondManager::new(Some(db_path.clone())).unwrap();
+    let src = TempDir::new().unwrap();
+    let tgt_dir = TempDir::new().unwrap();
+    let tgt = tgt_dir.path().join("meta_link");
+
+    let mut metadata = HashMap::new();
+    metadata.insert("scope".to_string(), "integration".to_string());
+    metadata.insert("status".to_string(), "active".to_string());
+
+    let created = mgr
+        .create_bond_with_metadata(
+            src.path(),
+            &tgt,
+            Some("meta-reopen".into()),
+            Some(metadata.clone()),
+        )
+        .unwrap();
+
+    // Force a new manager/connection to prove DB persistence, not in-memory state.
+    drop(mgr);
+
+    let mgr2 = BondManager::new(Some(db_path)).unwrap();
+    let fetched = mgr2.get_bond(created.id()).unwrap();
+    assert_eq!(fetched.metadata(), Some(&metadata));
 }
