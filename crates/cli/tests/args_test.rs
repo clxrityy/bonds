@@ -1,4 +1,4 @@
-use bonds_cli::args::{Cli, Commands, ConfigAction};
+use bonds_cli::args::{Cli, Commands, ConfigAction, MetadataAction};
 use clap::Parser;
 
 #[test]
@@ -188,5 +188,62 @@ fn parse_migrate_without_dest() {
             assert!(dest.is_none());
         }
         _ => panic!("expected Migrate"),
+    }
+}
+
+#[test]
+fn parse_metadata_get_all() {
+    let cli = Cli::try_parse_from(["bond", "metadata", "get", "foo"]).unwrap();
+    match cli.command {
+        Commands::Metadata {
+            action: MetadataAction::Get { id, key },
+        } => {
+            assert_eq!(id, "foo");
+            assert!(key.is_none());
+        }
+        _ => panic!("expected Metadata Get"),
+    }
+}
+
+#[test]
+fn parse_metadata_get_key() {
+    let cli = Cli::try_parse_from(["bond", "metadata", "get", "foo", "owner"]).unwrap();
+    match cli.command {
+        Commands::Metadata {
+            action: MetadataAction::Get { id, key },
+        } => {
+            assert_eq!(id, "foo");
+            assert_eq!(key.unwrap(), "owner");
+        }
+        _ => panic!("expected Metadata Get"),
+    }
+}
+
+#[test]
+fn parse_metadata_set() {
+    let cli = Cli::try_parse_from(["bond", "metadata", "set", "foo", "owner", "mj"]).unwrap();
+    match cli.command {
+        Commands::Metadata {
+            action: MetadataAction::Set { id, key, value },
+        } => {
+            assert_eq!(id, "foo");
+            assert_eq!(key, "owner");
+            assert_eq!(value, "mj");
+        }
+        _ => panic!("expected Metadata Set"),
+    }
+}
+
+#[test]
+fn parse_metadata_remove() {
+    let cli = Cli::try_parse_from(["bond", "metadata", "remove", "foo", "owner"]).unwrap();
+    match cli.command {
+        Commands::Metadata {
+            action: MetadataAction::Remove { id, key },
+        } => {
+            assert_eq!(id, "foo");
+            assert_eq!(key, "owner");
+        }
+        _ => panic!("expected Metadata Remove"),
     }
 }
