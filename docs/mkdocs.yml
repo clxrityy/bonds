@@ -27,18 +27,18 @@ theme:
 
   # Tune palette to your brand as needed
   palette:
-    - scheme: default
+    - scheme: slate
       primary: indigo grey
-      accent: teal
+      accent: blue grey
       toggle:
-        icon: material/weather-night
-        name: Switch to blue mode
-    - scheme: blue
-      primary: blue grey
-      accent: indigo
-      toggle:
-        icon: material/weather-sunny
+        icon: material/invert-colors-off
         name: Switch to default mode
+    - scheme: default
+      primary: teal grey
+      accent: blue grey
+      toggle:
+        icon: material/invert-colors
+        name: Switch to dark mode
 
 markdown_extensions:
   - admonition
@@ -54,8 +54,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
   - pymdownx.highlight:
+      use_pygments: false
       anchor_linenums: true
       line_spans: __span
+      pygments_lang_class: true
   - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
@@ -67,9 +69,11 @@ plugins:
       minify_html: true
 
 extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css
   - assets/stylesheets/extra.css
 
 extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js
   - assets/javascripts/extra.js
 
 nav:

@@ -37,8 +37,8 @@ cargo install bonds-cli
       <td></td>
       <td>Main entry point, shows help if no subcommand is provided.</td>
       <td>
-        <pre><code lang="bash">bond</code></pre>
-        <pre><code lang="bash">bond --help</code></pre>
+        <pre><code class="language-bash">bond</code></pre>
+        <pre><code class="language-bash">bond --help</code></pre>
       </td>
     </tr>
     <tr id="add">
@@ -46,8 +46,8 @@ cargo install bonds-cli
       <td><code>&lt;source&gt;</code> <code>[--name &lt;name&gt;]</code></td>
       <td>Create a bond (symlink) from source to target.</td>
       <td>
-        <pre><code lang="bash">bond add ~/projects/my-app</code></pre>
-        <pre><code lang="bash">bond add ~/projects/my-app --name foo</code></pre>
+        <pre><code class="language-bash">bond add ~/projects/my-app</code></pre>
+        <pre><code class="language-bash">bond add ~/projects/my-app --name foo</code></pre>
       </td>
     </tr>
     <tr id="list">
@@ -55,7 +55,7 @@ cargo install bonds-cli
       <td></td>
       <td>List all bonds.</td>
       <td>
-        <pre><code lang="bash">bond list</code></pre>
+        <pre><code class="language-bash">bond list</code></pre>
       </td>
     </tr>
     <tr id="info">
@@ -63,7 +63,7 @@ cargo install bonds-cli
       <td><code>&lt;name|id&gt;</code></td>
       <td>Show details about a specific bond.</td>
       <td>
-        <pre><code lang="bash">bond info foo</code></pre>
+        <pre><code class="language-bash">bond info foo</code></pre>
       </td>
     </tr>
     <tr id="remove">
@@ -71,7 +71,7 @@ cargo install bonds-cli
       <td><code>&lt;name|id&gt;</code> <code>[--with-target]</code></td>
       <td>Remove a bond, with optional target deletion.</td>
       <td>
-        <pre><code lang="bash">bond remove foo</code></pre>
+        <pre><code class="language-bash">bond remove foo</code></pre>
       </td>
     </tr>
     <tr id="update">
@@ -79,8 +79,8 @@ cargo install bonds-cli
       <td><code>&lt;name|id&gt;</code> <code>[--source &lt;new-source&gt;]</code> <code>[--target &lt;new-target&gt;]</code></td>
       <td>Update a bond's source and/or target.</td>
       <td>
-        <pre><code lang="bash">bond update foo --source ~/projects/new-app</code></pre>
-        <pre><code lang="bash">bond update foo --target ~/bonds/new-app</code></pre>
+        <pre><code class="language-bash">bond update foo --source ~/projects/new-app</code></pre>
+        <pre><code class="language-bash">bond update foo --target ~/bonds/new-app</code></pre>
       </td>
     </tr>
     <tr id="migrate">
@@ -88,8 +88,8 @@ cargo install bonds-cli
       <td><code>&lt;name|id&gt;</code> <code>[new-target]</code></td>
       <td>Move existing bonds to a new target location (with auto-backup). Moves to the default target if none is provided.</td>
       <td>
-        <pre><code lang="bash">bond migrate foo</code></pre>
-        <pre><code lang="bash">bond migrate foo ~/new-bonds</code></pre>
+        <pre><code class="language-bash">bond migrate foo</code></pre>
+        <pre><code class="language-bash">bond migrate foo ~/new-bonds</code></pre>
       </td>
     </tr>
     <tr id="config">
@@ -97,8 +97,8 @@ cargo install bonds-cli
       <td><code>&lt;get|set&gt;</code> <code>&lt;key&gt;</code></td>
       <td>Get or set configuration values.</td>
       <td>
-        <pre><code lang="bash">bond config set default ~/my-bonds</code></pre>
-        <pre><code lang="bash">bond config get default</code></pre>
+        <pre><code class="language-bash">bond config set default ~/my-bonds</code></pre>
+        <pre><code class="language-bash">bond config get default</code></pre>
       </td>
     </tr>
     <tr id="metadata">
@@ -106,10 +106,10 @@ cargo install bonds-cli
       <td><code>&lt;get|set|remove&gt;</code> <code>&lt;name|id&gt;</code> <code>[key] [value]</code></td>
       <td>Read or modify metadata for a bond.</td>
       <td>
-        <pre><code lang="bash">bond metadata get foo</code></pre>
-        <pre><code lang="bash">bond metadata set foo project my-app</code></pre>
-        <pre><code lang="bash">bond metadata get foo project</code></pre>
-        <pre><code lang="bash">bond metadata remove foo project</code></pre>
+        <pre><code class="language-bash">bond metadata get foo</code></pre>
+        <pre><code class="language-bash">bond metadata set foo project my-app</code></pre>
+        <pre><code class="language-bash">bond metadata get foo project</code></pre>
+        <pre><code class="language-bash">bond metadata remove foo project</code></pre>
       </td>
     </tr>
   </tbody>
