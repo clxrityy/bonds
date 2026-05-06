@@ -2,6 +2,8 @@
 # Variables
 #	----------------------------------------
 VERSION ?= v0.1.4
+VERSION_TARGET	?= all
+SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
 TAG ?= $(VERSION)
 
@@ -95,6 +97,9 @@ docs-dev: setup-docs-venv ## Build documentation for all packages
 #	---------------------------------------
 # Release targets.
 #	---------------------------------------
+version: ## Update crate version(s). Usage: `make version VERSION=v0.0.0 VERSION_TARGET=all SYNC_MAKEFILE=true`
+	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE)
+
 tag-release: ## Tag + push a release for the current version. Usages: `make tag-release TAG=v0.1.0` `make tag-release TAG=core-v0.1.0` `make tag-release TAG=cli-v0.1.0`
 	@set -euo pipefail; \
 		if ! git diff --quiet || ! git diff --cached --quiet; then \
