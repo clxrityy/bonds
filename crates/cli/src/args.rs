@@ -1,3 +1,5 @@
+//! The `args` module defines the command-line argument structures and parsing logic for the bonds CLI application using the `clap` crate. It includes the main `Cli` struct, which represents the overall command-line interface, and the `Commands` enum, which defines the various subcommands that users can execute. Each subcommand may have its own set of arguments and options, allowing for a flexible and user-friendly command-line experience when managing directory bonds (symlinks with tracking).
+
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -7,7 +9,6 @@ use std::path::PathBuf;
     version,
     about = "Manage directory bonds (symlinks with tracking)"
 )]
-
 /// The `Cli` struct defines the command-line interface for the bonds CLI application. It uses the `clap` crate to parse command-line arguments and subcommands. The `db` field allows users to specify a custom path to the database file, while the `command` field represents the specific action that the user wants to perform, such as adding a new bond, listing existing bonds, or managing configuration. Each command is defined as a variant of the `Commands` enum, which further organizes related actions into subcommands for better usability and clarity.
 pub struct Cli {
     /// Path to the database file (overrides default ~/.bonds/bonds.db)

@@ -1,8 +1,8 @@
+//! Command handler for the `config` command, which allows users to view or modify configuration settings for the bonds CLI application. The command supports subcommands for getting and setting specific configuration keys, such as the default target directory for new bonds. The handler loads the current configuration, performs the requested action based on the subcommand, and provides user feedback on the success or failure of the operation.
+
 use bonds_cli::ui;
 use bonds_core::{BondError, BondsConfig};
 use std::path::PathBuf;
-
-/// Command handler for the `config` command, which allows users to view or modify configuration settings for the bonds CLI application. The command supports subcommands for getting and setting specific configuration keys, such as the default target directory for new bonds. The handler loads the current configuration, performs the requested action based on the subcommand, and provides user feedback on the success or failure of the operation.
 
 /// Command handler for the `config get` subcommand, which retrieves the current value of a specified configuration key and displays it to the user. If the key is not recognized, it returns an error indicating that the config key is unknown.
 /// **Example usage:**

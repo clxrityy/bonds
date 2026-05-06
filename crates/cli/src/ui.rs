@@ -1,10 +1,10 @@
+//! The `ui` module provides functions for formatting error messages and other user-facing output in a consistent and visually appealing way. It is used throughout the CLI application to ensure that all messages are presented in a clear and user-friendly manner.
+
 use std::fmt::Display;
 use std::io::IsTerminal;
 
 use bonds_core::BondError;
 use bonds_core::error::ErrorKind;
-
-/// The `ui` module provides functions for formatting error messages and other user-facing output in a consistent and visually appealing way. It is used throughout the CLI application to ensure that all messages are presented in a clear and user-friendly manner.
 
 const RESET: &str = "\x1b[0m";
 const GREEN_BOLD: &str = "\x1b[1;32m";
