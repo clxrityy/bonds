@@ -3,8 +3,9 @@ use crate::error::BondError;
 use chrono::{DateTime, Utc};
 use rusqlite::{Connection, params};
 use serde_json;
+use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Path, PathBuf}; // Metadata map type for API methods
 
 /// SQLite-backed manager for Bonds.
 pub struct BondManager {
@@ -104,17 +105,41 @@ impl BondManager {
         Ok(first)
     }
 
-    /// Create a symlink bond and persist it.
+    /// Create a symlink bond and persist it (no metadata).
     pub fn create_bond<P: AsRef<Path>, Q: AsRef<Path>>(
         &self,
         source: P,
         target: Q,
         name: Option<String>,
     ) -> Result<Bond, BondError> {
+        // Keep legacy signature stable for existing CLI/API callers.
+        self.create_bond_internal(source, target, name, None)
+    }
+
+    /// Create a symlink bond with metadata and persist it.
+    pub fn create_bond_with_metadata<P: AsRef<Path>, Q: AsRef<Path>>(
+        &self,
+        source: P,
+        target: Q,
+        name: Option<String>,
+        metadata: Option<HashMap<String, String>>,
+    ) -> Result<Bond, BondError> {
+        // New API path: lets library users persist metadata at creation time.
+        self.create_bond_internal(source, target, name, metadata)
+    }
+
+    /// Shared implementation used by both create methods.
+    fn create_bond_internal<P: AsRef<Path>, Q: AsRef<Path>>(
+        &self,
+        source: P,
+        target: Q,
+        name: Option<String>,
+        metadata: Option<HashMap<String, String>>,
+    ) -> Result<Bond, BondError> {
         let src = source.as_ref().to_path_buf();
         let tgt = target.as_ref().to_path_buf();
 
-        // Validate name uniqueness if provided
+        // Validate name uniqueness if provided.
         if let Some(ref n) = name {
             let mut stmt = self
                 .conn
@@ -131,8 +156,9 @@ impl BondManager {
                 src
             )));
         }
+
         if tgt.exists() {
-            // Allow targeting an empty directory (common after removing child bonds)
+            // Allow replacing an empty directory at target path.
             let is_empty_dir = tgt.is_dir()
                 && std::fs::read_dir(&tgt)
                     .map(|mut d| d.next().is_none())
@@ -142,7 +168,6 @@ impl BondManager {
                 return Err(BondError::TargetExists(format!("{}", tgt.display())));
             }
 
-            // Remove the empty dir so the symlink can take its place
             std::fs::remove_dir(&tgt)?;
         }
 
@@ -150,7 +175,6 @@ impl BondManager {
             fs::create_dir_all(parent)?;
         }
 
-        // Platform-specific symlink creation
         #[cfg(unix)]
         std::os::unix::fs::symlink(&src, &tgt)?;
         #[cfg(windows)]
@@ -162,20 +186,21 @@ impl BondManager {
             }
         }
 
-        let bond = Bond::new(src.clone(), tgt.clone(), name);
-        let metadata_json: Option<String> = bond
-            .metadata
-            .as_ref()
-            .map(serde_json::to_string)
-            .transpose()?;
+        // Keep returned Bond and DB row in sync.
+        let mut bond = Bond::new(src.clone(), tgt.clone(), name);
+        bond.metadata = metadata;
+
+        // Store metadata as JSON in SQLite TEXT column.
+        let metadata_json: Option<String> =
+            bond.metadata().map(serde_json::to_string).transpose()?;
 
         self.conn.execute(
         "INSERT INTO bonds (id, name, source, target, created_at, metadata) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![
-            bond.id,
-            bond.name,
-            bond.source.to_string_lossy().to_string(),
-            bond.target.to_string_lossy().to_string(),
+            bond.id(),
+            bond.name(),
+            bond.source().to_string_lossy().to_string(),
+            bond.target().to_string_lossy().to_string(),
             bond.created_at_rfc3339(),
             metadata_json
         ],
@@ -261,6 +286,27 @@ impl BondManager {
         Ok(bond)
     }
 
+    /// Replace a bond's metadata. Pass `None` to clear metadata entirely.
+    pub fn update_bond_metadata(
+        &self,
+        identifier: &str,
+        metadata: Option<HashMap<String, String>>,
+    ) -> Result<Bond, BondError> {
+        // Reuse existing identifier resolution (name, full ID, or unique ID prefix).
+        let mut bond = self.get_bond(identifier)?;
+
+        let metadata_json: Option<String> =
+            metadata.as_ref().map(serde_json::to_string).transpose()?;
+
+        self.conn.execute(
+            "UPDATE bonds SET metadata = ?1 WHERE id = ?2",
+            params![metadata_json, bond.id()],
+        )?;
+
+        bond.metadata = metadata;
+        Ok(bond)
+    }
+
     /// Delete a bond by id. If `remove_target` is true, non-symlink targets are removed too.
     pub fn delete_bond(&self, id: &str, remove_target: bool) -> Result<Bond, BondError> {
         let bond = self.get_bond(id)?;
@@ -303,6 +349,8 @@ impl BondManager {
 
         // Migration: add name column (ignore error if it already exists)
         let _ = conn.execute_batch("ALTER TABLE bonds ADD COLUMN name TEXT;");
+        // Migration: add metadata column for older databases (ignore if it already exists).
+        let _ = conn.execute_batch("ALTER TABLE bonds ADD COLUMN metadata TEXT;");
 
         Ok(Self { conn })
     }
@@ -312,7 +360,8 @@ impl BondManager {
 mod tests {
     use super::*;
     use rusqlite::Connection;
-    use tempfile::TempDir;
+    use std::collections::HashMap;
+    use tempfile::TempDir; // Needed for metadata assertions
 
     /// Helper: creates a BondManager backed by in-memory SQLite.
     fn test_manager() -> BondManager {
@@ -431,5 +480,62 @@ mod tests {
         // bond2 was created second, should appear first (newest-first order)
         assert_eq!(bonds[0].id, bond2.id);
         assert_eq!(bonds[1].id, bond1.id);
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn create_bond_with_metadata_round_trips() {
+        let mgr = test_manager();
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let mut metadata = HashMap::new();
+        metadata.insert("project".to_string(), "bonds".to_string());
+        metadata.insert("owner".to_string(), "core-team".to_string());
+
+        let created = mgr
+            .create_bond_with_metadata(
+                &src_path,
+                &tgt_path,
+                Some("meta-bond".into()),
+                Some(metadata.clone()),
+            )
+            .unwrap();
+
+        assert_eq!(created.metadata(), Some(&metadata));
+
+        let fetched = mgr.get_bond(created.id()).unwrap();
+        assert_eq!(fetched.metadata(), Some(&metadata));
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn update_bond_metadata_set_and_clear() {
+        let mgr = test_manager();
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let created = mgr.create_bond(&src_path, &tgt_path, None).unwrap();
+        assert!(created.metadata().is_none());
+
+        let mut metadata = HashMap::new();
+        metadata.insert("env".to_string(), "dev".to_string());
+        metadata.insert("team".to_string(), "platform".to_string());
+
+        let updated = mgr
+            .update_bond_metadata(created.id(), Some(metadata.clone()))
+            .unwrap();
+        assert_eq!(updated.metadata(), Some(&metadata));
+
+        let fetched = mgr.get_bond(created.id()).unwrap();
+        assert_eq!(fetched.metadata(), Some(&metadata));
+
+        let cleared = mgr.update_bond_metadata(created.id(), None).unwrap();
+        assert!(cleared.metadata().is_none());
+
+        let fetched_again = mgr.get_bond(created.id()).unwrap();
+        assert!(fetched_again.metadata().is_none());
     }
 }
