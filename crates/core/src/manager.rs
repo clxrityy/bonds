@@ -1,5 +1,6 @@
 use crate::bond::Bond;
 use crate::error::BondError;
+use crate::query::{BondQuery, MetadataFilter};
 use chrono::{DateTime, Utc};
 use rusqlite::{Connection, params};
 use serde_json;
@@ -364,6 +365,78 @@ impl BondManager {
 
         Ok(Self { conn })
     }
+
+    /// Query bonds using optional source/target/metadata filters.
+    ///
+    /// This implementation filters in Rust after loading bonds from SQLite.
+    /// It keeps behavior predictable across SQLite builds and is sufficient for current scale.
+    pub fn query_bonds(&self, query: &BondQuery) -> Result<Vec<Bond>, BondError> {
+        let bonds = self.list_bonds()?;
+
+        let filtered = bonds
+            .into_iter()
+            .filter(|bond| {
+                if let Some(source) = query.source.as_ref() {
+                    if bond.source() != source.as_path() {
+                        return false;
+                    }
+                }
+
+                if let Some(target) = query.target.as_ref() {
+                    if bond.target() != target.as_path() {
+                        return false;
+                    }
+                }
+
+                if let Some(meta_filter) = query.metadata.as_ref() {
+                    let Some(metadata) = bond.metadata() else {
+                        return false;
+                    };
+
+                    match meta_filter {
+                        MetadataFilter::HasKey(key) => {
+                            if !metadata.contains_key(key) {
+                                return false;
+                            }
+                        }
+                        MetadataFilter::KeyValue { key, value } => {
+                            if metadata.get(key).map(|v| v.as_str()) != Some(value.as_str()) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                true
+            })
+            .collect();
+
+        Ok(filtered)
+    }
+
+    /// Convenience helper for exact source matching.
+    pub fn query_by_source<P: AsRef<Path>>(&self, source: P) -> Result<Vec<Bond>, BondError> {
+        let query = BondQuery::new().with_source(source);
+        self.query_bonds(&query)
+    }
+
+    /// Convenience helper for exact target matching.
+    pub fn query_by_target<P: AsRef<Path>>(&self, target: P) -> Result<Vec<Bond>, BondError> {
+        let query = BondQuery::new().with_target(target);
+        self.query_bonds(&query)
+    }
+
+    /// Convenience helper for metadata key existence matching.
+    pub fn query_by_metadata_key(&self, key: &str) -> Result<Vec<Bond>, BondError> {
+        let query = BondQuery::new().with_metadata_key(key);
+        self.query_bonds(&query)
+    }
+
+    /// Convenience helper for metadata key/value matching.
+    pub fn query_by_metadata(&self, key: &str, value: &str) -> Result<Vec<Bond>, BondError> {
+        let query = BondQuery::new().with_metadata(key, value);
+        self.query_bonds(&query)
+    }
 }
 
 #[cfg(test)]
@@ -547,5 +620,56 @@ mod tests {
 
         let fetched_again = mgr.get_bond(created.id()).unwrap();
         assert!(fetched_again.metadata().is_none());
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn query_bonds_filters_by_source_target_and_metadata() {
+        let mgr = test_manager();
+
+        let (_src1_dir, src1) = temp_source();
+        let (_src2_dir, src2) = temp_source();
+
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt1 = tgt_dir.path().join("a");
+        let tgt2 = tgt_dir.path().join("b");
+
+        let mut meta1 = HashMap::new();
+        meta1.insert("team".to_string(), "core".to_string());
+
+        let mut meta2 = HashMap::new();
+        meta2.insert("team".to_string(), "platform".to_string());
+
+        let bond1 = mgr
+            .create_bond_with_metadata(&src1, &tgt1, Some("alpha".into()), Some(meta1))
+            .unwrap();
+        let bond2 = mgr
+            .create_bond_with_metadata(&src2, &tgt2, Some("beta".into()), Some(meta2))
+            .unwrap();
+
+        let by_source = mgr.query_by_source(&src1).unwrap();
+        assert_eq!(by_source.len(), 1);
+        assert_eq!(by_source[0].id(), bond1.id());
+
+        let by_target = mgr.query_by_target(&tgt2).unwrap();
+        assert_eq!(by_target.len(), 1);
+        assert_eq!(by_target[0].id(), bond2.id());
+
+        let by_key = mgr.query_by_metadata_key("team").unwrap();
+        assert_eq!(by_key.len(), 2);
+
+        let by_pair = mgr.query_by_metadata("team", "platform").unwrap();
+        assert_eq!(by_pair.len(), 1);
+        assert_eq!(by_pair[0].id(), bond2.id());
+
+        let combined = mgr
+            .query_bonds(
+                &BondQuery::new()
+                    .with_source(&src2)
+                    .with_metadata("team", "platform"),
+            )
+            .unwrap();
+        assert_eq!(combined.len(), 1);
+        assert_eq!(combined[0].id(), bond2.id());
     }
 }
