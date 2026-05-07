@@ -26,8 +26,11 @@ pub mod config;
 pub mod error;
 /// High-level manager for bond lifecycle operations.
 pub mod manager;
+/// Query builder types for filtering bonds.
+pub mod query;
 
 pub use bond::Bond;
 pub use config::BondsConfig;
 pub use error::{BondError, ErrorKind};
+pub use query::{BondQuery, MetadataFilter};
 pub use manager::BondManager;
