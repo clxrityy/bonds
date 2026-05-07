@@ -376,16 +376,16 @@ impl BondManager {
         let filtered = bonds
             .into_iter()
             .filter(|bond| {
-                if let Some(source) = query.source.as_ref() {
-                    if bond.source() != source.as_path() {
-                        return false;
-                    }
+                if let Some(source) = query.source.as_ref()
+                    && bond.source() != source.as_path()
+                {
+                    return false;
                 }
 
-                if let Some(target) = query.target.as_ref() {
-                    if bond.target() != target.as_path() {
-                        return false;
-                    }
+                if let Some(target) = query.target.as_ref()
+                    && bond.target() != target.as_path()
+                {
+                    return false;
                 }
 
                 if let Some(meta_filter) = query.metadata.as_ref() {

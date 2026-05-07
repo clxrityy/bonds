@@ -32,5 +32,5 @@ pub mod query;
 pub use bond::Bond;
 pub use config::BondsConfig;
 pub use error::{BondError, ErrorKind};
-pub use query::{BondQuery, MetadataFilter};
 pub use manager::BondManager;
+pub use query::{BondQuery, MetadataFilter};
