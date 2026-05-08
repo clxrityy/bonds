@@ -24,6 +24,8 @@ pub mod bond;
 pub mod config;
 /// Public error types returned by this crate.
 pub mod error;
+/// Event and hook types for lifecycle notifications.
+pub mod events;
 /// High-level manager for bond lifecycle operations.
 pub mod manager;
 /// Query builder types for filtering bonds.
@@ -32,5 +34,6 @@ pub mod query;
 pub use bond::Bond;
 pub use config::BondsConfig;
 pub use error::{BondError, ErrorKind};
+pub use events::{BondBrokenReason, BondEvent, BondEventHook, BondEventKind, BondEventPayload};
 pub use manager::BondManager;
 pub use query::{BondQuery, MetadataFilter};
