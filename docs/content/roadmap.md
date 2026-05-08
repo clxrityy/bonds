@@ -9,7 +9,7 @@ date: 2026-04-14
 ---
 
 - ✔ [Phase 1](#phase-1-cli-core-tool-): **CLI (core tool)**
-- ◌ [Phase 2](#phase-2-library-api-): Library API
+- ✔ [Phase 2](#phase-2-library-api-): Library API
 - ✘ [Phase 3](#phase-3-gui-application-): GUI Application
 - ✘ [Phase 4](#phase-4-ecosystem--plugins-): Ecosystem & Plugins
 
@@ -30,15 +30,15 @@ The primary, usable product. Everything in this phase should work from the termi
 - ✔ **Name a bond (for easier reference and management) (displays in `bond list`)**
 - ✔ **Tests for all functionality**
 
-## Phase 2: Library API ◌
+## Phase 2: Library API ✔
 
 Expose `bonds-core` & `bonds-cli` as a proper public API so developers can integrate it.
 
 - ✔ **Stabilize and document the public API surface**
 - ✔ **Add metadata read/write operations**
-- ✘ Hooks/events system (bond created, deleted, broken, etc.)
-- ✘ Query bonds by source, target, or metadata
-- ✘ API documentation + usage examples
+- ✔ **Hooks/events system (bond created, deleted, broken, etc.)**
+- ✔ **Query bonds by source, target, or metadata**
+- ✔ **API documentation + usage examples**
 
 ## Phase 3: GUI Application ✘
 

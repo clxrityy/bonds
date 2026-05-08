@@ -29,3 +29,11 @@ let combined = manager.query_bonds(
 )?;
 # Ok::<(), bonds_core::BondError>(())
 ```
+
+## Matching behavior
+
+- Source and target matching use exact path equality.
+- Metadata filters support:
+  - key existence (`with_metadata_key`)
+  - key/value equality (`with_metadata`)
+- Multiple filters are combined using AND semantics.
