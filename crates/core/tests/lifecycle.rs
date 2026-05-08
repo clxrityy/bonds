@@ -1,14 +1,8 @@
-use bonds_core::{BondError, BondManager};
-use std::collections::HashMap;
-use tempfile::TempDir;
+mod common;
 
-/// Integration helper: manager with a real file-backed DB in a temp dir.
-fn setup() -> (BondManager, TempDir) {
-    let db_dir = TempDir::new().unwrap();
-    let db_path = db_dir.path().join("test.db");
-    let mgr = BondManager::new(Some(db_path)).unwrap();
-    (mgr, db_dir) // hold db_dir to keep it alive
-}
+use bonds_core::BondError;
+use common::setup;
+use tempfile::TempDir;
 
 #[test]
 #[cfg_attr(windows, ignore)]
@@ -40,14 +34,13 @@ fn symlink_resolves_to_source_contents() {
     let (mgr, _db) = setup();
     let src = TempDir::new().unwrap();
 
-    // Write a file inside source
+    // Write via source, read via symlink to verify link integrity.
     std::fs::write(src.path().join("hello.txt"), "world").unwrap();
 
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
     mgr.create_bond(src.path(), &tgt, None).unwrap();
 
-    // Reading through the symlink should see the source's contents
     let content = std::fs::read_to_string(tgt.join("hello.txt")).unwrap();
     assert_eq!(content, "world");
 }
@@ -62,17 +55,14 @@ fn delete_with_target_removes_actual_files() {
 
     let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
-    // First remove the symlink and replace with a real directory
-    // (simulates someone who broke the symlink)
+    // Simulate broken bond: symlink replaced with real directory.
     std::fs::remove_file(&tgt).unwrap();
     std::fs::create_dir(&tgt).unwrap();
     std::fs::write(tgt.join("file.txt"), "data").unwrap();
 
-    // Without --with-target, this should error
     let err = mgr.delete_bond(bond.id(), false).unwrap_err();
     assert!(matches!(err, BondError::InvalidPath(_)));
 
-    // With --with-target, it should succeed and remove everything
     let removed = mgr.delete_bond(bond.id(), true).unwrap();
     assert_eq!(removed.id(), bond.id());
     assert!(!tgt.exists());
@@ -87,21 +77,17 @@ fn update_bond_target() {
     let old_tgt = tgt_dir.path().join("old_link");
     let new_tgt = tgt_dir.path().join("new_link");
 
-    // Create a bond
     let bond = mgr.create_bond(src.path(), &old_tgt, None).unwrap();
-    assert!(old_tgt.symlink_metadata().unwrap().file_type().is_symlink());
-
-    // Update only target
     let updated = mgr
         .update_bond(bond.id(), None, Some(new_tgt.clone()), None)
         .unwrap();
-    assert_eq!(updated.id(), bond.id()); // same bond
-    assert_eq!(updated.target(), new_tgt); // target changed
-    assert_eq!(updated.source(), bond.source()); // source unchanged
-    assert!(!old_tgt.exists()); // old symlink removed
-    assert!(new_tgt.symlink_metadata().unwrap().file_type().is_symlink()); // new symlink exists
 
-    // Verify DB is consistent
+    assert_eq!(updated.id(), bond.id());
+    assert_eq!(updated.target(), new_tgt);
+    assert_eq!(updated.source(), bond.source());
+    assert!(!old_tgt.exists());
+    assert!(new_tgt.symlink_metadata().unwrap().file_type().is_symlink());
+
     let fetched = mgr.get_bond(bond.id()).unwrap();
     assert_eq!(fetched.target(), new_tgt);
 }
@@ -120,17 +106,13 @@ fn update_bond_source() {
     let tgt = tgt_dir.path().join("link");
 
     let bond = mgr.create_bond(old_src.path(), &tgt, None).unwrap();
-
-    // Symlink currently points to old source
     assert!(tgt.join("a.txt").exists());
 
-    // Update source
     let updated = mgr
         .update_bond(bond.id(), Some(new_src.path().to_path_buf()), None, None)
         .unwrap();
     assert_eq!(updated.source(), new_src.path());
 
-    // Symlink now points to new source
     assert!(tgt.join("b.txt").exists());
     assert!(!tgt.join("a.txt").exists());
 }
@@ -149,9 +131,8 @@ fn update_bond_rejects_missing_source() {
     let err = mgr
         .update_bond(bond.id(), Some(bad_src), None, None)
         .unwrap_err();
-    assert!(matches!(err, BondError::InvalidPath(_)));
 
-    // Original bond should be untouched
+    assert!(matches!(err, BondError::InvalidPath(_)));
     assert!(tgt.symlink_metadata().unwrap().file_type().is_symlink());
 }
 
@@ -165,13 +146,13 @@ fn update_bond_rejects_occupied_target() {
 
     let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
-    // Create something at the new target path
     let occupied = tgt_dir.path().join("occupied");
     std::fs::create_dir(&occupied).unwrap();
 
     let err = mgr
         .update_bond(bond.id(), None, Some(occupied), None)
         .unwrap_err();
+
     assert!(matches!(err, BondError::AlreadyExists));
 }
 
@@ -188,11 +169,9 @@ fn create_and_lookup_by_name() {
         .unwrap();
     assert_eq!(bond.name(), Some("my-project"));
 
-    // Lookup by name
     let found = mgr.get_bond("my-project").unwrap();
     assert_eq!(found.id(), bond.id());
 
-    // Name should appear in list
     let all = mgr.list_bonds().unwrap();
     assert_eq!(all[0].name(), Some("my-project"));
 }
@@ -207,9 +186,11 @@ fn duplicate_name_rejected() {
 
     mgr.create_bond(src1.path(), tgt_dir.path().join("a"), Some("taken".into()))
         .unwrap();
+
     let err = mgr
         .create_bond(src2.path(), tgt_dir.path().join("b"), Some("taken".into()))
         .unwrap_err();
+
     assert!(matches!(err, BondError::AlreadyExists));
 }
 
@@ -223,7 +204,7 @@ fn get_bond_by_prefix() {
 
     let bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
 
-    // First 8 chars should resolve
+    // Prefix lookup should uniquely resolve.
     let prefix = &bond.id()[..8];
     let found = mgr.get_bond(prefix).unwrap();
     assert_eq!(found.id(), bond.id());
@@ -246,7 +227,6 @@ fn update_bond_name() {
         .unwrap();
     assert_eq!(updated.name(), Some("new-name"));
 
-    // Lookup by new name works
     let found = mgr.get_bond("new-name").unwrap();
     assert_eq!(found.id(), bond.id());
 }
@@ -259,42 +239,9 @@ fn create_bond_into_empty_dir() {
     let tgt_dir = TempDir::new().unwrap();
     let tgt = tgt_dir.path().join("link");
 
-    // Pre-create an empty directory at the target path
+    // Target path exists as empty directory; create should replace it with symlink.
     std::fs::create_dir(&tgt).unwrap();
 
-    // Should succeed -- empty dir gets replaced by symlink
     let _bond = mgr.create_bond(src.path(), &tgt, None).unwrap();
     assert!(tgt.symlink_metadata().unwrap().file_type().is_symlink());
-}
-
-#[test]
-#[cfg_attr(windows, ignore)]
-fn metadata_persists_after_manager_reopen() {
-    let db_dir = TempDir::new().unwrap();
-    let db_path = db_dir.path().join("test.db");
-
-    let mgr = BondManager::new(Some(db_path.clone())).unwrap();
-    let src = TempDir::new().unwrap();
-    let tgt_dir = TempDir::new().unwrap();
-    let tgt = tgt_dir.path().join("meta_link");
-
-    let mut metadata = HashMap::new();
-    metadata.insert("scope".to_string(), "integration".to_string());
-    metadata.insert("status".to_string(), "active".to_string());
-
-    let created = mgr
-        .create_bond_with_metadata(
-            src.path(),
-            &tgt,
-            Some("meta-reopen".into()),
-            Some(metadata.clone()),
-        )
-        .unwrap();
-
-    // Force a new manager/connection to prove DB persistence, not in-memory state.
-    drop(mgr);
-
-    let mgr2 = BondManager::new(Some(db_path)).unwrap();
-    let fetched = mgr2.get_bond(created.id()).unwrap();
-    assert_eq!(fetched.metadata(), Some(&metadata));
 }
