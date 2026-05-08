@@ -1,17 +1,21 @@
 use crate::bond::Bond;
 use crate::error::BondError;
+use crate::events::{BondBrokenReason, BondEvent, BondEventHook, BondEventPayload};
 use crate::query::{BondQuery, MetadataFilter};
 use chrono::{DateTime, Utc};
 use rusqlite::{Connection, params};
 use serde_json;
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf}; // Metadata map type for API methods
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, RwLock}; // Metadata map type for API methods
 
 /// SQLite-backed manager for Bonds.
 /// The `BondManager` struct provides high-level methods for managing the lifecycle of bonds, including creating, retrieving, updating, and deleting bonds. It handles the underlying SQLite database connection and schema management, as well as the filesystem operations required to create and update symlinks. The manager ensures that bond records are kept in sync with the actual state of the filesystem and provides error handling for various edge cases, such as invalid paths or conflicts with existing files.
 pub struct BondManager {
     conn: Connection,
+    // Hook callbacks are stored behind interior mutability since manager methods use &self.
+    hooks: RwLock<Vec<Arc<dyn BondEventHook>>>,
 }
 
 impl BondManager {
@@ -213,6 +217,8 @@ impl BondManager {
         ],
     )?;
 
+        self.emit_event(BondEventPayload::Created { bond: bond.clone() });
+
         Ok(bond)
     }
 
@@ -227,6 +233,7 @@ impl BondManager {
         new_name: Option<String>,
     ) -> Result<Bond, BondError> {
         let mut bond = self.get_bond(id)?;
+        let before = bond.clone();
 
         let source = match new_source {
             Some(s) => {
@@ -291,6 +298,11 @@ impl BondManager {
         if new_name.is_some() {
             bond.name = new_name;
         }
+
+        self.emit_event(BondEventPayload::Updated {
+            before,
+            after: bond.clone(),
+        });
         Ok(bond)
     }
 
@@ -312,7 +324,12 @@ impl BondManager {
             params![metadata_json, bond.id()],
         )?;
 
+        let before = bond.clone();
         bond.metadata = metadata;
+        self.emit_event(BondEventPayload::MetadataUpdated {
+            before,
+            after: bond.clone(),
+        });
         Ok(bond)
     }
 
@@ -341,6 +358,9 @@ impl BondManager {
 
         self.conn
             .execute("DELETE FROM bonds WHERE id = ?1", params![bond.id])?;
+
+        self.emit_event(BondEventPayload::Deleted { bond: bond.clone() });
+
         Ok(bond)
     }
 
@@ -363,7 +383,10 @@ impl BondManager {
         // Migration: add metadata column for older databases (ignore if it already exists).
         let _ = conn.execute_batch("ALTER TABLE bonds ADD COLUMN metadata TEXT;");
 
-        Ok(Self { conn })
+        Ok(Self {
+            conn,
+            hooks: RwLock::new(Vec::new()),
+        })
     }
 
     /// Query bonds using optional source/target/metadata filters.
@@ -437,14 +460,108 @@ impl BondManager {
         let query = BondQuery::new().with_metadata(key, value);
         self.query_bonds(&query)
     }
+
+    /// Register a hook callback (closure or type implementing BondEventHook).
+    pub fn register_hook<H>(&self, hook: H)
+    where
+        H: BondEventHook + 'static,
+    {
+        self.register_hook_arc(Arc::new(hook));
+    }
+
+    /// Register a pre-built Arc hook, useful for shared test collectors.
+    pub fn register_hook_arc(&self, hook: Arc<dyn BondEventHook>) {
+        if let Ok(mut hooks) = self.hooks.write() {
+            hooks.push(hook);
+        }
+    }
+
+    /// Emit a typed event to all registered hooks.
+    /// Hooks are invoked synchronously to preserve operation ordering.
+    fn emit_event(&self, payload: BondEventPayload) {
+        // Clone Arc handles first so we don't hold lock while running user code.
+        let hooks = match self.hooks.read() {
+            Ok(h) => h.clone(),
+            Err(_) => return, // If poisoned, skip hook delivery but keep core operation successful.
+        };
+
+        if hooks.is_empty() {
+            return;
+        }
+
+        let event = BondEvent {
+            occurred_at: Utc::now(),
+            payload,
+        };
+
+        for hook in hooks {
+            hook.on_event(&event);
+        }
+    }
+
+    /// Scan all bonds and return those that are broken.
+    /// Broken means target missing OR target exists but is not a symlink.
+    pub fn scan_broken_bonds(&self) -> Result<Vec<Bond>, BondError> {
+        let bonds = self.list_bonds()?;
+        let mut broken = Vec::new();
+
+        for bond in bonds {
+            let reason = Self::broken_reason(&bond);
+            if let Some(reason) = reason {
+                self.emit_event(BondEventPayload::BrokenDetected {
+                    bond: bond.clone(),
+                    reason,
+                });
+                broken.push(bond);
+            }
+        }
+
+        Ok(broken)
+    }
+
+    fn broken_reason(bond: &Bond) -> Option<BondBrokenReason> {
+        // `exists()` follows symlinks, so broken symlinks report false here.
+        let target_exists = bond.target().exists();
+
+        // `symlink_metadata()` inspects the link itself, not the link target.
+        let is_symlink = bond
+            .target()
+            .symlink_metadata()
+            .map(|m| m.file_type().is_symlink())
+            .unwrap_or(false);
+
+        if !target_exists {
+            Some(BondBrokenReason::MissingTarget)
+        } else if !is_symlink {
+            Some(BondBrokenReason::TargetNotSymlink)
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::events::{
+        BondBrokenReason, BondEvent, BondEventHook, BondEventKind, BondEventPayload,
+    };
     use rusqlite::Connection;
     use std::collections::HashMap;
+    use std::sync::{Arc, Mutex};
     use tempfile::TempDir; // Needed for metadata assertions
+
+    #[derive(Default)]
+    struct TestHook {
+        events: Mutex<Vec<BondEvent>>,
+    }
+
+    impl BondEventHook for TestHook {
+        fn on_event(&self, event: &BondEvent) {
+            // Clone event snapshot so assertions are independent from call timing.
+            self.events.lock().unwrap().push(event.clone());
+        }
+    }
 
     /// Helper: creates a BondManager backed by in-memory SQLite.
     fn test_manager() -> BondManager {
@@ -671,5 +788,82 @@ mod tests {
             .unwrap();
         assert_eq!(combined.len(), 1);
         assert_eq!(combined[0].id(), bond2.id());
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn hooks_receive_lifecycle_events_in_order() {
+        let mgr = test_manager();
+        let collector = Arc::new(TestHook::default());
+        mgr.register_hook_arc(collector.clone());
+
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let created = mgr
+            .create_bond(&src_path, &tgt_path, Some("old".into()))
+            .unwrap();
+        let _updated = mgr
+            .update_bond(created.id(), None, None, Some("new".into()))
+            .unwrap();
+
+        let mut metadata = HashMap::new();
+        metadata.insert("team".to_string(), "core".to_string());
+        let _meta = mgr
+            .update_bond_metadata(created.id(), Some(metadata))
+            .unwrap();
+
+        let _deleted = mgr.delete_bond(created.id(), false).unwrap();
+
+        let events = collector.events.lock().unwrap();
+        let kinds: Vec<BondEventKind> = events.iter().map(BondEvent::kind).collect();
+
+        assert_eq!(
+            kinds,
+            vec![
+                BondEventKind::Created,
+                BondEventKind::Updated,
+                BondEventKind::MetadataUpdated,
+                BondEventKind::Deleted
+            ]
+        );
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn scan_broken_bonds_emits_broken_detected_event() {
+        let mgr = test_manager();
+        let collector = Arc::new(TestHook::default());
+        mgr.register_hook_arc(collector.clone());
+
+        let (_src_dir, src_path) = temp_source();
+        let tgt_dir = TempDir::new().unwrap();
+        let tgt_path = tgt_dir.path().join("link");
+
+        let created = mgr.create_bond(&src_path, &tgt_path, None).unwrap();
+
+        // Break the bond by removing the symlink target path.
+        std::fs::remove_file(created.target()).unwrap();
+
+        let broken = mgr.scan_broken_bonds().unwrap();
+        assert_eq!(broken.len(), 1);
+        assert_eq!(broken[0].id(), created.id());
+
+        let events = collector.events.lock().unwrap();
+        let broken_events: Vec<&BondEvent> = events
+            .iter()
+            .filter(|e| e.kind() == BondEventKind::BrokenDetected)
+            .collect();
+
+        assert_eq!(broken_events.len(), 1);
+
+        assert!(matches!(
+            broken_events[0].payload,
+            BondEventPayload::BrokenDetected {
+                reason: BondBrokenReason::MissingTarget,
+                ..
+            }
+        ));
     }
 }
