@@ -4,11 +4,13 @@ version = "0.1.6"
 edition = "2024"
 description = "CLI for creating and managing symlink-based bonds"
 license-file = "../../LICENSE"
+homepage = "https://bonds.fyi"
 repository = "https://github.com/clxrityy/bonds"
 readme = "README.md"
 documentation = "https://bonds.fyi/latest/api/bonds_cli/"
 keywords = ["cli", "symlink", "filesystem", "productivity"]
 categories = ["command-line-utilities", "filesystem"]
+authors = ["MJ Anglin <contact@mjanglin.com>"]
 
 [[bin]]
 name = "bond"          # the actual binary users run

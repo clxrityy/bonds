@@ -8,8 +8,10 @@ license-file = "../../LICENSE"
 repository = "https://github.com/clxrityy/bonds"
 readme = "README.md"
 documentation = "https://bonds.fyi/latest/api/bonds_core/"
+homepage = "https://bonds.fyi"
 keywords = ["symlink", "filesystem", "sqlite", "productivity"]
 categories = ["filesystem", "command-line-utilities"]
+authors = ["MJ Anglin <contact@mjanglin.com>"]
 
 [dependencies]
 rusqlite = { workspace = true }
