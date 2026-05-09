@@ -1,7 +1,7 @@
 # ----------------------------------------
 # Variables
 #	----------------------------------------
-VERSION ?= v0.1.5
+VERSION ?= v0.1.6
 VERSION_TARGET	?= all
 SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
@@ -103,7 +103,7 @@ version: ## Update crate version(s). Usage: `make version VERSION=v0.0.0 VERSION
 	@git add .
 	@git commit -m "Bump to $(VERSION)"
 	@git push
-	@make publish VERSION=$(VERSION)
+	@make publish VERSION=$(VERSION) TARGET=$(VERSION_TARGET || all)
 	@make release-commits VERSION=$(VERSION)
 	@make tag-release TAG=$(VERSION)
 
