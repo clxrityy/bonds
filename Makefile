@@ -142,3 +142,7 @@ clean: ## Clean build artifacts and documentation
 	cargo clean
 	rm -rf docs/site
 	rm -rf .venv
+
+release-commits: ##	Generate release commit messages based on conventional commits since the last tag. Usage: `make release-commits VERSION=v0.1.0`
+	@chmod	+x scripts/release-commits.sh
+	@scripts/release-commits.sh $(VERSION)
