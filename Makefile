@@ -100,6 +100,12 @@ docs-dev: setup-docs ## Build documentation for all packages
 #	---------------------------------------
 version: ## Update crate version(s). Usage: `make version VERSION=v0.0.0 VERSION_TARGET=all SYNC_MAKEFILE=true`
 	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE)
+	@git add .
+	@git commit -m "Bump to $(VERSION)"
+	@git push
+	@make publish VERSION=$(VERSION)
+	@make release-commits VERSION=$(VERSION)
+	@make tag-release TAG=$(VERSION)
 
 tag-release: ## Tag + push a release for the current version. Usages: `make tag-release TAG=v0.1.0` `make tag-release TAG=core-v0.1.0` `make tag-release TAG=cli-v0.1.0`
 	@set -euo pipefail; \
