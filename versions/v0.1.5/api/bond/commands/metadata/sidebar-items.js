@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["cmd_metadata_get","cmd_metadata_remove","cmd_metadata_set"]};
