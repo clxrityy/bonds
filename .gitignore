@@ -4,3 +4,6 @@
 site/
 .env*
 release-notes/
+node_modules/
+dist/
+build/

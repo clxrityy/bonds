@@ -1,0 +1,20 @@
+{
+  "name": "bonds-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config web/vite.config.ts",
+    "build": "tsc -p web/tsconfig.json && vite build --config web/vite.config.ts",
+    "preview": "vite preview --config web/vite.config.ts"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.1",
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.11"
+  }
+}
