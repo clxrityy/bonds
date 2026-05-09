@@ -37,12 +37,12 @@
 <a href=#37 id=37 data-nosnippet>37</a>    }
 <a href=#38 id=38 data-nosnippet>38</a>
 <a href=#39 id=39 data-nosnippet>39</a>    <span class="kw">let </span>bond = manager.create_bond(<span class="kw-2">&amp;</span>source, <span class="kw-2">&amp;</span>target, name)<span class="question-mark">?</span>;
-<a href=#40 id=40 data-nosnippet>40</a>    ui::success(<span class="macro">format!</span>(<span class="string">"Bond created: {}"</span>, bond.id()));
-<a href=#41 id=41 data-nosnippet>41</a>    ui::info(<span class="macro">format!</span>(
-<a href=#42 id=42 data-nosnippet>42</a>        <span class="string">"  {} -&gt; {}"</span>,
-<a href=#43 id=43 data-nosnippet>43</a>        bond.source().display(),
-<a href=#44 id=44 data-nosnippet>44</a>        bond.target().display()
-<a href=#45 id=45 data-nosnippet>45</a>    ));
+<a href=#40 id=40 data-nosnippet>40</a>    ui::status_ok(<span class="string">"✓ Bond created:"</span>);
+<a href=#41 id=41 data-nosnippet>41</a>    ui::subheading(<span class="macro">format!</span>(<span class="string">"   {}"</span>, bond.id()));
+<a href=#42 id=42 data-nosnippet>42</a>    ui::newline();
+<a href=#43 id=43 data-nosnippet>43</a>    ui::dim(<span class="macro">format!</span>(<span class="string">"   {}"</span>, bond.source().display()));
+<a href=#44 id=44 data-nosnippet>44</a>    ui::normal(<span class="string">"    ⤡ "</span>);
+<a href=#45 id=45 data-nosnippet>45</a>    ui::dim(<span class="macro">format!</span>(<span class="string">"    {}\n"</span>, bond.target().display()));
 <a href=#46 id=46 data-nosnippet>46</a>    <span class="prelude-val">Ok</span>(())
 <a href=#47 id=47 data-nosnippet>47</a>}
 <a href=#48 id=48 data-nosnippet>48</a>
@@ -76,27 +76,32 @@
 <a href=#76 id=76 data-nosnippet>76</a>
 <a href=#77 id=77 data-nosnippet>77</a>        <span class="kw">match </span>manager.create_bond(<span class="kw-2">&amp;</span>child, <span class="kw-2">&amp;</span>child_target, <span class="prelude-val">None</span>) {
 <a href=#78 id=78 data-nosnippet>78</a>            <span class="prelude-val">Ok</span>(bond) =&gt; {
-<a href=#79 id=79 data-nosnippet>79</a>                ui::success(<span class="macro">format!</span>(
-<a href=#80 id=80 data-nosnippet>80</a>                    <span class="string">"  {} -&gt; {}"</span>,
-<a href=#81 id=81 data-nosnippet>81</a>                    bond.source().display(),
-<a href=#82 id=82 data-nosnippet>82</a>                    bond.target().display()
-<a href=#83 id=83 data-nosnippet>83</a>                ));
-<a href=#84 id=84 data-nosnippet>84</a>                created += <span class="number">1</span>;
-<a href=#85 id=85 data-nosnippet>85</a>            }
-<a href=#86 id=86 data-nosnippet>86</a>            <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#87 id=87 data-nosnippet>87</a>                ui::warning(<span class="macro">format!</span>(<span class="string">"  skip {}: {}"</span>, child_name.to_string_lossy(), e));
-<a href=#88 id=88 data-nosnippet>88</a>                failed += <span class="number">1</span>;
-<a href=#89 id=89 data-nosnippet>89</a>            }
-<a href=#90 id=90 data-nosnippet>90</a>        }
-<a href=#91 id=91 data-nosnippet>91</a>    }
-<a href=#92 id=92 data-nosnippet>92</a>
-<a href=#93 id=93 data-nosnippet>93</a>    ui::info(<span class="macro">format!</span>(<span class="string">"\n{created} bond(s) created, {failed} skipped."</span>));
-<a href=#94 id=94 data-nosnippet>94</a>
-<a href=#95 id=95 data-nosnippet>95</a>    <span class="kw">if </span>created == <span class="number">0 </span>&amp;&amp; failed &gt; <span class="number">0 </span>{
-<a href=#96 id=96 data-nosnippet>96</a>        ui::error(<span class="string">"No bonds were created. All entries failed."</span>);
-<a href=#97 id=97 data-nosnippet>97</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(BondError::InvalidPath(<span class="string">"no bonds were created"</span>.into()));
-<a href=#98 id=98 data-nosnippet>98</a>    }
-<a href=#99 id=99 data-nosnippet>99</a>
-<a href=#100 id=100 data-nosnippet>100</a>    <span class="prelude-val">Ok</span>(())
-<a href=#101 id=101 data-nosnippet>101</a>}
+<a href=#79 id=79 data-nosnippet>79</a>                ui::dim(<span class="macro">format!</span>(<span class="string">"   {}"</span>, bond.source().display()));
+<a href=#80 id=80 data-nosnippet>80</a>                ui::normal(<span class="string">"    ⤡ "</span>);
+<a href=#81 id=81 data-nosnippet>81</a>                ui::dim(<span class="macro">format!</span>(<span class="string">"    {}\n"</span>, bond.target().display()));
+<a href=#82 id=82 data-nosnippet>82</a>                created += <span class="number">1</span>;
+<a href=#83 id=83 data-nosnippet>83</a>            }
+<a href=#84 id=84 data-nosnippet>84</a>            <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#85 id=85 data-nosnippet>85</a>                ui::status_warn(<span class="string">"⚠ SKIP"</span>);
+<a href=#86 id=86 data-nosnippet>86</a>                ui::warning(<span class="macro">format!</span>(
+<a href=#87 id=87 data-nosnippet>87</a>                    <span class="string">"  failed to bond {}: {}"</span>,
+<a href=#88 id=88 data-nosnippet>88</a>                    child_name.to_string_lossy(),
+<a href=#89 id=89 data-nosnippet>89</a>                    e
+<a href=#90 id=90 data-nosnippet>90</a>                ));
+<a href=#91 id=91 data-nosnippet>91</a>                failed += <span class="number">1</span>;
+<a href=#92 id=92 data-nosnippet>92</a>            }
+<a href=#93 id=93 data-nosnippet>93</a>        }
+<a href=#94 id=94 data-nosnippet>94</a>    }
+<a href=#95 id=95 data-nosnippet>95</a>
+<a href=#96 id=96 data-nosnippet>96</a>    ui::newline();
+<a href=#97 id=97 data-nosnippet>97</a>    ui::info(<span class="macro">format!</span>(<span class="string">"{} bond(s) created, {} skipped."</span>, created, failed));
+<a href=#98 id=98 data-nosnippet>98</a>
+<a href=#99 id=99 data-nosnippet>99</a>    <span class="kw">if </span>created == <span class="number">0 </span>&amp;&amp; failed &gt; <span class="number">0 </span>{
+<a href=#100 id=100 data-nosnippet>100</a>        ui::status_bad(<span class="string">"✗ ERROR"</span>);
+<a href=#101 id=101 data-nosnippet>101</a>        ui::error(<span class="string">"   No bonds were created. All entries failed."</span>);
+<a href=#102 id=102 data-nosnippet>102</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(BondError::InvalidPath(<span class="string">"no bonds were created"</span>.into()));
+<a href=#103 id=103 data-nosnippet>103</a>    }
+<a href=#104 id=104 data-nosnippet>104</a>
+<a href=#105 id=105 data-nosnippet>105</a>    <span class="prelude-val">Ok</span>(())
+<a href=#106 id=106 data-nosnippet>106</a>}
 </code></pre></div></section></main></body></html>

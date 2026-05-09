@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["cmd_info"]};
+window.SIDEBAR_ITEMS = {"fn":["cmd_info","status"]};
