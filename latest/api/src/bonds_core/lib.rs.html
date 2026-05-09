@@ -24,11 +24,17 @@
 <a href=#24 id=24 data-nosnippet>24</a></span><span class="kw">pub mod </span>config;
 <a href=#25 id=25 data-nosnippet>25</a><span class="doccomment">/// Public error types returned by this crate.
 <a href=#26 id=26 data-nosnippet>26</a></span><span class="kw">pub mod </span>error;
-<a href=#27 id=27 data-nosnippet>27</a><span class="doccomment">/// High-level manager for bond lifecycle operations.
-<a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">pub mod </span>manager;
-<a href=#29 id=29 data-nosnippet>29</a>
-<a href=#30 id=30 data-nosnippet>30</a><span class="kw">pub use </span>bond::Bond;
-<a href=#31 id=31 data-nosnippet>31</a><span class="kw">pub use </span>config::BondsConfig;
-<a href=#32 id=32 data-nosnippet>32</a><span class="kw">pub use </span>error::{BondError, ErrorKind};
-<a href=#33 id=33 data-nosnippet>33</a><span class="kw">pub use </span>manager::BondManager;
+<a href=#27 id=27 data-nosnippet>27</a><span class="doccomment">/// Event and hook types for lifecycle notifications.
+<a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">pub mod </span>events;
+<a href=#29 id=29 data-nosnippet>29</a><span class="doccomment">/// High-level manager for bond lifecycle operations.
+<a href=#30 id=30 data-nosnippet>30</a></span><span class="kw">pub mod </span>manager;
+<a href=#31 id=31 data-nosnippet>31</a><span class="doccomment">/// Query builder types for filtering bonds.
+<a href=#32 id=32 data-nosnippet>32</a></span><span class="kw">pub mod </span>query;
+<a href=#33 id=33 data-nosnippet>33</a>
+<a href=#34 id=34 data-nosnippet>34</a><span class="kw">pub use </span>bond::Bond;
+<a href=#35 id=35 data-nosnippet>35</a><span class="kw">pub use </span>config::BondsConfig;
+<a href=#36 id=36 data-nosnippet>36</a><span class="kw">pub use </span>error::{BondError, ErrorKind};
+<a href=#37 id=37 data-nosnippet>37</a><span class="kw">pub use </span>events::{BondBrokenReason, BondEvent, BondEventHook, BondEventKind, BondEventPayload};
+<a href=#38 id=38 data-nosnippet>38</a><span class="kw">pub use </span>manager::BondManager;
+<a href=#39 id=39 data-nosnippet>39</a><span class="kw">pub use </span>query::{BondQuery, MetadataFilter};
 </code></pre></div></section></main></body></html>
