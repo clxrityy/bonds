@@ -1,7 +1,7 @@
 # ----------------------------------------
 # Variables
 #	----------------------------------------
-VERSION ?= v0.1.4
+VERSION ?= v0.1.5
 VERSION_TARGET	?= all
 SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
@@ -99,7 +99,7 @@ docs-dev: setup-docs ## Build documentation for all packages
 # Release targets.
 #	---------------------------------------
 version: ## Update crate version(s). Usage: `make version VERSION=v0.0.0 VERSION_TARGET=all SYNC_MAKEFILE=true`
-	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE)
+	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE == true && "--update-makefile" || "")
 	@git add .
 	@git commit -m "Bump to $(VERSION)"
 	@git push
