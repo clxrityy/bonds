@@ -22,3 +22,11 @@ A tool for creating and managing "bonds" between files and directories.
 - [ ] Ecosystem & plugins
 
 ---
+
+#### CLI examples
+
+| Command | Description | Example |
+| --- | --- | --- |
+| `bond list` | List all bonds | ![list](.github/img/bond-list.png) |
+| `bond info <id\|name>` | Show bond details | ![info](.github/img/bond-info.png) |
+| `bond remove <id\|name>` | Remove a bond | ![remove](.github/img/bond-remove.png) |
