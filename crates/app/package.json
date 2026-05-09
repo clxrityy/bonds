@@ -6,15 +6,20 @@
   "scripts": {
     "dev": "vite --config web/vite.config.ts",
     "build": "tsc -p web/tsconfig.json && vite build --config web/vite.config.ts",
-    "preview": "vite preview --config web/vite.config.ts"
+    "preview": "vite preview --config web/vite.config.ts",
+    "lint": "eslint web/src/*.ts",
+    "lint:fix": "eslint web/src/*.ts --fix"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@tauri-apps/cli": "^2.11.1",
     "@types/node": "^25.6.2",
+    "eslint": "^10.3.0",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
     "vite": "^8.0.11"
   },
   "packageManager": "pnpm@11.0.9"

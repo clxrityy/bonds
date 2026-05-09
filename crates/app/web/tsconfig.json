@@ -7,7 +7,11 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "rootDir": "./",
+    "resolveJsonModule": true,
   },
-  "include": ["src"]
+  "include": ["."],
+  "exclude": ["dist"]
 }
