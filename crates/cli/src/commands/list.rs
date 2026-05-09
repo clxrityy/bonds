@@ -9,22 +9,36 @@ use bonds_core::{BondError, BondManager};
 pub fn cmd_list(manager: &BondManager) -> Result<(), BondError> {
     let bonds = manager.list_bonds()?;
 
+    ui::title("All Bonds:");
+
     if bonds.is_empty() {
-        ui::warning("No bonds found.");
+        ui::warning("⚠ No bonds found.");
+        ui::newline();
         return Ok(());
     }
 
     for bond in &bonds {
+        if bonds.len() - 1 == 0 {
+            ui::subheading("----------------");
+        }
         let label = match bond.name() {
             Some(name) => format!("{name} ({id})", id = &bond.id()[..8]),
             None => bond.id()[..8].to_string(),
         };
-        ui::info(format!(
-            "{label}  -  {src} -> {tgt}  ({date})",
-            src = bond.source().display(),
-            tgt = bond.target().display(),
-            date = bond.created_at().format("%Y-%m-%d %H:%M"),
-        ));
+        // ui::info(format!(
+        //     "{label}  -  {src} -> {tgt}  ({date})",
+        //     src = bond.source().display(),
+        //     tgt = bond.target().display(),
+        //     date = bond.created_at().format("%Y-%m-%d %H:%M"),
+        // ));
+        let src = format!("{}", bond.source().display());
+        let tgt = format!("{}", bond.target().display());
+        let date = format!("{}", bond.created_at().format("%Y-%m-%d %H:%M"));
+        ui::info(format!("{label}   -"));
+        ui::key(format!("   ⑂   {}", src));
+        ui::path(format!("   ⑃   {}", tgt));
+        ui::dim(format!("   {}", date));
+        ui::subheading("----------------");
     }
 
     ui::info(format!("\n{} bond(s) total.", bonds.len()));

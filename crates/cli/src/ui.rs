@@ -10,11 +10,21 @@ const RESET: &str = "\x1b[0m";
 const GREEN_BOLD: &str = "\x1b[1;32m";
 const YELLOW_BOLD: &str = "\x1b[1;33m";
 const RED_BOLD: &str = "\x1b[1;31m";
-const CYAN_BOLD: &str = "\x1b[1;36m";
-const BLUE_BOLD: &str = "\x1b[1;34m";
+// const CYAN_BOLD: &str = "\x1b[1;36m";
+// const BLUE_BOLD: &str = "\x1b[1;34m";
 const MAGENTA: &str = "\x1b[35m";
 const CYAN: &str = "\x1b[36m";
 const DIM: &str = "\x1b[2m";
+const BOLD: &str = "\x1b[1m";
+const UNDERLINE: &str = "\x1b[4m";
+const BOLD_UNDERLINE: &str = "\x1b[1;4m";
+const GREEN: &str = "\x1b[32m";
+const YELLOW: &str = "\x1b[33m";
+const RED: &str = "\x1b[31m";
+const GOLD: &str = "\x1b[38;5;220m";
+const LIGHT_BLUE: &str = "\x1b[38;5;117m";
+const DIM_BOLD: &str = "\x1b[1;2m";
+const NEWLINE: &str = " ";
 
 fn colors_enabled() -> bool {
     // Respect common no-color conventions and avoid ANSI noise when redirected.
@@ -71,49 +81,73 @@ pub fn format_context_error(context: &str, err: &BondError) -> String {
 /// Prints a user-facing message for a successful operation.
 #[allow(dead_code)]
 pub fn success(text: impl Display) -> String {
-    paint(text, GREEN_BOLD)
+    paint(text, GREEN)
 }
 
 /// Prints a user-facing message for informational purposes.
 #[allow(dead_code)]
 pub fn info(text: impl Display) -> String {
-    paint(text, CYAN_BOLD)
+    paint(text, CYAN)
 }
 
 /// Prints a user-facing message for a warning or recoverable issue.
 #[allow(dead_code)]
 pub fn warning(text: impl Display) -> String {
-    paint(text, YELLOW_BOLD)
+    paint(text, YELLOW)
 }
 
 /// Prints a user-facing message for an error or failure.
 #[allow(dead_code)]
 pub fn error(text: impl Display) -> String {
-    paint(text, RED_BOLD)
+    paint(text, RED)
 }
 
 /// Prints a user-facing heading or section title.
 #[allow(dead_code)]
+pub fn title(text: impl Display) -> String {
+    paint(format!("\n{}\n", text), BOLD_UNDERLINE)
+}
+
+/// Prints a user-facing message for a title or important section header.
+#[allow(dead_code)]
 pub fn heading(text: impl Display) -> String {
-    paint(text, CYAN_BOLD)
+    paint(format!("{}", text), BOLD)
+}
+
+/// Prints a user-facing message with underlined text, often used for emphasis or to indicate a sub-section.
+#[allow(dead_code)]
+pub fn underline(text: impl Display) -> String {
+    paint(format!("{}", text), UNDERLINE)
+}
+
+/// Prints a user-facing message for a subheading or less prominent section header.
+#[allow(dead_code)]
+pub fn subheading(text: impl Display) -> String {
+    paint(format!("{}", text), DIM_BOLD)
+}
+
+/// Prints normal text without any special styling. This can be used for messages that don't fit into the other categories or when you want to reset back to default styling after a heading or label.
+#[allow(dead_code)]
+pub fn normal(text: impl Display) -> String {
+    paint(text, RESET)
 }
 
 /// Prints a user-facing label for a key or identifier.
 #[allow(dead_code)]
 pub fn key(text: impl Display) -> String {
-    paint(text, BLUE_BOLD)
+    paint(text, GOLD)
 }
 
 /// Prints a user-facing label for an ID or unique identifier.
 #[allow(dead_code)]
 pub fn id(text: impl Display) -> String {
-    paint(text, MAGENTA)
+    paint(text, LIGHT_BLUE)
 }
 
 /// Prints a user-facing label for a file path or location.
 #[allow(dead_code)]
 pub fn path(text: impl Display) -> String {
-    paint(text, CYAN)
+    paint(text, MAGENTA)
 }
 
 /// Prints a user-facing message in a dimmed or less prominent style.
@@ -138,4 +172,10 @@ pub fn status_warn(text: impl Display) -> String {
 #[allow(dead_code)]
 pub fn status_bad(text: impl Display) -> String {
     paint(text, RED_BOLD)
+}
+
+/// Prints a newline to the user-facing output. This can be used to separate sections or add spacing between messages for better readability.
+#[allow(dead_code)]
+pub fn newline() {
+    paint("", NEWLINE);
 }

@@ -41,7 +41,9 @@ pub fn cmd_config_set(key: &str, value: &str) -> Result<(), BondError> {
 
             config.default_target = Some(path.clone());
             config.save()?;
-            ui::success(format!("default_target set to: {}", path.display()));
+            ui::status_ok("✓ SUCCESS");
+            ui::info("Default target directory updated to:");
+            ui::subheading(format!("{}", path.display()));
         }
         _ => return Err(BondError::Config(format!("unknown config key: {key}"))),
     }

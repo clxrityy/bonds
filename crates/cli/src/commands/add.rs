@@ -37,12 +37,12 @@ pub fn cmd_add(
     }
 
     let bond = manager.create_bond(&source, &target, name)?;
-    ui::success(format!("Bond created: {}", bond.id()));
-    ui::info(format!(
-        "  {} -> {}",
-        bond.source().display(),
-        bond.target().display()
-    ));
+    ui::status_ok("✓ Bond created:");
+    ui::subheading(format!("   {}", bond.id()));
+    ui::newline();
+    ui::dim(format!("   {}", bond.source().display()));
+    ui::normal("    ⤡ ");
+    ui::dim(format!("    {}\n", bond.target().display()));
     Ok(())
 }
 
@@ -76,24 +76,29 @@ fn add_contents(manager: &BondManager, source: &PathBuf, target: &Path) -> Resul
 
         match manager.create_bond(&child, &child_target, None) {
             Ok(bond) => {
-                ui::success(format!(
-                    "  {} -> {}",
-                    bond.source().display(),
-                    bond.target().display()
-                ));
+                ui::dim(format!("   {}", bond.source().display()));
+                ui::normal("    ⤡ ");
+                ui::dim(format!("    {}\n", bond.target().display()));
                 created += 1;
             }
             Err(e) => {
-                ui::warning(format!("  skip {}: {}", child_name.to_string_lossy(), e));
+                ui::status_warn("⚠ SKIP");
+                ui::warning(format!(
+                    "  failed to bond {}: {}",
+                    child_name.to_string_lossy(),
+                    e
+                ));
                 failed += 1;
             }
         }
     }
 
-    ui::info(format!("\n{created} bond(s) created, {failed} skipped."));
+    ui::newline();
+    ui::info(format!("{} bond(s) created, {} skipped.", created, failed));
 
     if created == 0 && failed > 0 {
-        ui::error("No bonds were created. All entries failed.");
+        ui::status_bad("✗ ERROR");
+        ui::error("   No bonds were created. All entries failed.");
         return Err(BondError::InvalidPath("no bonds were created".into()));
     }
 

@@ -23,7 +23,10 @@ pub fn cmd_metadata_get(
                 .and_then(|m| m.get(k))
                 .ok_or_else(|| BondError::NotFound(format!("metadata key not found: {k}")))?;
 
-            ui::info(format!("{k}: {value}"));
+            // ui::info(format!("{k}: {value}"));
+            ui::title("Metadata:");
+            ui::subheading(format!("  {k}:"));
+            ui::dim(format!("    {value}"));
         }
         None => {
             // Full read: print all keys in deterministic order.
@@ -42,7 +45,9 @@ pub fn cmd_metadata_get(
 
             ui::heading("Metadata:");
             for (k, v) in entries {
-                ui::info(format!("  {k}: {v}"));
+                // ui::info(format!("  {k}: {v}"));
+                ui::subheading(format!("    {k}:"));
+                ui::dim(format!("       {v}"));
             }
         }
     }
@@ -69,8 +74,12 @@ pub fn cmd_metadata_set(
 
     let updated = manager.update_bond_metadata(bond.id(), Some(metadata))?;
 
-    ui::success(format!("Metadata updated for {}", &updated.id()[..8]));
-    ui::info(format!("  {key}: {value}"));
+    ui::status_ok("✓ SUCCESS");
+    ui::success("Metadata updated for bond:");
+    ui::id(format!("   {}", &updated.id()[..8]));
+    // ui::info(format!("  {key}: {value}"));
+    ui::subheading(format!("  {key}:"));
+    ui::dim(format!("     {value}"));
     Ok(())
 }
 
@@ -101,7 +110,9 @@ pub fn cmd_metadata_remove(manager: &BondManager, id: &str, key: &str) -> Result
     };
     let updated = manager.update_bond_metadata(bond.id(), next)?;
 
-    ui::success(format!("Metadata key removed for {}", &updated.id()[..8]));
-    ui::info(format!("  removed key: {key}"));
+    ui::status_ok("✓ SUCCESS");
+    ui::success("Metadata key removed for bond:");
+    ui::id(format!("   {}", &updated.id()[..8]));
+    ui::subheading(format!("  removed key: {key}"));
     Ok(())
 }

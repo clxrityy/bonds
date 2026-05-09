@@ -76,7 +76,7 @@ fn main() {
 
     if let Err(e) = result {
         // One place for every command failure.
-        eprintln!("{}", ui::format_error(&e));
+        ui::format_error(&e);
         std::process::exit(1);
     }
 }
