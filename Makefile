@@ -152,3 +152,17 @@ clean: ## Clean build artifacts and documentation
 release-commits: ##	Generate release commit messages based on conventional commits since the last tag. Usage: `make release-commits VERSION=v0.1.0`
 	@chmod	+x scripts/release-commits.sh
 	@scripts/release-commits.sh $(VERSION)
+
+# ---------------------------------------
+# App targets.
+# ---------------------------------------
+
+app: ## Test & build the Bonds desktop app
+	@cargo test -p	bonds-app
+	@cd crates/app \ && pnpm tauri build
+
+app-dev: ## Run the Bonds desktop app in development mode
+	@cd crates/app \ && pnpm tauri dev
+
+app-preview: ## Run the Bonds desktop app preview server
+	@cd crates/app \ && pnpm preview
