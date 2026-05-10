@@ -1,8 +1,8 @@
 # bonds
 
-> [!TIP]
+> [!IMPORTANT]
 >
-> ##### <img src="./docs/content/assets/img/logo.svg" alt="bonds logo" width="14" /> [bonds.fyi](https://bonds.fyi)
+> #### <img src="./docs/content/assets/img/logo.svg" alt="bonds logo" width="16" height="16" /> [bonds.fyi](https://bonds.fyi)
 
 A tool for creating and managing "bonds" between files and directories.
 
