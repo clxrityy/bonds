@@ -41,3 +41,14 @@ export const ui = {
 	statusPillBase:
 		"rounded-full border px-2 py-1 text-[11px] font-medium uppercase tracking-wide",
 } as const;
+
+import { LuPanelRightClose, LuPanelLeftOpen, LuPanelTopOpen, LuPanelTopClose, LuHouse, LuRefreshCw } from "react-icons/lu";
+
+export const Icons = {
+	SidePanelClose: LuPanelRightClose,
+	SidePanelOpen: LuPanelLeftOpen,
+	TopPanelOpen: LuPanelTopOpen,
+	TopPanelClose: LuPanelTopClose,
+	Home: LuHouse,
+	Refresh: LuRefreshCw,
+} as const;

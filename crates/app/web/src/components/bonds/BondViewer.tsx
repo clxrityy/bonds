@@ -1,5 +1,5 @@
 import type { BondListItem } from "../../lib/types";
-import { ui, cx } from "../../lib/ui";
+import { ui, cx, Icons } from "../../lib/ui";
 import { BondCard } from "./BondCard";
 
 interface BondViewerProps {
@@ -15,7 +15,9 @@ export function BondViewer({ loading, error, bonds, onRefresh }: BondViewerProps
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<h2 className="text-xl font-semibold text-slate-100">Current bonds</h2>
 				<button type="button" className={ui.primaryBtn} onClick={onRefresh}>
-					Refresh
+					<Icons.Refresh />
+					<span>Refresh</span>
+					<span className="sr-only">Refresh bond data</span>
 				</button>
 			</div>
 

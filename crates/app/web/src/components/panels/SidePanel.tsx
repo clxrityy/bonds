@@ -2,7 +2,8 @@ import type { PanelControlsProps } from "./panelTypes";
 import { SearchInput } from "../ui/SearchInput";
 import { ViewTabs } from "../ui/ViewTabs";
 import { ResizeHandle } from "./ResizeHandle";
-import { ui } from "../../lib/ui";
+import { ui, Icons } from "../../lib/ui";
+import { Logo } from "../elements/Logo";
 
 type SidePanelProps = PanelControlsProps & {
 	width: number;
@@ -23,11 +24,10 @@ export function SidePanel({
 	return (
 		<aside className="relative grid h-full grid-rows-[auto_auto_1fr] gap-3 p-3" style={{ width }}>
 			<div className="flex flex-wrap items-center gap-2">
-				<button className={ui.ghostBtn} type="button">
-					Home
-				</button>
-				<button className={ui.ghostBtn} type="button" onClick={onSwitchToTop}>
-					Use top panel
+				<Logo />
+				<button className={`${ui.ghostBtn} h-auto w-auto`} type="button" onClick={onSwitchToTop}>
+					<Icons.TopPanelOpen />
+					<span className="sr-only">Switch to top panel</span>
 				</button>
 			</div>
 

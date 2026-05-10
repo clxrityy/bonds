@@ -1,6 +1,6 @@
 import type { CSSProperties, PropsWithChildren, ReactNode } from "react";
 import type { PanelMode } from "../../lib/types";
-import { cx, ui } from "../../lib/ui";
+import { cx, ui, Icons } from "../../lib/ui";
 
 type AppShellProps = PropsWithChildren<{
 	mode: PanelMode;
@@ -43,7 +43,7 @@ export function AppShell({
 					type="button"
 					onClick={onTogglePanel}
 				>
-					{isOpen ? "Hide panel" : "Show panel"}
+					{isOpen ? <Icons.SidePanelClose /> : <Icons.SidePanelOpen />}
 				</button>
 
 				<div className="flex items-center gap-2">
@@ -55,7 +55,8 @@ export function AppShell({
 						)}
 						onClick={() => onSetMode("side")}
 					>
-						Side
+						<Icons.SidePanelOpen />
+						<span className="sr-only">Side panel mode</span>
 					</button>
 					<button
 						type="button"
@@ -65,7 +66,8 @@ export function AppShell({
 						)}
 						onClick={() => onSetMode("top")}
 					>
-						Top
+						<Icons.TopPanelOpen />
+						<span className="sr-only">Top panel mode</span>
 					</button>
 				</div>
 			</header>
