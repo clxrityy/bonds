@@ -8,9 +8,9 @@ authors:
 date: 2026-04-14
 ---
 
-- ✔ [Phase 1](#phase-1-cli-core-tool-): **CLI (core tool)**
+- ✔ [Phase 1](#phase-1-cli-core-tool-): CLI (core tool)
 - ✔ [Phase 2](#phase-2-library-api-): Library API
-- ✘ [Phase 3](#phase-3-gui-application-): GUI Application
+- **[Phase 3](#phase-3-gui-application): GUI Application**
 - ✘ [Phase 4](#phase-4-ecosystem--plugins-): Ecosystem & Plugins
 
 ## Phase 1: CLI (core tool) ✔
@@ -40,17 +40,26 @@ Expose `bonds-core` & `bonds-cli` as a proper public API so developers can integ
 - ✔ **Query bonds by source, target, or metadata**
 - ✔ **API documentation + usage examples**
 
-## Phase 3: GUI Application ✘
+## Phase 3: GUI Application
 
 Tauri-based desktop app, depends on [Phase 2](#phase-2-library-api-)'s API.
 
-- ✘ Scaffold `crates/app` (Tauri)
-- ✘ Bond viewer (sorted by recently updated)
-  - ✘ Search/filter bonds by source, target, or metadata
+- ✔ **Scaffold `crates/app` (Tauri)**
+- ✔ **Bond viewer (sorted by recently viewed)**
+- ✔ Panel
+  - ✘ bookmarks/favorites
+  - ✘ custom groups/tags
+- ✘ Search/filter bonds by:
+  - ✔ Status (healthy, broken, etc.)
+  - ✘ Source/target paths
+  - ✘ Metadata (name, tags, etc.)
 - ✘ Empty-state CTA to create first bond
 - ✘ Open bonded directory from UI
+  - ✘ Open source/target from UI
+  - ✘ Open metadata from UI
+  - ✘ Preview file contents from UI (images, text, etc.)
+    - ✘ File extension icons in list view
 - ✘ Create / edit / delete bonds from UI
-- ✘ Sidebar bookmarks/favorites
 - ✘ Bond detail panel (source, target, metadata)
 - ✘ Bond relationship visualization (graph view)
 
