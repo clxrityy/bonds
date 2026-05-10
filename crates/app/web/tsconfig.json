@@ -11,7 +11,11 @@
     "esModuleInterop": true,
     "rootDir": "./",
     "resolveJsonModule": true,
+    "jsx": "react-jsx"
   },
-  "include": ["."],
-  "exclude": ["dist"]
+  "include": ["src"],
+  "exclude": ["dist"],
+  "references": [{
+    "path": "./tsconfig.node.json"
+  }]
 }

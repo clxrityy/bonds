@@ -7,17 +7,25 @@
     "dev": "vite --config web/vite.config.ts",
     "build": "tsc -p web/tsconfig.json && vite build --config web/vite.config.ts",
     "preview": "vite preview --config web/vite.config.ts",
-    "lint": "eslint web/src/*.ts",
-    "lint:fix": "eslint web/src/*.ts --fix"
+    "lint": "eslint web/src/*.ts*",
+    "lint:fix": "eslint web/src/*.ts* --fix"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.11.0"
+    "@tauri-apps/api": "^2.11.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.0",
     "@tauri-apps/cli": "^2.11.1",
     "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.3.0",
+    "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.11"
