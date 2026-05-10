@@ -68,10 +68,12 @@ test-publish-cli:	## Trigger the publish workflow for the CLI package with test 
 lint: ## Run all linters
 	cargo fmt --all --check
 	cargo clippy --workspace
+	@cd	crates/app && pnpm lint
 
 lint-fix: ## Run all linters and fix issues
 	cargo fmt --all
 	cargo clippy --workspace --fix
+	@cd	crates/app && pnpm lint:fix
 
 lint-actions:	## Run linters with GitHub Actions annotations
 	@actionlint -config-file .github/actionlint.yaml -verbose
