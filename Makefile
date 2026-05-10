@@ -20,6 +20,12 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
     | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
+#	---------------------------------------
+# Start/refresh the development environment.
+#	---------------------------------------
+
+refresh: clean setup-docs setup-app build test app lint	## Clean, setup, build, test, and lint the entire workspace
+
 # ---------------------------------------
 # Setup targets.
 # ---------------------------------------
@@ -27,6 +33,9 @@ setup-docs: ## Setup .venv	for documentation generation
 	@python3 -m venv .venv
 	@.venv/bin/pip install -r docs/requirements.txt
 	bash -c "source .venv/bin/activate"
+
+setup-app: ## Setup the Bonds desktop app
+	@cd crates/app && pnpm install
 
 # ---------------------------------------
 # Testing targets.
@@ -89,13 +98,31 @@ build: ## Build all packages
 
 # ---------------------------------------
 # Documentation targets.
+#
+# TODO: The docs script will integrate with the app from `crates/app` to generate guides and API docs. For now, it just builds the Rust docs and copies them to the docs/site/api folder.
 # ---------------------------------------
-docs-dev: setup-docs ## Build documentation for all packages
+docs: setup-docs ## Build documentation for all packages
 	@rm -rf docs/site
 	SITE_URL=$${SITE_URL:-http://127.0.0.1:4173/} .venv/bin/mkdocs build --strict -f docs/mkdocs.yml
 	cargo doc --workspace --no-deps
 	mkdir -p docs/site/api
 	@cp -R target/doc/* docs/site/api/
+
+# ---------------------------------------
+# Utility targets.
+# ---------------------------------------
+show-tag: ## Show the tag that would be used
+	@echo $(TAG)
+
+# ---------------------------------------
+# Clean targets.
+# ---------------------------------------
+clean: ## Clean build artifacts and temporary development files
+	cargo clean
+	rm -rf docs/site
+	rm -rf .venv
+	rm -rf crates/app/web/dist
+	rm -rf crates/app/node_modules
 
 #	---------------------------------------
 # Release targets.
@@ -138,33 +165,14 @@ publish: ## Trigger the publish workflow. Usage: `make publish VERSION=v0.1.0` `
 	@act workflow_dispatch -j publish --input target=$(TARGET) --input version=$(VERSION)
 
 # ---------------------------------------
-# Utility targets.
-# ---------------------------------------
-show-tag: ## Show the tag that would be used
-	@echo $(TAG)
-
-# ---------------------------------------
-# Clean targets.
-# ---------------------------------------
-clean: ## Clean build artifacts and documentation
-	cargo clean
-	rm -rf docs/site
-	rm -rf .venv
-
-release-commits: ##	Generate release commit messages based on conventional commits since the last tag. Usage: `make release-commits VERSION=v0.1.0`
-	@chmod	+x scripts/release-commits.sh
-	@scripts/release-commits.sh $(VERSION)
-
-# ---------------------------------------
 # App targets.
 # ---------------------------------------
 
-app: ## Test & build the Bonds desktop app
-	@cargo test -p	bonds-app
-	@cd crates/app \ && pnpm tauri build
+app: ## Build the Bonds desktop app
+	@cd crates/app \ && pnpm build
 
 app-dev: ## Run the Bonds desktop app in development mode
 	@cd crates/app \ && pnpm tauri dev
 
 app-preview: ## Run the Bonds desktop app preview server
-	@cd crates/app \ && pnpm preview
+	@cd crates/app \ && pnpm build \	&& pnpm preview
