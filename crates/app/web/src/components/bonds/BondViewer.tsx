@@ -13,7 +13,7 @@ export function BondViewer({ loading, error, bonds, onRefresh }: BondViewerProps
 	return (
 		<section className="grid gap-4">
 			<div className="flex flex-wrap items-center justify-between gap-3">
-				<h2 className="text-xl font-semibold text-slate-100">Current bonds</h2>
+				<h2 className="text-xl lg:text-2xl text-slate-900/75 uppercase heading-text-shadow font-science-gothic  font-semibold text-shadow-2xs">Current bonds</h2>
 				<button type="button" className={ui.primaryBtn} onClick={onRefresh}>
 					<Icons.Refresh />
 					<span>Refresh</span>

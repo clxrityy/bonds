@@ -17,17 +17,17 @@ export function TopPanel({
 	onSwitchToSide,
 }: TopPanelProps) {
 	return (
-		<section className="grid gap-3">
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<div className="flex items-center gap-2">
+		<section className="grid gap-2 border border-zinc-700 bg-zinc-300 p-2 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)]">
+			<div className="flex items-center justify-between gap-2 border-b border-zinc-700 pb-2">
+				<div className="flex items-center gap-1.5">
 						<Logo />
-					<button className={`${ui.ghostBtn} h-auto w-auto`} type="button" onClick={onSwitchToSide}>
+					<button className={ui.iconToolBtn} type="button" onClick={onSwitchToSide}>
 						<Icons.SidePanelOpen />
 						<span className="sr-only">Switch to side panel</span>
 					</button>
 				</div>
 
-				<div className="w-full max-w-sm">
+				<div className="w-full max-w-[18rem]">
 					<SearchInput value={search} onChange={onSearchChange} />
 				</div>
 			</div>

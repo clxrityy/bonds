@@ -17,6 +17,8 @@ export function SearchInput({
 			type="search"
 			value={value}
 			placeholder={placeholder}
+			autoComplete="off"
+			spellCheck={false}
 			onChange={(e) => onChange(e.target.value)}
 		/>
 	);

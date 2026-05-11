@@ -22,16 +22,16 @@ export function SidePanel({
 	onResizePointerDown,
 }: SidePanelProps) {
 	return (
-		<aside className="relative grid h-full grid-rows-[auto_auto_1fr] gap-3 p-3" style={{ width }}>
-			<div className="flex flex-wrap items-center gap-2">
+		<aside className="relative grid h-full grid-rows-[auto_auto_1fr] gap-2 border border-zinc-700 bg-zinc-300 p-2 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)]" style={{ width }}>
+			<div className="flex items-center justify-between gap-2 border-b border-zinc-700 pb-2">
 				<Logo />
-				<button className={`${ui.ghostBtn} h-auto w-auto`} type="button" onClick={onSwitchToTop}>
+				<button className={ui.iconToolBtn} type="button" onClick={onSwitchToTop}>
 					<Icons.TopPanelOpen />
 					<span className="sr-only">Switch to top panel</span>
 				</button>
 			</div>
 
-			<div className="grid gap-3">
+			<div className="grid gap-2 border border-zinc-700 bg-zinc-250 p-2 shadow-[inset_1px_1px_0_rgba(0,0,0,0.18),inset_-1px_-1px_0_rgba(255,255,255,0.65)]">
 				<SearchInput value={search} onChange={onSearchChange} />
 				<ViewTabs active={activeTab} counts={counts} onChange={onTabChange} />
 			</div>
