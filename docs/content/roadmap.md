@@ -47,11 +47,11 @@ Tauri-based desktop app, depends on [Phase 2](#phase-2-library-api-)'s API.
 - ✔ **Scaffold `crates/app` (Tauri)**
 - ✔ **Bond viewer (sorted by recently viewed)**
 - ✔ Panel
-  - ✘ bookmarks/favorites
-  - ✘ custom groups/tags
+  - ✘ Bookmarks/favorites
+  - ✘ Custom groups/tags
 - ✘ Search/filter bonds by:
   - ✔ Status (healthy, broken, etc.)
-  - ✘ Source/target paths
+  - ✔ Source/target paths
   - ✘ Metadata (name, tags, etc.)
 - ✘ Empty-state CTA to create first bond
 - ✘ Open bonded directory from UI
