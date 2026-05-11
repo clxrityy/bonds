@@ -19,10 +19,10 @@
       {
         "label": "main",
         "title": "Bonds",
-        "width": 1280,
-        "height": 860,
-        "minWidth": 960,
-        "minHeight": 640,
+        "width": 1080,
+        "height": 720,
+        "minWidth": 740,
+        "minHeight": 420,
         "center": true,
         "resizable": true
       }
