@@ -1,48 +1,66 @@
 /**
  * Shared Tailwind utility tokens.
- * This keeps styling consistent and avoids repeating large class strings.
+ * Retro/vintage grayscale style system:
+ * - flat/boxed controls
+ * - raised/inset edges
+ * - minimal color accents
  */
+
+import {
+	LuPanelRightClose,
+	LuPanelLeftOpen,
+	LuPanelTopOpen,
+	LuPanelTopClose,
+	LuHouse,
+	LuRefreshCw,
+} from "react-icons/lu";
 
 export function cx(...parts: (string | false | null | undefined)[]): string {
 	return parts.filter(Boolean).join(" ");
 }
 
 export const ui = {
-	// Generic surfaces
-	panelSurface: "border-slate-700/70 bg-slate-900/70 backdrop-blur",
+	// Generic window/panel surface (retro frame)
+	panelSurface:
+		"border border-zinc-700 bg-zinc-300 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)]",
 
-	// Buttons
+	// Toolbar/chrome buttons
 	chromeBtnBase:
-		"rounded-md border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70",
-	chromeBtnIdle: "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700",
-	chromeBtnActive: "border-sky-400/70 bg-sky-500/10 text-sky-300",
+		"inline-flex items-center gap-1.5 rounded-[4px] border px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-800",
+	chromeBtnIdle:
+		"border-zinc-700 bg-zinc-200 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100 active:translate-y-px active:shadow-[inset_1px_1px_0_rgba(0,0,0,0.2)]",
+	chromeBtnActive:
+		"border-zinc-800 bg-zinc-100 text-zinc-950 shadow-[inset_1px_1px_0_rgba(255,255,255,0.78),inset_-1px_-1px_0_rgba(0,0,0,0.24)]",
 
 	ghostBtn:
-		"rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70",
+		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-700 bg-zinc-200 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100 active:translate-y-px",
 
+	// Keep command button darker for hierarchy, but still grayscale.
 	primaryBtn:
-		"rounded-md border border-sky-400/50 bg-sky-500/15 px-3 py-2 text-sm font-medium text-sky-200 transition-colors hover:bg-sky-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70",
+		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-100 shadow-[inset_1px_1px_0_rgba(255,255,255,0.12),inset_-1px_-1px_0_rgba(0,0,0,0.35)] hover:bg-zinc-800 active:translate-y-px",
 
-	// Inputs
+	// Inset field style (old desktop utility look)
 	searchInput:
-		"w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70",
+		"w-full rounded-[3px] border border-zinc-700 bg-zinc-50 px-2.5 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-500 shadow-[inset_1px_1px_0_rgba(0,0,0,0.2),inset_-1px_-1px_0_rgba(255,255,255,0.58)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-800",
 
-	// Tabs
+	// Segmented tabs (not modern pills)
 	tabBase:
-		"inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70",
-	tabIdle: "border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700",
-	tabActive: "border-sky-400/70 bg-sky-500/10 text-sky-300",
-	tabCount: "text-[11px] text-slate-400",
+		"inline-flex items-center gap-2 rounded-[4px] border px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-800",
+	tabIdle:
+		"border-zinc-700 bg-zinc-200 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100",
+	tabActive:
+		"border-zinc-900 bg-zinc-100 text-zinc-950 shadow-[inset_1px_1px_0_rgba(255,255,255,0.78),inset_-1px_-1px_0_rgba(0,0,0,0.24)]",
+	tabCount: "text-[10px] text-zinc-600",
 
-	// Cards / states
-	card: "rounded-sm border border-slate-700 bg-slate-900 p-3",
-	stateCard: "rounded-sm border border-dashed border-slate-700 bg-slate-900 p-4 text-slate-200",
-	stateCardError: "border-rose-500/50",
+	// Content panes
+	card:
+		"rounded-[4px] border border-zinc-700 bg-zinc-200 p-3 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.7),inset_-1px_-1px_0_rgba(0,0,0,0.18)]",
+	stateCard:
+		"rounded-[4px] border border-zinc-700 bg-zinc-200 p-4 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.7),inset_-1px_-1px_0_rgba(0,0,0,0.18)]",
+	stateCardError: "border-zinc-800 bg-zinc-300",
 	statusPillBase:
-		"rounded-full border px-2 py-1 text-[11px] font-medium uppercase tracking-wide",
+		"rounded-[4px] border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide",
 } as const;
-
-import { LuPanelRightClose, LuPanelLeftOpen, LuPanelTopOpen, LuPanelTopClose, LuHouse, LuRefreshCw } from "react-icons/lu";
 
 export const Icons = {
 	SidePanelClose: LuPanelRightClose,

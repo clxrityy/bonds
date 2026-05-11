@@ -1,10 +1,34 @@
 @import "tailwindcss";
 
+/* Global grayscale desktop palette */
+:root {
+	--desk-bg: 191 191 191;
+	--ink: 24 24 27;
+	--muted-ink: 82 82 91;
+}
+
 * {
 	box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+	margin: 0;
+	min-height: 100%;
+	background: rgb(var(--desk-bg));
+	color: rgb(var(--ink));
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Word-wrap helper used by BondCard fields */
 :where(.wrap-break-word) {
 	overflow-wrap: break-word;
 	word-break: break-word;
+}
+
+/* Optional micro-texture utility if you want old UI feel on specific panes */
+:where(.retro-noise-soft) {
+	background-image: radial-gradient(rgba(0, 0, 0, 0.04) 0.6px, transparent 0.6px);
+	background-size: 3px 3px;
 }

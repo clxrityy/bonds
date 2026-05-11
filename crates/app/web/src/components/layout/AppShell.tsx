@@ -29,15 +29,15 @@ export function AppShell({
 
 	// Compact panel placement switches by current mode.
 	const compactPanelClass = cx(
-		"fixed z-50 border border-slate-700/70 bg-slate-900/95 shadow-2xl backdrop-blur",
+		"fixed z-50 border border-zinc-700 bg-zinc-300 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)]",
 		mode === "side"
 			? "inset-y-0 left-0 w-[min(85vw,340px)] border-r"
 			: "inset-x-0 top-0 border-b"
 	);
 
 	return (
-		<div className="grid min-h-screen grid-rows-[auto_auto_1fr] bg-slate-950 text-slate-100">
-			<header className="flex items-center justify-between gap-3 border-b border-slate-700/70 bg-slate-900/70 px-4 py-3 backdrop-blur">
+		<div className="grid min-h-screen grid-rows-[auto_auto_1fr] bg-zinc-400 text-zinc-900">
+			<header className="flex items-center justify-between gap-2 border border-zinc-700 bg-zinc-300 px-3 py-2 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)]">
 				<button
 					className={cx(ui.chromeBtnBase, ui.chromeBtnIdle)}
 					type="button"
