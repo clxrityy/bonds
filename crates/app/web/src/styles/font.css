@@ -1,0 +1,27 @@
+/**
+ * Custom font import(s)
+ */
+
+/* Science Gothic */
+@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:slnt,wdth,wght,CTRS@-10..0,50..200,100..900,0..85&display=swap');
+
+/**
+ ****************************
+ * Science Gothic font styles
+
+ * WEIGHT: 100 - 900
+ * SLANT: -10 to 0
+ * WIDTH: 50 to 200
+ * CONTRAST: 0 to 85
+ */
+
+.font-science-gothic {
+	font-family: "Science Gothic", sans-serif;
+	font-optical-sizing: auto;
+	font-weight: inherit;
+	font-style: normal;
+	font-variation-settings:
+		"slnt" 0,
+		"wdth" 100,
+		"CTRS" 0;
+}

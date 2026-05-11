@@ -1,0 +1,22 @@
+/**
+ * Global styles for Bond's UI layers. These are meant to be imported within the main css file (index.css) and provide base styles for the various UI layers (e.g., cards, modals, etc.).
+ * This file can include layer-specific utility classes, base styles for components, and any other styles that are meant to be shared across multiple components.
+ */
+
+/* Word-wrap helper used by BondCard fields */
+:where(.wrap-break-word) {
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+/* Optional micro-texture utility if you want old UI feel on specific panes */
+:where(.retro-noise-soft) {
+	background-image: radial-gradient(rgba(0, 0, 0, 0.04) 0.6px, transparent 0.6px);
+	background-size: 3px 3px;
+}
+
+/* Optional micro-texture utility if you want old UI feel on specific panes */
+:where(.retro-noise-strong) {
+	background-image: radial-gradient(rgba(0, 0, 0, 0.08) 0.6px, transparent 0.6px);
+	background-size: 3px 3px;
+}
