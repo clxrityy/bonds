@@ -1,6 +1,6 @@
 # bonds <img src="./docs/content/assets/img/logo.svg" alt="bonds logo" width="25" height="25" style="filter: grayscale(75%); contrast:125%;" />
 
-#### ⇥ [bonds.fyi](https://bonds.fyi)
+### ⇥ [bonds.fyi](https://bonds.fyi)
 
 Built to ease the organization, management, history, and navigation of files/directories on your computer.
 
@@ -14,7 +14,7 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
 >
 > ##### A tool for creating and managing *bonds* between files and directories
 >
-> Inspired by the *[`~/dotfiles`](https://dotfiles.github.io) trend*, the power of [symbolic links](https://en.wikipedia.org/wiki/Symbolic_link), [GNU Stow](https://www.gnu.org/software/stow/).
+> Inspired by the *[`~/dotfiles`](https://dotfiles.github.io) trend*, the power of [symbolic links](https://en.wikipedia.org/wiki/Symbolic_link), and [GNU Stow](https://www.gnu.org/software/stow/).
 >
 > ---
 
