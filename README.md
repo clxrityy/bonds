@@ -69,9 +69,14 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
     </td>
     <td>List all bonds</td>
     <td>
-      <a href=".github/img/bond-list.png" target="_blank">
-        <img src=".github/img/bond-list.png" alt="list" width="auto" max-height="90%" />
-      </a>
+      <details>
+        <summary>
+          <b><code>bond-list.png</code></b>
+        </summary>
+        <a href=".github/img/bond-list.png" target="_blank">
+          <img src=".github/img/bond-list.png" alt="list" width="auto" max-height="90%" />
+        </a>
+      </details>
     </td>
   </tr>
   <tr>
@@ -80,9 +85,14 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
     </td>
     <td>Show bond details</td>
     <td>
-      <a href=".github/img/bond-info.png" target="_blank">
-        <img src=".github/img/bond-info.png" alt="info" width="auto" max-height="90%" />
-      </a>
+      <details>
+        <summary>
+          <b><code>bond-info.png</code></b>
+        </summary>
+        <a href=".github/img/bond-info.png" target="_blank">
+          <img src=".github/img/bond-info.png" alt="info" width="auto" max-height="90%" />
+        </a>
+      </details>
     </td>
   </tr>
   <tr>
@@ -91,9 +101,14 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
     </td>
     <td>Remove a bond</td>
     <td>
-      <a href=".github/img/bond-remove.png" target="_blank">
-        <img src=".github/img/bond-remove.png" alt="remove" width="auto" max-height="90%" />
-      </a>
+      <details>
+        <summary>
+          <b><code>bond-remove.png</code></b>
+        </summary>
+        <a href=".github/img/bond-remove.png" target="_blank">
+          <img src=".github/img/bond-remove.png" alt="remove" width="auto" max-height="90%" />
+        </a>
+      </details>
     </td>
   </tr>
 </table>
