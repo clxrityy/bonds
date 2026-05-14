@@ -21,10 +21,19 @@ help: ## Show this help message
     | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 #	---------------------------------------
-# Start/refresh the development environment.
+# Start/refresh/setup the development environment.
 #	---------------------------------------
 
+setup: install-deps	setup-docs	## Setup the development environment for the entire workspace
+
 refresh: clean setup-docs setup-app build test app lint	## Clean, setup, build, test, and lint the entire workspace
+
+# ----------------------------------------
+# Installation	targets.
+# ----------------------------------------
+install-deps:	## Install dependencies for all packages
+	cargo fetch --workspace
+	@cd crates/app && pnpm install
 
 # ---------------------------------------
 # Setup targets.
