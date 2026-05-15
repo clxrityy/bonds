@@ -105,6 +105,11 @@ build: ## Build all packages
 # build-release: ## Build all packages in release mode
 #	cargo build --workspace --release
 
+# ----------------------------------------
+# PRE-COMMIT targets
+#	----------------------------------------
+pre-commit: lint test build ## Run all pre-commit checks (linting, tests, and build) to ensure code quality before committing
+
 # ---------------------------------------
 # Documentation targets.
 #
