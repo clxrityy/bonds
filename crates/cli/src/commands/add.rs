@@ -2,11 +2,12 @@ use bonds_cli::ui;
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
 
-/// The `add` command allows users to create a new bond between a source and target path. It supports options for bonding the contents of a directory as separate bonds, as well as giving the bond a name for easy reference. The command handles various error cases, such as invalid paths or issues during bond creation, and provides user-friendly output to indicate the success or failure of the operation.
-/// **Example usage:**
-/// ```bash
-/// bond add /path/to/target --name foo
-/// ```
+#[doc = r"The `add` command allows users to create a new bond between a source and target path. It supports options for bonding the contents of a directory as separate bonds, as well as giving the bond a name for easy reference. The command handles various error cases, such as invalid paths or issues during bond creation, and provides user-friendly output to indicate the success or failure of the operation.
+**Example usage:**
+```bash
+bond add /path/to/target --name foo
+```
+@See [CLI Documentation](https://docs.bonds.rs/cli#add) for more details and examples."]
 pub fn cmd_add(
     manager: &BondManager,
     source: PathBuf,
