@@ -76,7 +76,11 @@ fn main() {
             };
             cmd_info(&manager, &id)
         }
-        Commands::Remove { id, with_target, flags } => {
+        Commands::Remove {
+            id,
+            with_target,
+            flags,
+        } => {
             let manager = match bonds_core::BondManager::new(cli.db) {
                 Ok(m) => m,
                 Err(e) => {
@@ -106,7 +110,15 @@ fn main() {
                     std::process::exit(1);
                 }
             };
-            cmd_update(&manager, &id, source, target, name, flags.dry_run, flags.verbose)
+            cmd_update(
+                &manager,
+                &id,
+                source,
+                target,
+                name,
+                flags.dry_run,
+                flags.verbose,
+            )
         }
         Commands::Migrate { id, dest, flags } => {
             let manager = match bonds_core::BondManager::new(cli.db) {

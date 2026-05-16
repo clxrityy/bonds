@@ -56,7 +56,11 @@ pub fn cmd_migrate(
 
     if dry_run {
         ui::warning("Dry run enabled: no changes will be made.");
-        ui::info(format!("Would migrate bond '{}' to {}", id, new_target.display()));
+        ui::info(format!(
+            "Would migrate bond '{}' to {}",
+            id,
+            new_target.display()
+        ));
         return Ok(());
     }
 
