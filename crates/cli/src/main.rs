@@ -19,12 +19,23 @@ use clap::Parser;
 fn main() {
     let cli = Cli::parse();
 
-    let result = match cli.command {
+    // Branded default landing output when no subcommand is provided.
+    let Some(cmd) = cli.command else {
+        ui::landing(env!("CARGO_PKG_VERSION"));
+        return;
+    };
+
+    let result = match cmd {
         Commands::Config { action } => match action {
             ConfigAction::Get { key } => cmd_config_get(&key),
             ConfigAction::Set { key, value } => cmd_config_set(&key, &value),
         },
-        cmd => {
+        Commands::Add {
+            source,
+            target,
+            name,
+            flags,
+        } => {
             // Only init DB for commands that need it.
             let manager = match bonds_core::BondManager::new(cli.db) {
                 Ok(m) => m,
@@ -37,39 +48,103 @@ fn main() {
                     std::process::exit(1);
                 }
             };
-
-            match cmd {
-                Commands::Add {
-                    source,
-                    target,
-                    contents,
-                    name,
-                } => cmd_add(&manager, source, target, contents, name),
-                Commands::List => cmd_list(&manager),
-                Commands::Info { id } => cmd_info(&manager, &id),
-                Commands::Remove { id, with_target } => cmd_remove(&manager, &id, with_target),
-                Commands::Config { .. } => unreachable!(),
-                Commands::Update {
-                    id,
-                    source,
-                    target,
-                    name,
-                } => cmd_update(&manager, &id, source, target, name),
-                Commands::Migrate { id, dest } => cmd_migrate(&manager, &id, dest),
-                Commands::Metadata { action } => match action {
-                    MetadataAction::Get { id, key } => {
-                        // None key means "print all metadata"
-                        cmd_metadata_get(&manager, &id, key.as_deref())
-                    }
-                    MetadataAction::Set { id, key, value } => {
-                        // Upsert metadata key/value on the selected bond
-                        cmd_metadata_set(&manager, &id, &key, &value)
-                    }
-                    MetadataAction::Remove { id, key } => {
-                        // Remove a single key from metadata map
-                        cmd_metadata_remove(&manager, &id, &key)
-                    }
-                },
+            cmd_add(&manager, source, target, name, flags.dry_run, flags.verbose)
+        }
+        Commands::List => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            cmd_list(&manager)
+        }
+        Commands::Info { id } => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            cmd_info(&manager, &id)
+        }
+        Commands::Remove { id, with_target, flags } => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            cmd_remove(&manager, &id, with_target, flags.dry_run, flags.verbose)
+        }
+        Commands::Update {
+            id,
+            source,
+            target,
+            name,
+            flags,
+        } => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            cmd_update(&manager, &id, source, target, name, flags.dry_run, flags.verbose)
+        }
+        Commands::Migrate { id, dest, flags } => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            cmd_migrate(&manager, &id, dest, flags.dry_run, flags.verbose)
+        }
+        Commands::Metadata { action } => {
+            let manager = match bonds_core::BondManager::new(cli.db) {
+                Ok(m) => m,
+                Err(e) => {
+                    eprintln!(
+                        "{}",
+                        ui::format_context_error("Failed to initialize bond manager", &e)
+                    );
+                    std::process::exit(1);
+                }
+            };
+            match action {
+                MetadataAction::Get { id, key } => {
+                    // None key means "print all metadata"
+                    cmd_metadata_get(&manager, &id, key.as_deref())
+                }
+                MetadataAction::Set { id, key, value } => {
+                    // Upsert metadata key/value on the selected bond
+                    cmd_metadata_set(&manager, &id, &key, &value)
+                }
+                MetadataAction::Remove { id, key } => {
+                    // Remove a single key from metadata map
+                    cmd_metadata_remove(&manager, &id, &key)
+                }
             }
         }
     };
