@@ -150,8 +150,7 @@ clean: ## Clean build artifacts and temporary development files
 #	---------------------------------------
 # Release targets.
 #	---------------------------------------
-version: ## Update crate version(s). Usage: `make version VERSION=v0.0.0 VERSION_TARGET=all SYNC_MAKEFILE=true`
-	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE == true && "--update-makefile" || "")
+version-release: version	## Update version, commit, push, trigger publish workflow, create release commits, and tag the release. Usage: `make version-release VERSION=v0.1.0 VERSION_TARGET=core SYNC_MAKEFILE=true`
 	@git add .
 	@git commit -m "Bump to $(VERSION)"
 	@git push
@@ -186,6 +185,12 @@ docs-release: ## Trigger the documentation release workflow. Usage: `make docs-r
 
 publish: ## Trigger the publish workflow. Usage: `make publish VERSION=v0.1.0` `make publish TARGET=core VERSION=v0.1.0` `make publish TARGET=cli VERSION=v0.1.0`
 	@act workflow_dispatch -j publish --input target=$(TARGET) --input version=$(VERSION)
+
+version: ## Update crate version(s) locally. Usage: `make version VERSION=v0.0.0 VERSION_TARGET=all SYNC_MAKEFILE=true`
+	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE == true && "--update-makefile" || "")
+
+release-commits: ## Create release commits for the given version. Usage: `make release-commits VERSION=v0.1.0`
+	@bash scripts/release-commits.sh --version $(VERSION)
 
 # ---------------------------------------
 # App targets.
