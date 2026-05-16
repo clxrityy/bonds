@@ -11,10 +11,14 @@ const GREEN_BOLD: &str = "\x1b[1;32m";
 const YELLOW_BOLD: &str = "\x1b[1;33m";
 const RED_BOLD: &str = "\x1b[1;31m";
 // const CYAN_BOLD: &str = "\x1b[1;36m";
+// const CYAN_UNDERLINE: &str = "\x1b[4;36m";
+// const BLUE: &str = "\x1b[34m";
 // const BLUE_BOLD: &str = "\x1b[1;34m";
+// const BLUE_UNDERLINE: &str = "\x1b[4;34m";
 const MAGENTA: &str = "\x1b[35m";
 const CYAN: &str = "\x1b[36m";
 const DIM: &str = "\x1b[2m";
+const DIM_UNDERLINE: &str = "\x1b[2;4m";
 const BOLD: &str = "\x1b[1m";
 const UNDERLINE: &str = "\x1b[4m";
 const BOLD_UNDERLINE: &str = "\x1b[1;4m";
@@ -26,10 +30,27 @@ const LIGHT_BLUE: &str = "\x1b[38;5;117m";
 const DIM_BOLD: &str = "\x1b[1;2m";
 const NEWLINE: &str = " ";
 
+// Decorative startup banner for `bond` (shown on bare `bond` command).
+// Kept as raw string so spacing/alignment is preserved exactly.
+const BONDS_BANNER: &str = r#"
+ __                        __
+/\ \                      /\ \
+\ \ \____   ___    ___    \_\ \    ____
+ \ \ '__`\ / __`\/' _ `\  /'_` \  /',__\
+  \ \ \L\ /\ \L\ /\ \/\ \/\ \L\ \/\__, `\
+   \ \_,__\ \____\ \_\ \_\ \___,_\/\____/
+    \/___/ \/___/ \/_/\/_/\/__,_ /\/___/
+"#;
+
 /// Default landing output shown when running `bond` without subcommands.
 /// TODO: This should automatically display the command list and descriptions, but for now it's just a branded message with quick start instructions.
 pub fn landing(version: &str) {
-    title("bonds");
+    paint(BONDS_BANNER, BOLD);
+    paint("                              ", DIM_UNDERLINE);
+    newline();
+    paint("      https://bonds.fyi      ", LIGHT_BLUE);
+    paint("                              ", DIM_UNDERLINE);
+    newline();
     info(format!("Version {version}"));
     dim("Organize and manage source-target directory bonds.");
     newline();
@@ -39,7 +60,9 @@ pub fn landing(version: &str) {
     normal("  bond list");
     normal("  bond info <id|name>");
     normal("  bond remove <id|name> [--with-target] [--dry-run] [--verbose]");
-    normal("  bond update <id|name> [--source <path>] [--target <path>] [--name <name>] [--dry-run] [--verbose]");
+    normal(
+        "  bond update <id|name> [--source <path>] [--target <path>] [--name <name>] [--dry-run] [--verbose]",
+    );
     normal("  bond migrate <id|name> [dest] [--dry-run] [--verbose]");
     newline();
 
