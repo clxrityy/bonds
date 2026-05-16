@@ -1,0 +1,24 @@
+/* Global grayscale desktop palette */
+:root {
+	--desk-bg: 191 191 191;
+	--ink: 24 24 27;
+	--muted-ink: 82 82 91;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	margin: 0;
+	min-height: 100%;
+	background: rgb(var(--desk-bg));
+	color: rgb(var(--ink));
+	font-family: "Segoe UI",
+		Tahoma,
+		Geneva,
+		Verdana,
+		sans-serif;
+}

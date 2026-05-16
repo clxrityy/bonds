@@ -1,6 +1,6 @@
 //! The `args` module defines the command-line argument structures and parsing logic for the bonds CLI application using the `clap` crate. It includes the main `Cli` struct, which represents the overall command-line interface, and the `Commands` enum, which defines the various subcommands that users can execute. Each subcommand may have its own set of arguments and options, allowing for a flexible and user-friendly command-line experience when managing directory bonds (symlinks with tracking).
 
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -17,7 +17,7 @@ pub struct Cli {
 
     /// Command to execute
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
 /// The `Commands` enum defines the various commands that the bonds CLI application supports. Each variant corresponds to a specific action that can be performed on the bonds, such as adding a new bond, listing existing bonds, updating bond information, and managing metadata. Some commands have their own subcommands for more granular actions, such as the `Config` and `Metadata` commands. This structure allows for a clear and organized command-line interface, making it easier for users to understand and use the available functionality of the CLI application.
@@ -29,12 +29,12 @@ pub enum Commands {
         source: PathBuf,
         /// The target location (defaults to current directory + source name)
         target: Option<PathBuf>,
-        /// Bond each child of source as a separate bond into target
-        #[arg(long)]
-        contents: bool,
         /// Give this bond a name for easy reference
         #[arg(long)]
         name: Option<String>,
+        /// Common flags for mutating commands
+        #[command(flatten)]
+        flags: ActionFlags,
     },
 
     /// List all bonds
@@ -53,6 +53,9 @@ pub enum Commands {
         /// Also delete the target directory/file (not just the symlink)
         #[arg(long)]
         with_target: bool,
+        /// Common flags for mutating commands
+        #[command(flatten)]
+        flags: ActionFlags,
     },
 
     /// View or modify configuration
@@ -74,6 +77,9 @@ pub enum Commands {
         /// Set or change the bond's name
         #[arg(long)]
         name: Option<String>,
+        /// Common flags for mutating commands
+        #[command(flatten)]
+        flags: ActionFlags,
     },
 
     /// Move a bond's target to a new directory
@@ -82,6 +88,9 @@ pub enum Commands {
         id: String,
         /// Destination directory (defaults to configured default directory)
         dest: Option<PathBuf>,
+        /// Common flags for mutating commands
+        #[command(flatten)]
+        flags: ActionFlags,
     },
 
     /// Read or modify metadata for a bond
@@ -89,6 +98,18 @@ pub enum Commands {
         #[command(subcommand)]
         action: MetadataAction,
     },
+}
+
+/// Defines common command-line flags that can be reused across multiple mutating commands in the bonds CLI application. The `dry_run` flag allows users to preview the outcome of a command without making any actual changes to the filesystem or database, which is useful for testing and verification. The `verbose` flag enables the printing of extra execution details, providing users with more insight into what the command is doing, which can be helpful for debugging and inspection purposes. By centralizing these flags in a single struct, we can maintain consistency and reduce redundancy across different commands that perform mutations.
+#[derive(Debug, Clone, Args, Default)]
+pub struct ActionFlags {
+    /// Preview outcome without applying filesystem/database changes.
+    #[arg(long)]
+    pub dry_run: bool,
+
+    /// Print extra execution details for debugging/inspection.
+    #[arg(long)]
+    pub verbose: bool,
 }
 
 /// Subcommands for the `config` command, which allows users to get or set configuration values for the bonds CLI application. The `Get` variant retrieves the current value of a specified configuration key, while the `Set` variant updates a configuration key with a new value. This allows users to customize the behavior of the CLI application by modifying its configuration settings.

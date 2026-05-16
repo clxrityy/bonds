@@ -1,0 +1,5 @@
+@import "./font.css"; /* FONTS */
+@import "tailwindcss"; /* TAILWIND */
+@import "./global.css"; /* GLOBAL STYLES */
+@import "./layer.css"; /* LAYER STYLES */
+@import "./utilities.css"; /* UTILITY CLASSES */

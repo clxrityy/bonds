@@ -4,7 +4,7 @@ resolver = "3"
 members = [
     "crates/core",
     "crates/cli",
-    # "crates/app",  # uncomment later
+    "crates/app",
 ]
 
 # Share dependency versions across crates

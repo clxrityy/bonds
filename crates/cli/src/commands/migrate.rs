@@ -11,6 +11,8 @@ pub fn cmd_migrate(
     manager: &BondManager,
     id: &str,
     dest: Option<PathBuf>,
+    dry_run: bool,
+    verbose: bool,
 ) -> Result<(), BondError> {
     let bond = manager.get_bond(id)?;
 
@@ -40,6 +42,22 @@ pub fn cmd_migrate(
     if new_target == bond.target() {
         ui::warning(format!(
             "Bond '{}' is already at {}",
+            id,
+            new_target.display()
+        ));
+        return Ok(());
+    }
+
+    if verbose {
+        ui::debug(format!("Migrating bond with ID: {}", id));
+        ui::debug(format!("Current target path: {}", bond.target().display()));
+        ui::debug(format!("New target path: {}", new_target.display()));
+    }
+
+    if dry_run {
+        ui::warning("Dry run enabled: no changes will be made.");
+        ui::info(format!(
+            "Would migrate bond '{}' to {}",
             id,
             new_target.display()
         ));

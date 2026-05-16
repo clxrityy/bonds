@@ -1,6 +1,8 @@
 use std::path::{Path, PathBuf};
 
 /// Metadata matching rules for bond queries.
+/// - `HasKey`: matches bonds that contain a metadata key, regardless of value.
+/// - `KeyValue`: matches bonds where `key == value`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MetadataFilter {
     /// Match bonds that contain a metadata key, regardless of value.
@@ -12,6 +14,8 @@ pub enum MetadataFilter {
 /// Composable filter object for querying bonds.
 ///
 /// All fields are optional. When multiple fields are set, they are combined with AND logic.
+/// - `source` and `target` are matched with exact path equality.
+/// - `metadata` is matched according to the rules defined in `MetadataFilter`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct BondQuery {
     pub source: Option<PathBuf>,

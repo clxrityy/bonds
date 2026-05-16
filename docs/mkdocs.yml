@@ -1,10 +1,12 @@
 site_name: Bonds
-site_description: Bonds CLI and library API documentation
+site_description: Bonds is a tool for creating and managing symbolic links between files and directories, enabling flexible organization and access patterns.
 # Default points to latest; workflows can override per build context.
 site_url: !ENV SITE_URL
 repo_url: https://github.com/clxrityy/bonds
 repo_name: clxrityy/bonds
 edit_uri: edit/master/docs/content/
+site_author: MJ Anglin
+
 
 docs_dir: content
 
@@ -79,12 +81,24 @@ extra_javascript:
 nav:
   - Home: index.md
   - CLI: cli.md
-  - Library API:
-      - Overview: library/overview.md
+  - Architecture: architecture.md
+  - Roadmap: roadmap.md
+  - Library:
+      - Overview: library/index.md
       - Events: library/events.md
       - Querying: library/querying.md
       - API Reference:
-        - bonds-core: library/core-api.md
-        - bonds-cli: library/cli-api.md
-  - Architecture: architecture.md
-  - Roadmap: roadmap.md
+          - bonds-core: library/core-api.md
+          - bonds-cli: library/cli-api.md
+  - Contributing:
+      - Overview: contributing/index.md
+      - Development Workflow: contributing/development.md
+      - Testing: contributing/testing.md
+      - Pull Requests: contributing/pull-requests.md
+      - Reporting Issues: contributing/issues.md
+  - Resources:
+      - License: resources/license.md
+      - Security Policy: resources/security.md
+      - Code of Conduct: resources/code-of-conduct.md
+
+copyright: "Copyright © 2026 MJ Anglin. All rights reserved."

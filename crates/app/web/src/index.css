@@ -1,0 +1,5 @@
+/** * Global styles for the app. This file is imported in the root component (App.tsx) and applies to the entire application.
+ * It includes base styles, resets, and any global utility classes.
+ */
+
+@import "./styles/index.css";

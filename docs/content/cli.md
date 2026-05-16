@@ -72,6 +72,7 @@ cargo install bonds-cli
       <td>Remove a bond, with optional target deletion.</td>
       <td>
         <pre><code class="language-bash">bond remove foo</code></pre>
+        <pre><code class="language-bash">bond remove foo --with-target --dry-run --verbose</code></pre>
       </td>
     </tr>
     <tr id="update">
@@ -81,6 +82,7 @@ cargo install bonds-cli
       <td>
         <pre><code class="language-bash">bond update foo --source ~/projects/new-app</code></pre>
         <pre><code class="language-bash">bond update foo --target ~/bonds/new-app</code></pre>
+        <pre><code class="language-bash">bond update foo --dry-run --verbose</code></pre>
       </td>
     </tr>
     <tr id="migrate">
@@ -90,6 +92,7 @@ cargo install bonds-cli
       <td>
         <pre><code class="language-bash">bond migrate foo</code></pre>
         <pre><code class="language-bash">bond migrate foo ~/new-bonds</code></pre>
+        <pre><code class="language-bash">bond migrate foo --dry-run --verbose</code></pre>
       </td>
     </tr>
     <tr id="config">

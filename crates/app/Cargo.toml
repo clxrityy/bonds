@@ -1,0 +1,27 @@
+[package]
+name = "Bonds"
+version = "0.1.0"
+edition = "2024"
+description = "Desktop app for browsing and managing bonds"
+license-file = "../../LICENSE"
+homepage = "https://bonds.fyi"
+repository = "https://github.com/clxrityy/bonds"
+authors = ["MJ Anglin <contact@mjanglin.com>"]
+publish = false
+default-run = "Bonds"
+
+[lib]
+name = "bonds_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+bonds-core = { version = "0.1.7", path = "../core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tauri = { version = "2", features = [] }
+
+[dev-dependencies]
+tempfile = { workspace = true }

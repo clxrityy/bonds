@@ -1,15 +1,21 @@
 use bonds_cli::args::{Cli, Commands, ConfigAction, MetadataAction};
 use clap::Parser;
 
+// Helper function to extract the command from the parsed CLI arguments for testing purposes.
+fn cmd(cli: Cli) -> Commands {
+    cli.command.expect("expected subcommand")
+}
+
 #[test]
 fn parse_add_with_target() {
     let cli = Cli::try_parse_from(["bond", "add", "/src", "/tgt"]).unwrap();
-    match cli.command {
+
+    match cmd(cli) {
         Commands::Add {
             source,
             target,
-            contents: _,
             name: _,
+            flags: _,
         } => {
             assert_eq!(source.to_str().unwrap(), "/src");
             assert_eq!(target.unwrap().to_str().unwrap(), "/tgt");
@@ -21,11 +27,11 @@ fn parse_add_with_target() {
 #[test]
 fn parse_add_without_target() {
     let cli = Cli::try_parse_from(["bond", "add", "/src"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Add {
             source,
             target,
-            contents: _,
+            flags: _,
             name: _,
         } => {
             assert_eq!(source.to_str().unwrap(), "/src");
@@ -38,13 +44,13 @@ fn parse_add_without_target() {
 #[test]
 fn parse_list() {
     let cli = Cli::try_parse_from(["bond", "list"]).unwrap();
-    assert!(matches!(cli.command, Commands::List));
+    assert!(matches!(cmd(cli), Commands::List));
 }
 
 #[test]
 fn parse_info() {
     let cli = Cli::try_parse_from(["bond", "info", "abc123"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Info { id } => assert_eq!(id, "abc123"),
         _ => panic!("expected Info"),
     }
@@ -53,8 +59,12 @@ fn parse_info() {
 #[test]
 fn parse_remove_with_target_flag() {
     let cli = Cli::try_parse_from(["bond", "remove", "abc123", "--with-target"]).unwrap();
-    match cli.command {
-        Commands::Remove { id, with_target } => {
+    match cmd(cli) {
+        Commands::Remove {
+            id,
+            with_target,
+            flags: _,
+        } => {
             assert_eq!(id, "abc123");
             assert!(with_target);
         }
@@ -65,12 +75,13 @@ fn parse_remove_with_target_flag() {
 #[test]
 fn parse_update_target_only() {
     let cli = Cli::try_parse_from(["bond", "update", "abc123", "--target", "/new"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Update {
             id,
             source,
             target,
             name,
+            flags: _,
         } => {
             assert_eq!(id, "abc123");
             assert!(source.is_none());
@@ -87,12 +98,13 @@ fn parse_update_both() {
         "bond", "update", "abc123", "--source", "/s", "--target", "/t",
     ])
     .unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Update {
             id,
             source,
             target,
             name,
+            flags: _,
         } => {
             assert_eq!(id, "abc123");
             assert_eq!(source.unwrap().to_str().unwrap(), "/s");
@@ -106,7 +118,7 @@ fn parse_update_both() {
 #[test]
 fn parse_config_set() {
     let cli = Cli::try_parse_from(["bond", "config", "set", "default", "/bonds"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Config {
             action: ConfigAction::Set { key, value },
         } => {
@@ -120,7 +132,7 @@ fn parse_config_set() {
 #[test]
 fn parse_config_get() {
     let cli = Cli::try_parse_from(["bond", "config", "get", "default"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Config {
             action: ConfigAction::Get { key },
         } => {
@@ -133,23 +145,26 @@ fn parse_config_get() {
 #[test]
 fn parse_global_db_flag() {
     let cli = Cli::try_parse_from(["bond", "--db", "/tmp/test.db", "list"]).unwrap();
-    assert_eq!(cli.db.unwrap().to_str().unwrap(), "/tmp/test.db");
-    assert!(matches!(cli.command, Commands::List));
+    assert_eq!(cli.db.as_ref().unwrap().to_str().unwrap(), "/tmp/test.db");
+    assert!(matches!(cmd(cli), Commands::List));
 }
 
 #[test]
-fn parse_add_contents() {
-    let cli = Cli::try_parse_from(["bond", "add", "/src", "/tgt", "--contents"]).unwrap();
-    match cli.command {
-        Commands::Add { contents, .. } => assert!(contents),
-        _ => panic!("expected Add"),
-    }
+fn parse_add_rejects_contents_flag() {
+    let err = Cli::try_parse_from(["bond", "add", "/src", "/tgt", "--contents"]);
+    assert!(err.is_err());
+}
+
+#[test]
+fn parse_no_subcommand_is_allowed() {
+    let cli = Cli::try_parse_from(["bond"]).unwrap();
+    assert!(cli.command.is_none());
 }
 
 #[test]
 fn parse_add_with_name() {
     let cli = Cli::try_parse_from(["bond", "add", "/src", "--name", "foo"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Add { name, .. } => assert_eq!(name.unwrap(), "foo"),
         _ => panic!("expected Add"),
     }
@@ -158,7 +173,7 @@ fn parse_add_with_name() {
 #[test]
 fn parse_update_with_name() {
     let cli = Cli::try_parse_from(["bond", "update", "abc", "--name", "bar"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Update { id, name, .. } => {
             assert_eq!(id, "abc");
             assert_eq!(name.unwrap(), "bar");
@@ -170,8 +185,8 @@ fn parse_update_with_name() {
 #[test]
 fn parse_migrate_with_dest() {
     let cli = Cli::try_parse_from(["bond", "migrate", "foo", "/new/dir"]).unwrap();
-    match cli.command {
-        Commands::Migrate { id, dest } => {
+    match cmd(cli) {
+        Commands::Migrate { id, dest, flags: _ } => {
             assert_eq!(id, "foo");
             assert_eq!(dest.unwrap().to_str().unwrap(), "/new/dir");
         }
@@ -182,8 +197,8 @@ fn parse_migrate_with_dest() {
 #[test]
 fn parse_migrate_without_dest() {
     let cli = Cli::try_parse_from(["bond", "migrate", "foo"]).unwrap();
-    match cli.command {
-        Commands::Migrate { id, dest } => {
+    match cmd(cli) {
+        Commands::Migrate { id, dest, flags: _ } => {
             assert_eq!(id, "foo");
             assert!(dest.is_none());
         }
@@ -194,7 +209,7 @@ fn parse_migrate_without_dest() {
 #[test]
 fn parse_metadata_get_all() {
     let cli = Cli::try_parse_from(["bond", "metadata", "get", "foo"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Metadata {
             action: MetadataAction::Get { id, key },
         } => {
@@ -208,7 +223,7 @@ fn parse_metadata_get_all() {
 #[test]
 fn parse_metadata_get_key() {
     let cli = Cli::try_parse_from(["bond", "metadata", "get", "foo", "owner"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Metadata {
             action: MetadataAction::Get { id, key },
         } => {
@@ -222,7 +237,7 @@ fn parse_metadata_get_key() {
 #[test]
 fn parse_metadata_set() {
     let cli = Cli::try_parse_from(["bond", "metadata", "set", "foo", "owner", "mj"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Metadata {
             action: MetadataAction::Set { id, key, value },
         } => {
@@ -237,7 +252,7 @@ fn parse_metadata_set() {
 #[test]
 fn parse_metadata_remove() {
     let cli = Cli::try_parse_from(["bond", "metadata", "remove", "foo", "owner"]).unwrap();
-    match cli.command {
+    match cmd(cli) {
         Commands::Metadata {
             action: MetadataAction::Remove { id, key },
         } => {
