@@ -1,4 +1,4 @@
-name: Publish crates (core -> cli)
+name: Publish
 on:
   push:
     tags:

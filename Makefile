@@ -154,9 +154,8 @@ version-release: version	## Update version, commit, push, trigger publish workfl
 	@git add .
 	@git commit -m "Bump to $(VERSION)"
 	@git push
-	@make publish VERSION=$(VERSION) TARGET=$(VERSION_TARGET || all)
-	@make release-commits VERSION=$(VERSION)
 	@make tag-release TAG=$(VERSION)
+	@make publish VERSION=$(VERSION) TARGET=$(VERSION_TARGET || all)
 
 tag-release: ## Tag + push a release for the current version. Usages: `make tag-release TAG=v0.1.0` `make tag-release TAG=core-v0.1.0` `make tag-release TAG=cli-v0.1.0`
 	@set -euo pipefail; \
