@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["add_contents","cmd_add"]};
+window.SIDEBAR_ITEMS = {"fn":["cmd_add"]};

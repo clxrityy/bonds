@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Commands","ConfigAction","MetadataAction"],"struct":["Cli"]};
+window.SIDEBAR_ITEMS = {"enum":["Commands","ConfigAction","MetadataAction"],"struct":["ActionFlags","Cli"]};
