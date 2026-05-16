@@ -74,7 +74,7 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
           <b><code>bond-list.png</code></b>
         </summary>
         <a href=".github/img/bond-list.png" target="_blank">
-          <img src=".github/img/bond-list.png" alt="list" width="auto" max-height="90%" />
+          <img src=".github/img/bond-list.png" alt="list" style="max-height: 90%;" />
         </a>
       </details>
     </td>
@@ -90,7 +90,7 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
           <b><code>bond-info.png</code></b>
         </summary>
         <a href=".github/img/bond-info.png" target="_blank">
-          <img src=".github/img/bond-info.png" alt="info" width="auto" max-height="90%" />
+          <img src=".github/img/bond-info.png" alt="info" style="max-height: 90%;" />
         </a>
       </details>
     </td>
@@ -106,7 +106,7 @@ Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on 
           <b><code>bond-remove.png</code></b>
         </summary>
         <a href=".github/img/bond-remove.png" target="_blank">
-          <img src=".github/img/bond-remove.png" alt="remove" width="auto" max-height="90%" />
+          <img src=".github/img/bond-remove.png" alt="remove" style="max-height: 90%;" />
         </a>
       </details>
     </td>

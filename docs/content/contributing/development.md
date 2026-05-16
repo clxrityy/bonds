@@ -36,7 +36,7 @@ make setup
 `make setup` will:
 
 - fetch Rust dependencies the workspace
-- install app depdendencies in `crates/app`
+- install app dependencies in `crates/app`
 - create Python virtual environment for documentation toolchain
 
 ## Working conventions

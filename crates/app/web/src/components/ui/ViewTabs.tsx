@@ -18,7 +18,7 @@ export function ViewTabs({ active, counts, onChange }: ViewTabsProps) {
 					type="button"
 					role="tab"
 					aria-selected={active === tab}
-					className={cx(ui.tabBase, active ? ui.tabActive : ui.tabIdle)}
+					className={cx(ui.tabBase, active === tab ? ui.tabActive : ui.tabIdle)}
 					onClick={() => onChange(tab)}
 				>
 					<span className="leading-none">{tab}</span>
