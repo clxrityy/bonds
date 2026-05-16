@@ -190,7 +190,7 @@ version: ## Update crate version(s) locally. Usage: `make version VERSION=v0.0.0
 	@python3 scripts/versioner.py --version $(VERSION) --target $(VERSION_TARGET) --update-makefile $(SYNC_MAKEFILE == true && "--update-makefile" || "")
 
 release-commits: ## Create release commits for the given version. Usage: `make release-commits VERSION=v0.1.0`
-	@bash scripts/release-commits.sh --version $(VERSION)
+	@bash scripts/release-commits.sh $(VERSION)
 
 # ---------------------------------------
 # App targets.
