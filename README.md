@@ -6,7 +6,7 @@ Built to ease the organization, management, history, and navigation of files/dir
 
 Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on the vision and planned features.
 
-###### [**API Docs**](https://bonds.fyi/latest/library/overview/) | [**Architecture**](https://bonds.fyi/latest/architecture/) | [**Command Line Reference**](https://bonds.fyi/latest/cli/)
+###### [**API Docs**](https://bonds.fyi/latest/library/) | [**Architecture**](https://bonds.fyi/latest/architecture/) | [**Command Line Reference**](https://bonds.fyi/latest/cli/)
 
 [![CI](https://github.com/clxrityy/bonds/actions/workflows/ci.yml/badge.svg)](https://github.com/clxrityy/bonds/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/GPL--v3.0-LICENSE?style=flat&logo=gnuprivacyguard&logoSize=auto&label=License&labelColor=auto&color=%230093DD&link=https%3A%2F%2Fgithub.com%2Fclxrityy%2Fbonds%2Fblob%2Fmaster%2FLICENSE)](https://github.com/clxrityy/bonds/blob/master/LICENSE)
 
