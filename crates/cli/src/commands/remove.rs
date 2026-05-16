@@ -6,7 +6,38 @@ use bonds_core::{BondError, BondManager};
 /// ```bash
 /// bond remove <id | name> [--with-target]
 /// ```
-pub fn cmd_remove(manager: &BondManager, id: &str, with_target: bool) -> Result<(), BondError> {
+pub fn cmd_remove(
+    manager: &BondManager,
+    id: &str,
+    with_target: bool,
+    dry_run: bool,
+    verbose: bool,
+) -> Result<(), BondError> {
+    let bond = manager.get_bond(id)?;
+
+    if verbose {
+        ui::debug(format!("Removing bond with ID: {}", id));
+        if with_target {
+            ui::debug(format!(
+                "Target directory will also be deleted: {}",
+                bond.target().display()
+            ));
+        } else {
+            ui::debug("The target directory will NOT be deleted.");
+        }
+    }
+
+    if dry_run {
+        ui::warning("Dry run enabled: no changes will be made.");
+        ui::info(format!("Would remove bond with ID: {}", id));
+        if with_target {
+            ui::info("Would also delete the target directory.");
+        } else {
+            ui::info("Would NOT delete the target directory.");
+        }
+        return Ok(());
+    }
+
     let bond = manager.delete_bond(id, with_target)?;
     ui::status_ok("✓ SUCCESS");
     ui::success("Bond removed:");
