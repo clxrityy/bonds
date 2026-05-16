@@ -26,6 +26,26 @@ const LIGHT_BLUE: &str = "\x1b[38;5;117m";
 const DIM_BOLD: &str = "\x1b[1;2m";
 const NEWLINE: &str = " ";
 
+/// Default landing output shown when running `bond` without subcommands.
+/// TODO: This should automatically display the command list and descriptions, but for now it's just a branded message with quick start instructions.
+pub fn landing(version: &str) {
+    title("bonds");
+    info(format!("Version {version}"));
+    dim("Organize and manage source-target directory bonds.");
+    newline();
+
+    heading("Quick start:");
+    normal("  bond add <source> [target] [--name <name>] [--dry-run] [--verbose]");
+    normal("  bond list");
+    normal("  bond info <id|name>");
+    normal("  bond remove <id|name> [--with-target] [--dry-run] [--verbose]");
+    normal("  bond update <id|name> [--source <path>] [--target <path>] [--name <name>] [--dry-run] [--verbose]");
+    normal("  bond migrate <id|name> [dest] [--dry-run] [--verbose]");
+    newline();
+
+    dim("Use `bond --help` for the full command reference.");
+}
+
 fn colors_enabled() -> bool {
     // Respect common no-color conventions and avoid ANSI noise when redirected.
     if std::env::var_os("NO_COLOR").is_some() {
@@ -178,4 +198,10 @@ pub fn status_bad(text: impl Display) -> String {
 #[allow(dead_code)]
 pub fn newline() {
     paint("", NEWLINE);
+}
+
+/// Prints a user-facing message for a debug or verbose log, which is only shown when the verbose mode is enabled. This can be used to provide additional information about the internal state or operations of the application that may be helpful for troubleshooting or understanding the behavior of the application, but is not necessary for regular usage.
+#[allow(dead_code)]
+pub fn debug(text: impl Display) -> String {
+    paint(text, DIM)
 }
