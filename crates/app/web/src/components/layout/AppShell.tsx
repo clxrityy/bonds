@@ -41,6 +41,7 @@ export function AppShell({
 				<button
 					className={cx(ui.chromeBtnBase, ui.chromeBtnIdle)}
 					type="button"
+					aria-label={isOpen ? "Close panel" : "Open panel"}
 					onClick={onTogglePanel}
 				>
 					{isOpen ? <Icons.SidePanelClose /> : <Icons.SidePanelOpen />}
