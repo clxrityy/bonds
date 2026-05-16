@@ -197,10 +197,10 @@ release-commits: ## Create release commits for the given version. Usage: `make r
 # ---------------------------------------
 
 app: ## Build the Bonds desktop app
-	@cd crates/app \ && pnpm build
+	@cd crates/app && pnpm build
 
 app-dev: ## Run the Bonds desktop app in development mode
-	@cd crates/app \ && pnpm tauri dev
+	@cd crates/app && pnpm tauri dev
 
 app-preview: ## Run the Bonds desktop app preview server
-	@cd crates/app \ && pnpm build \	&& pnpm preview
+	@cd crates/app && pnpm build && pnpm preview
