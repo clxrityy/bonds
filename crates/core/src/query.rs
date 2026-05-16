@@ -1,6 +1,13 @@
 use std::path::{Path, PathBuf};
 
 /// Metadata matching rules for bond queries.
+/// - `HasKey`: matches bonds that contain a metadata key, regardless of value.
+/// - `KeyValue`: matches bonds where `key == value`.
+/// **Example usage:**
+/// ```rust
+/// let filter = MetadataFilter::HasKey("env".to_string());
+/// let filter = MetadataFilter::KeyValue { key: "env".to_string(), value: "production".to_string() };
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MetadataFilter {
     /// Match bonds that contain a metadata key, regardless of value.
@@ -12,6 +19,14 @@ pub enum MetadataFilter {
 /// Composable filter object for querying bonds.
 ///
 /// All fields are optional. When multiple fields are set, they are combined with AND logic.
+/// - `source` and `target` are matched with exact path equality.
+/// - `metadata` is matched according to the rules defined in `MetadataFilter`.
+/// **Example usage:**
+/// ```rust
+/// let query = BondQuery::new()
+///     .with_source("/path/to/source")
+///     .with_metadata("env", "production");
+/// ```
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct BondQuery {
     pub source: Option<PathBuf>,
