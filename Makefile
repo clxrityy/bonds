@@ -6,7 +6,7 @@ VERSION_TARGET	?= all
 SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
 TAG ?= $(VERSION)
-TARGET ?= VERSION_TARGET
+TARGET ?= $(VERSION_TARGET)
 
 # ---------------------------------------
 # Self-documenting help target.
@@ -106,9 +106,15 @@ build: ## Build all packages
 #	cargo build --workspace --release
 
 # ----------------------------------------
-# PRE-COMMIT targets
+# Pre targets
 #	----------------------------------------
 pre-commit: lint test build ## Run all pre-commit checks (linting, tests, and build) to ensure code quality before committing
+
+pre-tag: pre-commit show-tag show-target ## Run pre-commit checks and show the tag that would be used for the release
+
+pre-publish: pre-tag test-docs-release test-publish ## Run pre-commit checks, test the documentation release workflow, and test the publish workflow to ensure everything is in order before publishing
+	@echo "Pre-publish checks passed!"
+	@echo "Run: make publish VERSION=$(VERSION) TARGET=$(TARGET) to publish the release."
 
 # ---------------------------------------
 # Documentation targets.
@@ -127,6 +133,9 @@ docs: setup-docs ## Build documentation for all packages
 # ---------------------------------------
 show-tag: ## Show the tag that would be used
 	@echo $(TAG)
+
+show-target: ## Show the version that would be used
+	@echo $(TARGET)
 
 # ---------------------------------------
 # Clean targets.
