@@ -4,7 +4,7 @@
 
 Built to ease the organization, management, history, and navigation of files/directories on your computer.
 
-Take a look at the [**roadmap**](https://bonds.fyi/roadmap) for more details on the vision and planned features.
+Take a look at the [**roadmap**](https://bonds.fyi/latest/roadmap) for more details on the vision and planned features.
 
 ###### [**API Docs**](https://bonds.fyi/latest/library/) | [**Architecture**](https://bonds.fyi/latest/architecture/) | [**Command Line Reference**](https://bonds.fyi/latest/cli/)
 
