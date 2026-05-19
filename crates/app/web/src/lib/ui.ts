@@ -13,6 +13,7 @@ import {
 	LuPanelTopClose,
 	LuHouse,
 	LuRefreshCw,
+	LuPlus,
 } from "react-icons/lu";
 
 export function cx(...parts: (string | false | null | undefined)[]): string {
@@ -43,6 +44,9 @@ export const ui = {
 	// Inset field style (old desktop utility look)
 	searchInput:
 		"w-full rounded-[2px] border border-zinc-700 bg-zinc-100 px-2 py-1.5 text-[13px] leading-5 text-zinc-900 placeholder:text-zinc-500 shadow-[inset_1px_1px_0_rgba(0,0,0,0.22),inset_-1px_-1px_0_rgba(255,255,255,0.75)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-900",
+	// Input with more padding for larger forms, but same style.
+	formInput:
+		"w-full rounded-[2px] border border-zinc-700 bg-zinc-100 px-3 py-2 text-[13px] leading-5 text-zinc-900 placeholder:text-zinc-500 shadow-[inset_1px_1px_0_rgba(0,0,0,0.22),inset_-1px_-1px_0_rgba(255,255,255,0.75)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-900",
 
 	// Segmented tabs (not modern pills)
 	tabBase:
@@ -70,4 +74,5 @@ export const Icons = {
 	TopPanelClose: LuPanelTopClose,
 	Home: LuHouse,
 	Refresh: LuRefreshCw,
+	Add: LuPlus,
 } as const;

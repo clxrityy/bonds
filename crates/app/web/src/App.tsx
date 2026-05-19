@@ -11,7 +11,7 @@ export default function App() {
 	const { layout, isCompact, setMode, togglePanel, setSearch, setActiveTab, setSideWidth } =
 		usePanelLayout();
 
-	const { bonds, loading, error, refresh } = useBonds();
+	const { bonds, loading, error, refresh, create, creating, createError } = useBonds();
 	const { filtered, counts } = useBondFilters(bonds, layout.search, layout.activeTab);
 
 	const { onPointerDown } = useResizableSidePanel({
@@ -46,7 +46,15 @@ export default function App() {
 			onSetMode={setMode}
 		>
 			<MainViewport>
-				<BondViewer loading={loading} error={error} bonds={filtered} onRefresh={refresh} />
+				<BondViewer
+					loading={loading}
+					error={error}
+					bonds={filtered}
+					onRefresh={refresh}
+					onCreate={create}
+					creating={creating}
+					createError={createError}
+				/>
 			</MainViewport>
 		</AppShell>
 	);

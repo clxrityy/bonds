@@ -21,3 +21,9 @@ export interface LayoutState {
 	search: string;
 	activeTab: ViewTab;
 };
+
+export interface CreateBondInput {
+	source: string;
+	target?: string | null;
+	name?: string | null;
+};
