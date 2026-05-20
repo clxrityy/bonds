@@ -3,18 +3,6 @@
 version = 4
 
 [[package]]
-name = "Bonds"
-version = "0.1.0"
-dependencies = [
- "bonds-core",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tempfile",
-]
-
-[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -220,6 +208,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdeb9d870516001442e364c5220d3574d2da8dc765554b4a617230d33fa58ef5"
 dependencies = [
  "objc2",
+]
+
+[[package]]
+name = "bonds-app"
+version = "0.1.0"
+dependencies = [
+ "bonds-core",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tempfile",
 ]
 
 [[package]]

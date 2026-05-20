@@ -1,5 +1,5 @@
 [package]
-name = "Bonds"
+name = "bonds-app"
 version = "0.1.0"
 edition = "2024"
 description = "Desktop app for browsing and managing bonds"
@@ -8,7 +8,7 @@ homepage = "https://bonds.fyi"
 repository = "https://github.com/clxrityy/bonds"
 authors = ["MJ Anglin <contact@mjanglin.com>"]
 publish = false
-default-run = "Bonds"
+default-run = "bonds-app"
 
 [lib]
 name = "bonds_app_lib"
