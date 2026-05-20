@@ -21,7 +21,7 @@
         "title": "Bonds",
         "width": 1080,
         "height": 720,
-        "minWidth": 740,
+        "minWidth": 540,
         "minHeight": 420,
         "center": true,
         "resizable": true
