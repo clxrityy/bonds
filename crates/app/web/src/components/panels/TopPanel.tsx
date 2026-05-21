@@ -1,8 +1,9 @@
 import type { PanelControlsProps } from "./panelTypes";
 import { SearchInput } from "../ui/SearchInput";
 import { ViewTabs } from "../ui/ViewTabs";
-import { ui, Icons } from "../../lib/ui";
+import { ui } from "../../lib/ui";
 import { Logo } from "../elements/Logo";
+import { SidePanelOpenIcon } from "../ui/Icons";
 
 type TopPanelProps = PanelControlsProps & {
 	onSwitchToSide: () => void;
@@ -22,7 +23,7 @@ export function TopPanel({
 				<div className="flex items-center gap-1.5">
 						<Logo />
 					<button className={ui.iconToolBtn} type="button" onClick={onSwitchToSide}>
-						<Icons.SidePanelOpen />
+						<SidePanelOpenIcon className="fill-zinc-700" />
 						<span className="sr-only">Switch to side panel</span>
 					</button>
 				</div>

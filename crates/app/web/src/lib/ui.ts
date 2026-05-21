@@ -6,16 +6,12 @@
  * - minimal color accents
  */
 
-import {
-	LuPanelRightClose,
-	LuPanelLeftOpen,
-	LuPanelTopOpen,
-	LuPanelTopClose,
-	LuHouse,
-	LuRefreshCw,
-	LuPlus,
-} from "react-icons/lu";
-
+/**
+ * Utility for conditionally joining class names together, filtering out falsy values.
+ * Example usage: cx("base-class", isActive && "active-class", isDisabled ? "disabled-class" : null)
+ * This will include "active-class" only if isActive is true, and "disabled-class" only if isDisabled is true.
+ * Falsy values (false, null, undefined) will be filtered out and not included in the final class string.
+ */
 export function cx(...parts: (string | false | null | undefined)[]): string {
 	return parts.filter(Boolean).join(" ");
 }
@@ -39,7 +35,7 @@ export const ui = {
 
 	// Keep command button darker for hierarchy, but still grayscale.
 	primaryBtn:
-		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-100 shadow-[inset_1px_1px_0_rgba(255,255,255,0.12),inset_-1px_-1px_0_rgba(0,0,0,0.35)] hover:bg-zinc-800 active:translate-y-px",
+		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-100 shadow-[inset_1px_1px_0_rgba(255,255,255,0.12),inset_-1px_-1px_0_rgba(0,0,0,0.35)] hover:bg-zinc-800 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
 
 	// Inset field style (old desktop utility look)
 	searchInput:
@@ -65,14 +61,4 @@ export const ui = {
 	stateCardError: "border-zinc-800 bg-zinc-300",
 	statusPillBase:
 		"rounded-[4px] border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide",
-} as const;
-
-export const Icons = {
-	SidePanelClose: LuPanelRightClose,
-	SidePanelOpen: LuPanelLeftOpen,
-	TopPanelOpen: LuPanelTopOpen,
-	TopPanelClose: LuPanelTopClose,
-	Home: LuHouse,
-	Refresh: LuRefreshCw,
-	Add: LuPlus,
 } as const;

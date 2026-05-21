@@ -1,6 +1,7 @@
 import type { CSSProperties, PropsWithChildren, ReactNode } from "react";
 import type { PanelMode } from "../../lib/types";
-import { cx, ui, Icons } from "../../lib/ui";
+import { cx, ui } from "../../lib/ui";
+import { SidePanelCloseIcon, SidePanelOpenIcon, TopPanelOpenIcon } from "../ui/Icons";
 
 type AppShellProps = PropsWithChildren<{
 	mode: PanelMode;
@@ -44,7 +45,7 @@ export function AppShell({
 					aria-label={isOpen ? "Close panel" : "Open panel"}
 					onClick={onTogglePanel}
 				>
-					{isOpen ? <Icons.SidePanelClose /> : <Icons.SidePanelOpen />}
+					{isOpen ? <SidePanelCloseIcon className="fill-zinc-700" /> : <SidePanelOpenIcon className="fill-zinc-700" />}
 				</button>
 
 				<div className="flex items-center gap-2">
@@ -56,7 +57,7 @@ export function AppShell({
 						)}
 						onClick={() => onSetMode("side")}
 					>
-						<Icons.SidePanelOpen />
+						<SidePanelOpenIcon className="fill-zinc-700" />
 						<span className="sr-only">Side panel mode</span>
 					</button>
 					<button
@@ -67,7 +68,7 @@ export function AppShell({
 						)}
 						onClick={() => onSetMode("top")}
 					>
-						<Icons.TopPanelOpen />
+						<TopPanelOpenIcon className="fill-zinc-700" />
 						<span className="sr-only">Top panel mode</span>
 					</button>
 				</div>

@@ -1,4 +1,5 @@
 @import "./font.css"; /* FONTS */
+@import '@hackernoon/pixel-icon-library/fonts/iconfont.css'; /* ICON FONTS */
 @import "tailwindcss"; /* TAILWIND */
 @import "./global.css"; /* GLOBAL STYLES */
 @import "./layer.css"; /* LAYER STYLES */
