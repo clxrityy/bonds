@@ -8,9 +8,9 @@ interface BondCardProps {
 
 // Keep all status classes static for Tailwind class detection.
 const statusTone: Record<BondStatus, string> = {
-	healthy: "border-zinc-700 bg-zinc-100 text-zinc-900",
-	warning: "border-stone-700 bg-stone-200 text-stone-900",
-	broken: "border-neutral-800 bg-neutral-300 text-neutral-950",
+	healthy: "border-green-700 bg-green-100/25 text-green-900",
+	warning: "border-yellow-700 bg-yellow-200/20 text-yellow-900",
+	broken: "border-red-800 bg-red-300/15 text-red-950",
 };
 
 export function BondCard({ bond }: BondCardProps) {
@@ -21,7 +21,7 @@ export function BondCard({ bond }: BondCardProps) {
 					<h3 className="text-base font-semibold text-slate-700/80 tracking-tight">
 						{bond.name ?? shortId(bond.id)}
 					</h3>
-					<p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-slate-400 font-mono font-extrabold">
+					<p className="mt-1 text-[11px] uppercase tracking-[0.08em] text-slate-950/70 font-mono font-extrabold">
 						{shortId(bond.id)}
 					</p>
 				</div>
