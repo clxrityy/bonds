@@ -67,7 +67,7 @@ Current baseline:
 
 Next milestones:
 
-- `[ ]` Create bonds from the UI
+- `[x]` Create bonds from the UI
 - `[ ]` Edit and delete bonds from the UI
 - `[ ]` Open source and target paths from the UI
 - `[ ]` Add a bond detail panel with metadata visibility/editing
