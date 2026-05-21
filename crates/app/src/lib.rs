@@ -108,9 +108,9 @@ fn create_bond_item(
     let manager = BondManager::new(db_path)?;
 
     let source_input = PathBuf::from(request.source);
-    let source = source_input
-        .canonicalize()
-        .map_err(|_| BondError::InvalidPath(format!("cannot resolve source: {}", source_input.display())))?;
+    let source = source_input.canonicalize().map_err(|_| {
+        BondError::InvalidPath(format!("cannot resolve source: {}", source_input.display()))
+    })?;
 
     let target = resolve_create_target(&source, request.target)?;
     let created = manager.create_bond(&source, &target, request.name)?;
@@ -119,7 +119,10 @@ fn create_bond_item(
 }
 
 #[tauri::command]
-fn create_bond(request: CreateBondRequest, db_path: Option<String>) -> Result<BondListItem, String> {
+fn create_bond(
+    request: CreateBondRequest,
+    db_path: Option<String>,
+) -> Result<BondListItem, String> {
     create_bond_item(request, db_path.map(PathBuf::from)).map_err(|err| err.to_string())
 }
 
