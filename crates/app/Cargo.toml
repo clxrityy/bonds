@@ -22,6 +22,7 @@ bonds-core = { version = "0.1.7", path = "../core" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tauri = { version = "2", features = [] }
+tauri-plugin-dialog = { version = "2", features = [] }
 
 [dev-dependencies]
 tempfile = { workspace = true }
