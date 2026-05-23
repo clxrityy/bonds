@@ -55,6 +55,8 @@ fn list_bonds(db_path: Option<String>) -> Result<Vec<BondListItem>, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Enables native open/save dialogs from the frontend.
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![list_bonds, create_bond])
         .run(tauri::generate_context!())
         .expect("failed to run Bonds desktop app");
