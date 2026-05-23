@@ -69,7 +69,7 @@ Next milestones:
 
 - `[x]` Create bonds from the UI
 - `[ ]` Edit and delete bonds from the UI
-- `[ ]` Open source and target paths from the UI
+- `[x]` Open source and target paths from the UI
 - `[ ]` Add a bond detail panel with metadata visibility/editing
 - `[ ]` Add metadata-aware search and filtering
 - `[ ]` Add a first-run empty state and create-first-bond flow
