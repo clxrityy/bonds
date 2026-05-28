@@ -30,7 +30,7 @@ export const ui = {
 		"border-zinc-800 bg-zinc-100 text-zinc-950 shadow-[inset_1px_1px_0_rgba(255,255,255,0.78),inset_-1px_-1px_0_rgba(0,0,0,0.24)]",
 
 	ghostBtn:
-		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-700 bg-zinc-200 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100 active:translate-y-px",
+		"inline-flex items-center gap-1.5 rounded-[4px] border border-zinc-700 bg-zinc-200 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100 active:translate-y-px justify-center disabled:pointer-events-none disabled:opacity-50",
 	iconToolBtn: "inline-flex h-7 w-7 items-center justify-center rounded-[3px] border border-zinc-700 bg-zinc-200 text-zinc-900 shadow-[inset_1px_1px_0_rgba(255,255,255,0.72),inset_-1px_-1px_0_rgba(0,0,0,0.2)] hover:bg-zinc-100 active:translate-y-px",
 
 	// Keep command button darker for hierarchy, but still grayscale.

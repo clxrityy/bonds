@@ -1,9 +1,10 @@
 /**
  * Custom font import(s)
+ *
+ * - Science Gothic
+ * - Source Code Pro
  */
-
-/* Science Gothic */
-@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:slnt,wdth,wght,CTRS@-10..0,50..200,100..900,0..85&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 /**
  ****************************
@@ -24,4 +25,25 @@
 		"slnt" 0,
 		"wdth" 100,
 		"CTRS" 0;
+}
+
+/**
+ ****************************
+ * Source Code Pro font styles
+ *
+ * MONOSPACE FONT
+ */
+
+.font-source-code-pro {
+	font-family: "Source Code Pro", monospace;
+	font-style: normal;
+}
+
+/**
+ * Utility class for monospace font with text shadow
+ */
+.font-mono {
+	font-family: "Source Code Pro", monospace;
+	font-weight: 400;
+	text-shadow: 0px 1px 2px rgba(121, 121, 121, 0.3);
 }

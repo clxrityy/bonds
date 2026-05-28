@@ -1,4 +1,4 @@
-import { ui } from "../../lib/ui";
+import { cx, ui } from "../../lib/ui";
 
 export interface PathPickerAction {
 	label: string;
@@ -48,17 +48,19 @@ export function PathPickerField({
 					className={ui.formInput}
 				/>
 
-				{actions.map((action) => (
-					<button
-						key={action.label}
-						type="button"
-						className={ui.ghostBtn}
-						disabled={disabled || action.disabled}
-						onClick={() => void action.onClick()}
-					>
-						{action.label}
-					</button>
-				))}
+				<div className="flex gap-1 lg:flex-col lg:justify-center lg:w-1/2 lg:*:w-full items-center">
+					{actions.map((action) => (
+						<button
+							key={action.label}
+							type="button"
+							className={cx("text-center w-fit", ui.ghostBtn)}
+							disabled={disabled || action.disabled}
+							onClick={() => void action.onClick()}
+						>
+							{action.label}
+						</button>
+					))}
+				</div>
 			</div>
 
 			{hint ? <p className="text-xs text-slate-600">{hint}</p> : null}

@@ -21,20 +21,20 @@ export function CreateBondPanel({
 	return (
 		<div className="border-t pt-4">
 			<h3 className="text-lg font-medium text-slate-900/75 mb-2">Create new bond</h3>
-			<p className="text-sm text-slate-700 mb-3">
+			<p className="text-sm text-slate-700/65 mb-3 text-shadow-2xs indent-4 italic">
 				Type source/target paths manually, or select them from your file system.
 			</p>
 
 			{form.localError ? (
 				<div className={cx(ui.stateCard, ui.stateCardError, "mb-3 p-3")}>
-					<p className="text-xs text-rose-700">{form.localError}</p>
+					<p className="text-xs text-rose-700 text-shadow-2xs">{form.localError}</p>
 				</div>
 			) : null}
 
 			{createError ? (
 				<div className={cx(ui.stateCard, ui.stateCardError, "mb-3 p-3")}>
-					<p className="mb-1 text-xs font-medium text-rose-700">Failed to create bond.</p>
-					<pre className="overflow-x-auto whitespace-pre-wrap wrap-break-word text-xs text-slate-700">
+					<p className="mb-1 text-xs font-medium text-rose-700 text-shadow-2xs">Failed to create bond.</p>
+					<pre className="overflow-x-auto whitespace-pre-wrap wrap-break-word text-xs text-slate-700 text-shadow-2xs">
 						{createError}
 					</pre>
 				</div>
