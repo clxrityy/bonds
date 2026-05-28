@@ -1,4 +1,4 @@
-use crate::bond_view::{map_bond_detail, BondDetailItem};
+use crate::bond_view::{BondDetailItem, map_bond_detail};
 use crate::requests::UpdateBondMetadataRequest;
 use bonds_core::{BondError, BondManager};
 use std::collections::HashMap;
@@ -29,8 +29,7 @@ pub fn update_bond_metadata(
     request: UpdateBondMetadataRequest,
     db_path: Option<String>,
 ) -> Result<BondDetailItem, String> {
-    update_bond_metadata_item(request, db_path.map(PathBuf::from))
-        .map_err(|err| err.to_string())
+    update_bond_metadata_item(request, db_path.map(PathBuf::from)).map_err(|err| err.to_string())
 }
 
 #[cfg(test)]

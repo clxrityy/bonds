@@ -1,4 +1,4 @@
-use crate::bond_view::{map_bond_detail, BondDetailItem};
+use crate::bond_view::{BondDetailItem, map_bond_detail};
 use crate::requests::GetBondDetailRequest;
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
@@ -43,12 +43,7 @@ mod tests {
         metadata.insert("project".to_string(), "bonds".to_string());
 
         let created = manager
-            .create_bond_with_metadata(
-                src.path(),
-                &tgt,
-                Some("viewer".into()),
-                Some(metadata),
-            )
+            .create_bond_with_metadata(src.path(), &tgt, Some("viewer".into()), Some(metadata))
             .expect("seed create");
 
         let req = GetBondDetailRequest {
