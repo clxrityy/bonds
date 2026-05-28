@@ -2,7 +2,9 @@ mod bond_view;
 mod commands;
 mod requests;
 
-use crate::commands::{create_bond, delete_bond, list_bonds, update_bond};
+use crate::commands::{
+    create_bond, delete_bond, get_bond_detail, list_bonds, update_bond, update_bond_metadata,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -10,8 +12,10 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             list_bonds,
+            get_bond_detail,
             create_bond,
             update_bond,
+            update_bond_metadata,
             delete_bond
         ])
         .run(tauri::generate_context!())

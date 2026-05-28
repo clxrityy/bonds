@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::collections::HashMap;
 
 /// Payload for `create_bond` command.
 #[derive(Debug, Deserialize)]
@@ -25,4 +26,19 @@ pub(crate) struct UpdateBondRequest {
 pub(crate) struct DeleteBondRequest {
     pub(crate) id: String,
     pub(crate) with_target: bool,
+}
+
+/// Payload for `get_bond_detail` command.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct GetBondDetailRequest {
+    pub(crate) id: String,
+}
+
+/// Payload for `update_bond_metadata` command.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct UpdateBondMetadataRequest {
+    pub(crate) id: String,
+    pub(crate) metadata: Option<HashMap<String, String>>,
 }

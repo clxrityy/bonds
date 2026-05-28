@@ -69,4 +69,36 @@ mod tests {
         let err = delete_bond_item(req, Some(db_path)).expect_err("expected not found");
         assert!(matches!(err, BondError::NotFound(_)));
     }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn delete_bond_item_blocks_non_symlink_target_in_safe_mode() {
+        let db_dir = TempDir::new().expect("temp db dir");
+        let db_path = db_dir.path().join("delete-warning-safe.db");
+
+        let manager = BondManager::new(Some(db_path.clone())).expect("manager");
+        let src = TempDir::new().expect("src");
+        let tgt_root = TempDir::new().expect("target root");
+        let tgt = tgt_root.path().join("viewer-link");
+
+        let created = manager
+            .create_bond(src.path(), &tgt, Some("viewer".into()))
+            .expect("seed create");
+        drop(manager);
+
+        // Convert a valid symlink target path into a real directory at same path.
+        std::fs::remove_file(&tgt).expect("remove symlink");
+        std::fs::create_dir_all(&tgt).expect("replace with directory");
+
+        let req = DeleteBondRequest {
+            id: created.id().to_string(),
+            with_target: false, // safe mode
+        };
+
+        let err = delete_bond_item(req, Some(db_path)).expect_err("expected safe-delete failure");
+        assert!(
+            matches!(err, BondError::InvalidPath(ref msg) if msg.contains("not a symlink")),
+            "unexpected error: {err}"
+        );
+    }
 }
