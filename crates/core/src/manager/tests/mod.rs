@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use tempfile::TempDir;
 
+mod history;
 mod hooks;
 mod lifecycle;
 mod querying;

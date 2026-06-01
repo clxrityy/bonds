@@ -97,14 +97,57 @@ impl BondManager {
     /// Runs schema migration. Useful for testing with in-memory DBs.
     pub(crate) fn from_connection(conn: Connection) -> Result<Self, BondError> {
         conn.execute_batch(
-            "CREATE TABLE IF NOT EXISTS bonds (
+            r#"
+            CREATE TABLE IF NOT EXISTS bonds (
                 id TEXT PRIMARY KEY,
                 name TEXT,
                 source TEXT NOT NULL,
                 target TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 metadata TEXT
-            );",
+            );
+
+            CREATE TABLE IF NOT EXISTS snapshot_policies (
+                bond_id TEXT PRIMARY KEY,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                interval_seconds INTEGER NOT NULL,
+                keep_last INTEGER NOT NULL,
+                storage_root TEXT,
+                last_run_at TEXT,
+                next_run_at TEXT,
+                last_error TEXT,
+                last_error_at TEXT,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS snapshots (
+                id TEXT PRIMARY KEY,
+                bond_id TEXT NOT NULL,
+                bond_name TEXT,
+                created_at TEXT NOT NULL,
+                storage_path TEXT NOT NULL,
+                payload_path TEXT NOT NULL,
+                manifest_path TEXT NOT NULL,
+                source_path TEXT NOT NULL,
+                target_path TEXT NOT NULL,
+                metadata_json TEXT,
+                file_count INTEGER NOT NULL DEFAULT 0,
+                bytes_total INTEGER NOT NULL DEFAULT 0
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_snapshots_bond_created_at
+                ON snapshots (bond_id, created_at DESC);
+
+            CREATE TABLE IF NOT EXISTS restore_events (
+                id TEXT PRIMARY KEY,
+                bond_id TEXT NOT NULL,
+                snapshot_id TEXT NOT NULL,
+                safety_snapshot_id TEXT,
+                created_at TEXT NOT NULL,
+                status TEXT NOT NULL,
+                notes TEXT
+            );
+            "#,
         )?;
 
         // Safe migrations for older DBs.

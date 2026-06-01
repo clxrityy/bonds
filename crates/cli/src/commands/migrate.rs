@@ -64,6 +64,9 @@ pub fn cmd_migrate(
         return Ok(());
     }
 
+    let _snapshot = manager.create_snapshot(bond.id())?;
+    let _pruned = manager.prune_snapshots(bond.id())?;
+
     // Delegate to update_bond -- it handles symlink removal, creation, and DB update
     let updated = manager.update_bond(bond.id(), None, Some(new_target), None)?;
     ui::status_ok("✓ SUCCESS");

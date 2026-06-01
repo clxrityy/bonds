@@ -9,6 +9,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, RwLock};
 
 mod health;
+mod history;
 mod hooks;
 mod lifecycle;
 mod querying;
@@ -23,6 +24,5 @@ mod tests;
 /// Concern-specific method implementations live in sibling modules.
 pub struct BondManager {
     pub(super) conn: Connection,
-    // Hooks are shared mutable state behind interior mutability since methods take &self.
     pub(super) hooks: RwLock<Vec<Arc<dyn BondEventHook>>>,
 }

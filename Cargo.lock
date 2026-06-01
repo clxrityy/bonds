@@ -228,6 +228,7 @@ name = "bonds-cli"
 version = "0.1.7"
 dependencies = [
  "bonds-core",
+ "chrono",
  "clap",
 ]
 

@@ -26,6 +26,8 @@ pub mod config;
 pub mod error;
 /// Event and hook types for lifecycle notifications.
 pub mod events;
+/// Types related to bond snapshotting and restoration history.
+pub mod history;
 /// High-level manager for bond lifecycle operations.
 pub mod manager;
 /// Query builder types for filtering bonds.
@@ -35,5 +37,6 @@ pub use bond::Bond;
 pub use config::BondsConfig;
 pub use error::{BondError, ErrorKind};
 pub use events::{BondBrokenReason, BondEvent, BondEventHook, BondEventKind, BondEventPayload};
+pub use history::{RestoreRecord, SnapshotManifest, SnapshotPolicy, SnapshotRecord};
 pub use manager::BondManager;
 pub use query::{BondQuery, MetadataFilter};

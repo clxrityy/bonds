@@ -20,3 +20,4 @@ path = "src/main.rs"  # the source file for the binary
 # version is required for publishing; path keeps local workspace development smooth.
 bonds-core = { version = "0.1.7", path = "../core" }
 clap = { workspace = true }
+chrono = { workspace = true }

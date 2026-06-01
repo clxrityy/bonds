@@ -98,6 +98,12 @@ pub enum Commands {
         #[command(subcommand)]
         action: MetadataAction,
     },
+
+    /// Manage bond snapshot history
+    History {
+        #[command(subcommand)]
+        action: HistoryAction,
+    },
 }
 
 /// Defines common command-line flags that can be reused across multiple mutating commands in the bonds CLI application. The `dry_run` flag allows users to preview the outcome of a command without making any actual changes to the filesystem or database, which is useful for testing and verification. The `verbose` flag enables the printing of extra execution details, providing users with more insight into what the command is doing, which can be helpful for debugging and inspection purposes. By centralizing these flags in a single struct, we can maintain consistency and reduce redundancy across different commands that perform mutations.
@@ -154,5 +160,66 @@ pub enum MetadataAction {
         id: String,
         /// Metadata key to remove
         key: String,
+    },
+}
+
+/// Subcommands for the `history` command, which allows users to manage bond snapshot history. The `Enable` variant sets up automated snapshots for a specified bond with a given cadence and retention policy. The `Disable` variant turns off automated snapshots for a specified bond. The `Snapshot` variant creates a snapshot of a specified bond immediately. The `List` variant displays all snapshots associated with a specified bond. The `Restore` variant allows users to restore a bond from a specific snapshot. The `Watch` variant runs a foreground process that continuously checks for due snapshot work and executes it according to the configured policies. This set of commands provides comprehensive management of bond snapshots and their restoration history.
+#[derive(Subcommand)]
+pub enum HistoryAction {
+    /// Enable automated snapshots for a bond
+    Enable {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Snapshot cadence, in seconds
+        #[arg(long)]
+        every_seconds: i64,
+        /// Keep only the newest N snapshots
+        #[arg(long, default_value_t = 10)]
+        keep_last: i64,
+        /// Optional override for where snapshots should be stored
+        #[arg(long)]
+        storage_root: Option<PathBuf>,
+    },
+
+    /// Disable automated snapshots for a bond
+    Disable {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+    },
+
+    /// Create a snapshot immediately
+    Snapshot {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+    },
+
+    /// List snapshots for a bond
+    List {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+    },
+
+    /// Restore a bond from a snapshot
+    Restore {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Snapshot ID or unique prefix
+        snapshot_id: String,
+    },
+
+    /// Run a foreground watcher that keeps snapshotting until stopped
+    Watch {
+        /// Watch only one configured bond
+        #[arg(long, conflicts_with = "all_enabled")]
+        bond: Option<String>,
+        /// Watch all enabled bond policies
+        #[arg(long)]
+        all_enabled: bool,
+        /// Polling interval for due work
+        #[arg(long, default_value_t = 10)]
+        poll_seconds: u64,
+        /// Print extra loop details
+        #[arg(long)]
+        verbose: bool,
     },
 }
