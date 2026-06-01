@@ -21,6 +21,7 @@ cargo install bonds-cli
 - [migrate](#migrate)
 - [config](#config)
 - [metadata](#metadata)
+- [history](#history)
 
 <table style="width:fit-content; border-collapse: collapse; text-align: left;">
   <thead>
@@ -88,7 +89,7 @@ cargo install bonds-cli
     <tr id="migrate">
       <td><code>migrate</code></td>
       <td><code>&lt;name|id&gt;</code> <code>[new-target]</code></td>
-      <td>Move existing bonds to a new target location (with auto-backup). Moves to the default target if none is provided.</td>
+      <td>Move existing bonds to a new target location. Moves to the default target if none is provided.</td>
       <td>
         <pre><code class="language-bash">bond migrate foo</code></pre>
         <pre><code class="language-bash">bond migrate foo ~/new-bonds</code></pre>
@@ -113,6 +114,18 @@ cargo install bonds-cli
         <pre><code class="language-bash">bond metadata set foo project my-app</code></pre>
         <pre><code class="language-bash">bond metadata get foo project</code></pre>
         <pre><code class="language-bash">bond metadata remove foo project</code></pre>
+      </td>
+    </tr>
+    <tr id="history">
+      <td><code>history</code></td>
+      <td><code>&lt;enable|disable|snapshot|list|restore|watch&gt;</code> ...</td>
+      <td>Manage bond snapshot history, retention, restore, and automatic snapshot watching.</td>
+      <td>
+        <pre><code class="language-bash">bond history enable foo --every-seconds 3600 --keep-last 10</code></pre>
+        <pre><code class="language-bash">bond history snapshot foo</code></pre>
+        <pre><code class="language-bash">bond history list foo</code></pre>
+        <pre><code class="language-bash">bond history restore foo &lt;snapshot-id&gt;</code></pre>
+       <pre><code class="language-bash">bond history watch --bond foo --verbose</code></pre>
       </td>
     </tr>
   </tbody>
