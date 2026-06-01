@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use tempfile::TempDir;
 
 mod history;
+mod history_policy;
 mod hooks;
 mod lifecycle;
 mod querying;
