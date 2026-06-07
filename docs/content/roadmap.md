@@ -73,6 +73,8 @@ Next milestones:
 - `[ ]` Add a bond detail panel with metadata visibility/editing
 - `[ ]` Add metadata-aware search and filtering
 - `[x]` Add rollback and history / snapshots
+  - `[ ]` Add a history panel showing snapshots, changes, and restore points
+  - `[ ]` Add a one-click restore flow with confirmation and recovery safeguards
 - `[ ]` Add a first-run empty state and create-first-bond flow
 - `[ ]` Add a dashboard view for recent bonds and health summaries
 - `[ ]` Add a file explorer view for bonded content
