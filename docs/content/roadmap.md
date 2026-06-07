@@ -72,6 +72,7 @@ Next milestones:
 - `[x]` Open source and target paths from the UI
 - `[ ]` Add a bond detail panel with metadata visibility/editing
 - `[ ]` Add metadata-aware search and filtering
+- `[x]` Add rollback and history / snapshots
 - `[ ]` Add a first-run empty state and create-first-bond flow
 - `[ ]` Add a dashboard view for recent bonds and health summaries
 - `[ ]` Add a file explorer view for bonded content
