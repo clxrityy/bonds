@@ -53,6 +53,10 @@ Take a look at the [**roadmap**](https://bonds.fyi/latest/roadmap) for more deta
   </tr>
 </table>
 
+```zsh
+brew install clxrityy/tap/bonds
+```
+
 ---
 
 #### CLI examples
