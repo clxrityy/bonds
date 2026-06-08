@@ -84,12 +84,19 @@ mod tests {
             .expect("create bond");
 
         manager
-            .set_snapshot_policy(created.id(), 60, 10, Some(history_dir.path().join("history")))
+            .set_snapshot_policy(
+                created.id(),
+                60,
+                10,
+                Some(history_dir.path().join("history")),
+            )
             .expect("set policy");
 
         let seed = src.path().join("state.txt");
         fs::write(&seed, "alpha").expect("seed source");
-        let seeded_snapshot = manager.create_snapshot(created.id()).expect("seed snapshot");
+        let seeded_snapshot = manager
+            .create_snapshot(created.id())
+            .expect("seed snapshot");
         drop(manager);
 
         let items = list_bond_snapshots_items(
@@ -122,7 +129,12 @@ mod tests {
             .expect("create bond");
 
         manager
-            .set_snapshot_policy(created.id(), 60, 10, Some(history_dir.path().join("history")))
+            .set_snapshot_policy(
+                created.id(),
+                60,
+                10,
+                Some(history_dir.path().join("history")),
+            )
             .expect("set policy");
 
         fs::write(src.path().join("notes.txt"), "hello").expect("write source file");
@@ -158,13 +170,20 @@ mod tests {
             .expect("create bond");
 
         manager
-            .set_snapshot_policy(created.id(), 60, 10, Some(history_dir.path().join("history")))
+            .set_snapshot_policy(
+                created.id(),
+                60,
+                10,
+                Some(history_dir.path().join("history")),
+            )
             .expect("set policy");
 
         let live_file = src.path().join("state.txt");
 
         fs::write(&live_file, "before").expect("write before");
-        let original = manager.create_snapshot(created.id()).expect("snapshot before");
+        let original = manager
+            .create_snapshot(created.id())
+            .expect("snapshot before");
 
         fs::write(&live_file, "after").expect("write after");
         drop(manager);
