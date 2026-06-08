@@ -42,3 +42,19 @@ pub(crate) struct UpdateBondMetadataRequest {
     pub(crate) id: String,
     pub(crate) metadata: Option<HashMap<String, String>>,
 }
+
+/// Payload for history/snapshot commands that only need a bond identifier.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct BondHistoryRequest {
+    pub(crate) id: String,
+}
+
+/// Payload for restore command.
+/// `snapshot_id` is mapped from `snapshotId` from the frontend via `rename_all`.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RestoreSnapshotRequest {
+    pub(crate) id: String,
+    pub(crate) snapshot_id: String,
+}

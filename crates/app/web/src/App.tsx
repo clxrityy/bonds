@@ -5,11 +5,19 @@ import { BondViewer } from "./components/bonds/BondViewer";
 import { PanelHost } from "./components/panels/PanelHost";
 import { DeleteBondDialog } from "./components/dialogs/DeleteBondDialog";
 import { EditBondDialog } from "./components/dialogs/EditBondDialog";
+import { HistoryPanel } from "./components/panels/HistoryPanel";
+import { RestoreConfirmDialog } from "./components/dialogs/RestoreConfirmDialog";
 import { useBonds } from "./hooks/useBonds";
+import { useSnapshots } from "./hooks/useSnapshots";
 import { usePanelLayout } from "./hooks/usePanelLayout";
 import { useResizableSidePanel } from "./hooks/useResizableSidePanel";
 import { useBondFilters } from "./hooks/useBondFilters";
-import type { BondDetailItem, BondListItem, BondMetadata } from "./lib/types";
+import type {
+	BondDetailItem,
+	BondListItem,
+	BondMetadata,
+	SnapshotItem,
+} from "./lib/types";
 
 function normalizeMetadata(input: BondMetadata | null): BondMetadata | null {
 	if (!input) return null;
@@ -70,7 +78,30 @@ export default function App() {
 	// Delete dialog state.
 	const [deletingBond, setDeletingBond] = useState<BondListItem | null>(null);
 
-	const actionBusy = useMemo(() => updating || deleting, [updating, deleting]);
+	// History panel state.
+	const [historyBond, setHistoryBond] = useState<BondListItem | null>(null);
+	const [restoreCandidate, setRestoreCandidate] = useState<SnapshotItem | null>(null);
+
+	const {
+		snapshots,
+		loading: historyLoading,
+		error: historyError,
+		refresh: refreshHistory,
+		createNow: createSnapshotNow,
+		creating: historyCreating,
+		restoring: historyRestoring,
+		actionError: historyActionError,
+		clearActionError: clearHistoryActionError,
+		restore: restoreSnapshot,
+	} = useSnapshots({
+		bondId: historyBond?.id ?? null,
+		enabled: Boolean(historyBond),
+	});
+
+	const actionBusy = useMemo(
+		() => updating || deleting || historyCreating || historyRestoring,
+		[updating, deleting, historyCreating, historyRestoring],
+	);
 
 	const openEdit = useCallback(
 		async (bond: BondListItem) => {
@@ -150,17 +181,67 @@ export default function App() {
 		setDeletingBond(null);
 	}, []);
 
+	const openHistory = useCallback(
+		(bond: BondListItem) => {
+			// Clear any stale action errors from previous history operations.
+			clearHistoryActionError();
+			setRestoreCandidate(null);
+			setHistoryBond(bond);
+		},
+		[clearHistoryActionError],
+	);
+
+	const closeHistory = useCallback(() => {
+		clearHistoryActionError();
+		setRestoreCandidate(null);
+		setHistoryBond(null);
+	}, [clearHistoryActionError]);
+
+	const requestRestore = useCallback(
+		(snapshot: SnapshotItem) => {
+			clearHistoryActionError();
+			setRestoreCandidate(snapshot);
+		},
+		[clearHistoryActionError],
+	);
+
+	const cancelRestore = useCallback(() => {
+		clearHistoryActionError();
+		setRestoreCandidate(null);
+	}, [clearHistoryActionError]);
+
+	const confirmRestore = useCallback(async () => {
+		if (!historyBond || !restoreCandidate) return;
+
+		await restoreSnapshot(restoreCandidate.id);
+		setRestoreCandidate(null);
+
+		// Keep bond list status in sync after restore.
+		await refresh();
+	}, [historyBond, restoreCandidate, restoreSnapshot, refresh]);
+
 	const confirmDelete = useCallback(async () => {
 		if (!deletingBond) return;
 
+		const deletedId = deletingBond.id;
+
 		// Safe mode for this phase: do not remove underlying real target paths.
 		await remove({
-			id: deletingBond.id,
+			id: deletedId,
 			withTarget: false,
 		});
 
 		setDeletingBond(null);
-	}, [deletingBond, remove]);
+
+		// If the deleted bond is currently open in history, close that panel.
+		if (historyBond?.id === deletedId) {
+			closeHistory();
+		}
+	}, [deletingBond, remove, historyBond, closeHistory]);
+
+	const handleCreateSnapshot = useCallback(async () => {
+		await createSnapshotNow();
+	}, [createSnapshotNow]);
 
 	const panelNode = (
 		<PanelHost
@@ -196,11 +277,37 @@ export default function App() {
 					onCreate={create}
 					creating={creating}
 					createError={createError}
+					onHistoryBond={openHistory}
 					onEditBond={openEdit}
 					onDeleteBond={openDelete}
 					actionBusy={actionBusy}
 				/>
 			</MainViewport>
+
+			<HistoryPanel
+				open={Boolean(historyBond)}
+				bond={historyBond}
+				snapshots={snapshots}
+				loading={historyLoading}
+				error={historyError}
+				creating={historyCreating}
+				restoring={historyRestoring}
+				actionError={historyActionError}
+				onClose={closeHistory}
+				onRefresh={refreshHistory}
+				onCreateSnapshot={handleCreateSnapshot}
+				onRequestRestore={requestRestore}
+			/>
+
+			<RestoreConfirmDialog
+				open={Boolean(historyBond && restoreCandidate)}
+				bond={historyBond}
+				snapshot={restoreCandidate}
+				restoring={historyRestoring}
+				restoreError={historyActionError}
+				onCancel={cancelRestore}
+				onConfirm={confirmRestore}
+			/>
 
 			<EditBondDialog
 				open={Boolean(editingBond)}

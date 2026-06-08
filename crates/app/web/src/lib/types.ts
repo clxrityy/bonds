@@ -30,6 +30,38 @@ export interface BondDetailItem {
 	metadata: BondMetadata | null;
 }
 
+/**
+ * History snapshot item returned from app backend.
+ * Field names match Rust's `#[serde(rename_all = "camelCase")]` output.
+ */
+export interface SnapshotItem {
+	id: string;
+	bondId: string;
+	bondName: string | null;
+	createdAt: string;
+	sourcePath: string;
+	targetPath: string;
+	storagePath: string;
+	fileCount: number;
+	bytesTotal: number;
+	metadataCount: number;
+}
+
+export interface RestoreSnapshotInput {
+	id: string;
+	snapshotId: string;
+}
+
+export interface RestoreSnapshotResult {
+	id: string;
+	bondId: string;
+	snapshotId: string;
+	safetySnapshotId: string | null;
+	createdAt: string;
+	status: string;
+	notes: string | null;
+}
+
 export interface LayoutState {
 	mode: PanelMode;
 	isOpen: boolean;

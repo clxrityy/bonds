@@ -4,6 +4,9 @@ import type {
 	BondListItem,
 	CreateBondInput,
 	DeleteBondInput,
+	RestoreSnapshotInput,
+	RestoreSnapshotResult,
+	SnapshotItem,
 	UpdateBondInput,
 	UpdateBondMetadataInput,
 } from "./types";
@@ -59,6 +62,33 @@ export async function deleteBond(input: DeleteBondInput): Promise<BondListItem> 
 			id: input.id,
 			// Safe default for this phase: never delete underlying real targets from UI.
 			withTarget: input.withTarget ?? false,
+		},
+	});
+}
+
+/**
+ * History APIs
+ * Keep these wrappers focused and typed so components don't depend on command naming.
+ */
+export async function listBondSnapshots(id: string): Promise<SnapshotItem[]> {
+	return invoke<SnapshotItem[]>("list_bond_snapshots", {
+		request: { id },
+	});
+}
+
+export async function createBondSnapshot(id: string): Promise<SnapshotItem> {
+	return invoke<SnapshotItem>("create_bond_snapshot", {
+		request: { id },
+	});
+}
+
+export async function restoreBondSnapshot(
+	input: RestoreSnapshotInput,
+): Promise<RestoreSnapshotResult> {
+	return invoke<RestoreSnapshotResult>("restore_bond_snapshot", {
+		request: {
+			id: input.id,
+			snapshotId: input.snapshotId,
 		},
 	});
 }

@@ -15,6 +15,7 @@ interface BondViewerProps {
 
 	onEditBond?: (bond: BondListItem) => void;
 	onDeleteBond?: (bond: BondListItem) => void;
+	onHistoryBond?: (bond: BondListItem) => void;
 	actionBusy?: boolean;
 }
 
@@ -28,6 +29,7 @@ export function BondViewer({
 	createError,
 	onEditBond,
 	onDeleteBond,
+	onHistoryBond,
 	actionBusy = false,
 }: BondViewerProps) {
 	return (
@@ -64,6 +66,7 @@ export function BondViewer({
 						<BondCard
 							key={bond.id}
 							bond={bond}
+							onHistory={onHistoryBond}
 							onEdit={onEditBond}
 							onDelete={onDeleteBond}
 							busy={actionBusy}
