@@ -166,3 +166,34 @@ fn restore_snapshot_restores_source_and_creates_safety_snapshot() {
         "after"
     );
 }
+
+#[test]
+#[cfg_attr(windows, ignore)]
+fn delete_snapshot_removes_record_and_storage() {
+    let mgr = test_manager();
+    let (_src_dir, src_path) = temp_source();
+    let tgt_dir = TempDir::new().expect("temp dir");
+    let tgt_path = tgt_dir.path().join("link");
+    let history_dir = TempDir::new().expect("history dir");
+
+    let bond = mgr
+        .create_bond(&src_path, &tgt_path, Some("alpha".into()))
+        .expect("create bond");
+
+    mgr.set_snapshot_policy(bond.id(), 60, 10, Some(history_dir.path().join("history")))
+        .expect("set policy");
+
+    fs::write(src_path.join("state.txt"), "v1").expect("write v1");
+    let snapshot = mgr.create_snapshot(bond.id()).expect("create snapshot");
+    assert!(snapshot.storage_path.exists());
+
+    let deleted = mgr
+        .delete_snapshot(bond.id(), &snapshot.id)
+        .expect("delete snapshot");
+
+    assert_eq!(deleted.id, snapshot.id);
+    assert!(!snapshot.storage_path.exists());
+
+    let remaining = mgr.list_snapshots(bond.id()).expect("list snapshots");
+    assert!(remaining.is_empty());
+}

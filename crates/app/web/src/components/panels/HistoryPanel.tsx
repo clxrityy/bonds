@@ -1,7 +1,7 @@
 import { formatBytes, formatDate, shortId } from "../../lib/format";
 import type { BondListItem, SnapshotItem } from "../../lib/types";
 import { cx, ui } from "../../lib/ui";
-import { RefreshIcon, RestoreIcon, SnapshotIcon } from "../ui/Icons";
+import { DeleteIcon, RefreshIcon, RestoreIcon, SnapshotIcon } from "../ui/Icons";
 
 interface HistoryPanelProps {
 	open: boolean;
@@ -11,11 +11,13 @@ interface HistoryPanelProps {
 	error: string | null;
 	creating: boolean;
 	restoring: boolean;
+	deleting: boolean;
 	actionError: string | null;
 	onClose: () => void;
 	onRefresh: () => Promise<void> | void;
 	onCreateSnapshot: () => Promise<void> | void;
 	onRequestRestore: (snapshot: SnapshotItem) => void;
+	onRequestDelete: (snapshot: SnapshotItem) => void;
 }
 
 export function HistoryPanel({
@@ -26,15 +28,17 @@ export function HistoryPanel({
 	error,
 	creating,
 	restoring,
+	deleting,
 	actionError,
 	onClose,
 	onRefresh,
 	onCreateSnapshot,
 	onRequestRestore,
+	onRequestDelete,
 }: HistoryPanelProps) {
 	if (!open || !bond) return null;
 
-	const busy = creating || restoring;
+	const busy = creating || restoring || deleting;
 
 	return (
 		<>
@@ -100,8 +104,8 @@ export function HistoryPanel({
 								<span className="sr-only">Create snapshot</span>
 							</span>}
 					</button>
-
 					{restoring ? <span className="text-xs text-slate-600">Restore in progress…</span> : null}
+					{deleting ? <span className="text-xs text-slate-600">Delete in progress…</span> : null}
 				</div>
 
 				{error ? (
@@ -142,19 +146,35 @@ export function HistoryPanel({
 										</p>
 									</div>
 
-									<button
-										type="button"
-										className={ui.ghostBtn}
-										disabled={busy}
-										onClick={() => onRequestRestore(snapshot)}
-									>
-										<span>
-											<RestoreIcon aria-label="Restore snapshot" />
-											<span className="sr-only">
-												Restore snapshot created at {formatDate(snapshot.createdAt)}
+									<div className="flex items-center gap-2">
+										<button
+											type="button"
+											className={ui.ghostBtn}
+											disabled={busy}
+											onClick={() => onRequestRestore(snapshot)}
+										>
+											<span>
+												<RestoreIcon aria-label="Restore snapshot" />
+												<span className="sr-only">
+													Restore snapshot created at {formatDate(snapshot.createdAt)}
+												</span>
 											</span>
-										</span>
-									</button>
+										</button>
+
+										<button
+											type="button"
+											className={ui.ghostBtn}
+											disabled={busy}
+											onClick={() => onRequestDelete(snapshot)}
+										>
+											<span>
+												<DeleteIcon aria-label="Delete snapshot" />
+												<span className="sr-only">
+													Delete snapshot created at {formatDate(snapshot.createdAt)}
+												</span>
+											</span>
+										</button>
+									</div>
 								</div>
 
 								<dl className="mt-3 grid gap-1 text-xs text-slate-800">

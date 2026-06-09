@@ -1,5 +1,5 @@
 use crate::bond_view::{RestoreResultItem, SnapshotItem, map_restore_result, map_snapshot};
-use crate::requests::{BondHistoryRequest, RestoreSnapshotRequest};
+use crate::requests::{BondHistoryRequest, DeleteSnapshotRequest, RestoreSnapshotRequest};
 use bonds_core::{BondError, BondManager};
 use std::path::PathBuf;
 
@@ -59,10 +59,30 @@ pub fn restore_bond_snapshot(
     restore_bond_snapshot_item(request, db_path.map(PathBuf::from)).map_err(|err| err.to_string())
 }
 
+fn delete_bond_snapshot_item(
+    request: DeleteSnapshotRequest,
+    db_path: Option<PathBuf>,
+) -> Result<SnapshotItem, BondError> {
+    let manager = BondManager::new(db_path)?;
+    let deleted = manager.delete_snapshot(&request.id, &request.snapshot_id)?;
+    Ok(map_snapshot(deleted))
+}
+
+#[tauri::command]
+pub fn delete_bond_snapshot(
+    request: DeleteSnapshotRequest,
+    db_path: Option<String>,
+) -> Result<SnapshotItem, String> {
+    delete_bond_snapshot_item(request, db_path.map(PathBuf::from)).map_err(|err| err.to_string())
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{create_bond_snapshot_item, list_bond_snapshots_items, restore_bond_snapshot_item};
-    use crate::requests::{BondHistoryRequest, RestoreSnapshotRequest};
+    use super::{
+        create_bond_snapshot_item, delete_bond_snapshot_item, list_bond_snapshots_items,
+        restore_bond_snapshot_item,
+    };
+    use crate::requests::{BondHistoryRequest, DeleteSnapshotRequest, RestoreSnapshotRequest};
     use bonds_core::BondManager;
     use std::fs;
     use tempfile::TempDir;
@@ -203,5 +223,56 @@ mod tests {
             fs::read_to_string(&live_file).expect("read restored file"),
             "before"
         );
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn delete_bond_snapshot_removes_snapshot_and_storage() {
+        let db_dir = TempDir::new().expect("temp db dir");
+        let db_path = db_dir.path().join("history-delete.db");
+        let history_dir = TempDir::new().expect("history dir");
+
+        let manager = BondManager::new(Some(db_path.clone())).expect("manager");
+        let src = TempDir::new().expect("src");
+        let tgt_root = TempDir::new().expect("target root");
+        let tgt = tgt_root.path().join("viewer-link");
+
+        let created = manager
+            .create_bond(src.path(), &tgt, Some("viewer".into()))
+            .expect("create bond");
+
+        manager
+            .set_snapshot_policy(
+                created.id(),
+                60,
+                10,
+                Some(history_dir.path().join("history")),
+            )
+            .expect("set policy");
+
+        fs::write(src.path().join("notes.txt"), "hello").expect("write source file");
+        let snapshot = manager
+            .create_snapshot(created.id())
+            .expect("create snapshot");
+        assert!(snapshot.storage_path.exists());
+        drop(manager);
+
+        let deleted = delete_bond_snapshot_item(
+            DeleteSnapshotRequest {
+                id: created.id().to_string(),
+                snapshot_id: snapshot.id.clone(),
+            },
+            Some(db_path.clone()),
+        )
+        .expect("delete snapshot");
+
+        assert_eq!(deleted.id, snapshot.id);
+        assert!(!std::path::Path::new(&deleted.storage_path).exists());
+
+        let manager = BondManager::new(Some(db_path)).expect("manager");
+        let remaining = manager
+            .list_snapshots(created.id())
+            .expect("list snapshots");
+        assert!(remaining.is_empty());
     }
 }

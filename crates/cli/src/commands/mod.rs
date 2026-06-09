@@ -19,8 +19,8 @@ mod update;
 pub use add::cmd_add;
 pub use config::{cmd_config_get, cmd_config_set};
 pub use history::{
-    cmd_history_disable, cmd_history_enable, cmd_history_list, cmd_history_restore,
-    cmd_history_snapshot, cmd_history_watch,
+    cmd_history_delete, cmd_history_disable, cmd_history_enable, cmd_history_list,
+    cmd_history_restore, cmd_history_snapshot, cmd_history_watch,
 };
 pub use info::cmd_info;
 pub use list::cmd_list;

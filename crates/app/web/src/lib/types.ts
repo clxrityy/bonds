@@ -54,6 +54,11 @@ export interface RestoreSnapshotInput {
 	snapshotId: string;
 }
 
+export interface DeleteSnapshotInput {
+	id: string;
+	snapshotId: string;
+}
+
 export interface RestoreSnapshotResult {
 	id: string;
 	bondId: string;

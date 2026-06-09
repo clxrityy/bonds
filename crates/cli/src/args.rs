@@ -222,4 +222,12 @@ pub enum HistoryAction {
         #[arg(long)]
         verbose: bool,
     },
+
+    /// Delete a snapshot
+    Delete {
+        /// Bond name, full ID, or unique ID prefix
+        id: String,
+        /// Snapshot ID or unique prefix
+        snapshot_id: String,
+    },
 }

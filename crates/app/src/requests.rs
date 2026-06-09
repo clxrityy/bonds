@@ -58,3 +58,12 @@ pub(crate) struct RestoreSnapshotRequest {
     pub(crate) id: String,
     pub(crate) snapshot_id: String,
 }
+
+/// Payload for deleting a snapshot for a bond.
+/// `snapshot_id` is mapped from `snapshotId` via `rename_all = "camelCase"`.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct DeleteSnapshotRequest {
+    pub(crate) id: String,
+    pub(crate) snapshot_id: String,
+}

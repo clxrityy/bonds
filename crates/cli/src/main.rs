@@ -5,10 +5,10 @@
 
 use bonds_cli::args::{Cli, Commands, ConfigAction, HistoryAction, MetadataAction};
 use commands::{
-    cmd_add, cmd_config_get, cmd_config_set, cmd_history_disable, cmd_history_enable,
-    cmd_history_list, cmd_history_restore, cmd_history_snapshot, cmd_history_watch, cmd_info,
-    cmd_list, cmd_metadata_get, cmd_metadata_remove, cmd_metadata_set, cmd_migrate, cmd_remove,
-    cmd_update,
+    cmd_add, cmd_config_get, cmd_config_set, cmd_history_delete, cmd_history_disable,
+    cmd_history_enable, cmd_history_list, cmd_history_restore, cmd_history_snapshot,
+    cmd_history_watch, cmd_info, cmd_list, cmd_metadata_get, cmd_metadata_remove, cmd_metadata_set,
+    cmd_migrate, cmd_remove, cmd_update,
 };
 
 /// The `commands` module contains the implementation of all the command handlers for the CLI application. Each command corresponds to a specific action that can be performed on the bonds, such as adding a new bond, listing existing bonds, updating bond information, and managing metadata. The command handlers interact with the `BondManager` from the `bonds-core` crate to perform the necessary operations on the underlying data store. This modular structure allows for clean separation of concerns and makes it easier to maintain and extend the CLI functionality in the future.
@@ -198,6 +198,9 @@ fn main() {
                     poll_seconds,
                     verbose,
                 ),
+                HistoryAction::Delete { id, snapshot_id } => {
+                    cmd_history_delete(&manager, &id, &snapshot_id)
+                }
             }
         }
     };

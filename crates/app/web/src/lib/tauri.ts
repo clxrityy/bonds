@@ -4,6 +4,7 @@ import type {
 	BondListItem,
 	CreateBondInput,
 	DeleteBondInput,
+	DeleteSnapshotInput,
 	RestoreSnapshotInput,
 	RestoreSnapshotResult,
 	SnapshotItem,
@@ -86,6 +87,17 @@ export async function restoreBondSnapshot(
 	input: RestoreSnapshotInput,
 ): Promise<RestoreSnapshotResult> {
 	return invoke<RestoreSnapshotResult>("restore_bond_snapshot", {
+		request: {
+			id: input.id,
+			snapshotId: input.snapshotId,
+		},
+	});
+}
+
+export async function deleteBondSnapshot(
+	input: DeleteSnapshotInput,
+): Promise<SnapshotItem> {
+	return invoke<SnapshotItem>("delete_bond_snapshot", {
 		request: {
 			id: input.id,
 			snapshotId: input.snapshotId,

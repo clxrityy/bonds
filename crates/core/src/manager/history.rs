@@ -357,6 +357,25 @@ impl BondManager {
         Ok(to_delete)
     }
 
+    pub fn delete_snapshot(
+        &self,
+        identifier: &str,
+        snapshot_identifier: &str,
+    ) -> Result<SnapshotRecord, BondError> {
+        let bond = self.get_bond(identifier)?;
+        let snapshot = self.get_snapshot_record(bond.id(), snapshot_identifier)?;
+
+        // Remove snapshot artifacts from disk first.
+        // Helper tolerates missing paths and handles file/dir/symlink safely.
+        remove_path_if_exists(&snapshot.storage_path)?;
+
+        // Remove snapshot row from DB.
+        self.conn
+            .execute("DELETE FROM snapshots WHERE id = ?1", params![&snapshot.id])?;
+
+        Ok(snapshot)
+    }
+
     pub fn restore_snapshot(
         &self,
         identifier: &str,

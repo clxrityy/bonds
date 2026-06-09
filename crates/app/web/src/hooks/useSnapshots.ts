@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
 	createBondSnapshot,
+	deleteBondSnapshot,
 	listBondSnapshots,
 	restoreBondSnapshot,
 } from "../lib/tauri";
@@ -18,10 +19,10 @@ export function useSnapshots({ bondId, enabled = true }: UseSnapshotsOptions) {
 
 	const [creating, setCreating] = useState<boolean>(false);
 	const [restoring, setRestoring] = useState<boolean>(false);
+	const [deleting, setDeleting] = useState<boolean>(false);
 	const [actionError, setActionError] = useState<string | null>(null);
 
 	const refresh = useCallback(async () => {
-		// Reset state when panel is closed or no bond is selected.
 		if (!enabled || !bondId) {
 			setSnapshots([]);
 			setError(null);
@@ -69,10 +70,7 @@ export function useSnapshots({ bondId, enabled = true }: UseSnapshotsOptions) {
 			setActionError(null);
 
 			try {
-				const result = await restoreBondSnapshot({
-					id: bondId,
-					snapshotId,
-				});
+				const result = await restoreBondSnapshot({ id: bondId, snapshotId });
 				await refresh();
 				return result;
 			} catch (err) {
@@ -81,6 +79,28 @@ export function useSnapshots({ bondId, enabled = true }: UseSnapshotsOptions) {
 				throw err;
 			} finally {
 				setRestoring(false);
+			}
+		},
+		[bondId, refresh],
+	);
+
+	const removeSnapshot = useCallback(
+		async (snapshotId: string): Promise<SnapshotItem | null> => {
+			if (!bondId) return null;
+
+			setDeleting(true);
+			setActionError(null);
+
+			try {
+				const deleted = await deleteBondSnapshot({ id: bondId, snapshotId });
+				await refresh();
+				return deleted;
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				setActionError(message);
+				throw err;
+			} finally {
+				setDeleting(false);
 			}
 		},
 		[bondId, refresh],
@@ -102,10 +122,12 @@ export function useSnapshots({ bondId, enabled = true }: UseSnapshotsOptions) {
 
 		creating,
 		restoring,
+		deleting,
 		actionError,
 		clearActionError,
 
 		createNow,
 		restore,
+		removeSnapshot,
 	};
 }

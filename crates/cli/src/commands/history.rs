@@ -206,3 +206,20 @@ pub fn cmd_history_watch(
         thread::sleep(Duration::from_secs(poll_seconds.max(1)));
     }
 }
+
+pub fn cmd_history_delete(
+    manager: &BondManager,
+    id: &str,
+    snapshot_id: &str,
+) -> Result<(), BondError> {
+    let deleted = manager.delete_snapshot(id, snapshot_id)?;
+
+    ui::status_ok("snapshot deleted");
+    ui::success(format!(
+        "deleted snapshot {} for bond {}",
+        deleted.id, deleted.bond_id
+    ));
+    ui::path(format!("removed {}", deleted.storage_path.display()));
+
+    Ok(())
+}

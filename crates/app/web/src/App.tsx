@@ -6,6 +6,7 @@ import { PanelHost } from "./components/panels/PanelHost";
 import { DeleteBondDialog } from "./components/dialogs/DeleteBondDialog";
 import { EditBondDialog } from "./components/dialogs/EditBondDialog";
 import { HistoryPanel } from "./components/panels/HistoryPanel";
+import { DeleteSnapshotConfirmDialog } from "./components/dialogs/DeleteSnapshotConfirmDialog";
 import { RestoreConfirmDialog } from "./components/dialogs/RestoreConfirmDialog";
 import { useBonds } from "./hooks/useBonds";
 import { useSnapshots } from "./hooks/useSnapshots";
@@ -78,6 +79,9 @@ export default function App() {
 	// Delete dialog state.
 	const [deletingBond, setDeletingBond] = useState<BondListItem | null>(null);
 
+	// Delete snapshot dialog state.
+	const [deleteSnapshotCandidate, setDeleteSnapshotCandidate] = useState<SnapshotItem | null>(null);
+
 	// History panel state.
 	const [historyBond, setHistoryBond] = useState<BondListItem | null>(null);
 	const [restoreCandidate, setRestoreCandidate] = useState<SnapshotItem | null>(null);
@@ -90,17 +94,19 @@ export default function App() {
 		createNow: createSnapshotNow,
 		creating: historyCreating,
 		restoring: historyRestoring,
+		deleting: historyDeleting,
 		actionError: historyActionError,
 		clearActionError: clearHistoryActionError,
 		restore: restoreSnapshot,
+		removeSnapshot,
 	} = useSnapshots({
 		bondId: historyBond?.id ?? null,
 		enabled: Boolean(historyBond),
 	});
 
 	const actionBusy = useMemo(
-		() => updating || deleting || historyCreating || historyRestoring,
-		[updating, deleting, historyCreating, historyRestoring],
+		() => updating || deleting || historyCreating || historyRestoring || historyDeleting,
+		[updating, deleting, historyCreating, historyRestoring, historyDeleting],
 	);
 
 	const openEdit = useCallback(
@@ -183,9 +189,9 @@ export default function App() {
 
 	const openHistory = useCallback(
 		(bond: BondListItem) => {
-			// Clear any stale action errors from previous history operations.
 			clearHistoryActionError();
 			setRestoreCandidate(null);
+			setDeleteSnapshotCandidate(null);
 			setHistoryBond(bond);
 		},
 		[clearHistoryActionError],
@@ -194,16 +200,39 @@ export default function App() {
 	const closeHistory = useCallback(() => {
 		clearHistoryActionError();
 		setRestoreCandidate(null);
+		setDeleteSnapshotCandidate(null);
 		setHistoryBond(null);
 	}, [clearHistoryActionError]);
 
 	const requestRestore = useCallback(
 		(snapshot: SnapshotItem) => {
 			clearHistoryActionError();
+			setDeleteSnapshotCandidate(null);
 			setRestoreCandidate(snapshot);
 		},
 		[clearHistoryActionError],
 	);
+
+	const requestDeleteSnapshot = useCallback(
+		(snapshot: SnapshotItem) => {
+			clearHistoryActionError();
+			setRestoreCandidate(null);
+			setDeleteSnapshotCandidate(snapshot);
+		},
+		[clearHistoryActionError],
+	);
+
+	const cancelDeleteSnapshot = useCallback(() => {
+		clearHistoryActionError();
+		setDeleteSnapshotCandidate(null);
+	}, [clearHistoryActionError]);
+
+	const confirmDeleteSnapshot = useCallback(async () => {
+		if (!historyBond || !deleteSnapshotCandidate) return;
+
+		await removeSnapshot(deleteSnapshotCandidate.id);
+		setDeleteSnapshotCandidate(null);
+	}, [historyBond, deleteSnapshotCandidate, removeSnapshot]);
 
 	const cancelRestore = useCallback(() => {
 		clearHistoryActionError();
@@ -292,11 +321,13 @@ export default function App() {
 				error={historyError}
 				creating={historyCreating}
 				restoring={historyRestoring}
+				deleting={historyDeleting}
 				actionError={historyActionError}
 				onClose={closeHistory}
 				onRefresh={refreshHistory}
 				onCreateSnapshot={handleCreateSnapshot}
 				onRequestRestore={requestRestore}
+				onRequestDelete={requestDeleteSnapshot}
 			/>
 
 			<RestoreConfirmDialog
@@ -327,6 +358,16 @@ export default function App() {
 				deleteError={deleteError}
 				onCancel={closeDelete}
 				onConfirm={confirmDelete}
+			/>
+
+			<DeleteSnapshotConfirmDialog
+				open={Boolean(historyBond && deleteSnapshotCandidate)}
+				bond={historyBond}
+				snapshot={deleteSnapshotCandidate}
+				deleting={historyDeleting}
+				deleteError={historyActionError}
+				onCancel={cancelDeleteSnapshot}
+				onConfirm={confirmDeleteSnapshot}
 			/>
 		</AppShell>
 	);
