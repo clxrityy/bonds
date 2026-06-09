@@ -96,7 +96,7 @@ export function HistoryPanel({
 						onClick={() => void onCreateSnapshot()}
 					>
 						{creating ? "Creating…" : <span>
-								<SnapshotIcon aria-label="Create snapshot" />
+								<SnapshotIcon aria-label="Create snapshot" className="fill-slate-300" />
 								<span className="sr-only">Create snapshot</span>
 							</span>}
 					</button>

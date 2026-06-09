@@ -33,7 +33,14 @@ export function SidePanel({
 			</div>
 
 			<div className="grid gap-2 border border-zinc-700 bg-zinc-250 p-2 shadow-[inset_1px_1px_0_rgba(0,0,0,0.18),inset_-1px_-1px_0_rgba(255,255,255,0.65)]">
-				<SearchInput value={search} onChange={onSearchChange} />
+				<SearchInput
+					value={search}
+					onChange={onSearchChange}
+					placeholder="Search paths, names, meta:key=value, has:metadata…"
+				/>
+				<p className="text-[10px] text-slate-600">
+					Tips: <span className="font-mono">meta:env=prod</span> <span className="font-mono">has:metadata</span>
+				</p>
 				<ViewTabs active={activeTab} counts={counts} onChange={onTabChange} />
 			</div>
 

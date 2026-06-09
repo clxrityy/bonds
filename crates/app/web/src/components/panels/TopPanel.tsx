@@ -29,7 +29,11 @@ export function TopPanel({
 				</div>
 
 				<div className="w-full max-w-[18rem]">
-					<SearchInput value={search} onChange={onSearchChange} />
+					<SearchInput
+						value={search}
+						onChange={onSearchChange}
+						placeholder="Search bonds + metadata (meta:key=value)"
+					/>
 				</div>
 			</div>
 

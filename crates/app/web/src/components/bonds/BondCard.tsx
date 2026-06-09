@@ -86,7 +86,7 @@ export function BondCard({
 					<dt className="text-[11px] uppercase tracking-wider text-slate-500 font-bold max-w-20">
 						Source
 					</dt>
-					<dd className="mt-0.5 wrap-break-word text-sm text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded">
+					<dd className="mt-0.5 wrap-break-word text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded text-[0.65rem]">
 						{bond.source}
 					</dd>
 				</div>
@@ -94,7 +94,7 @@ export function BondCard({
 					<dt className="text-[11px] uppercase tracking-wider text-slate-500 font-bold max-w-20">
 						Target
 					</dt>
-					<dd className="mt-0.5 wrap-break-word text-sm text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded">
+					<dd className="mt-0.5 wrap-break-word text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded text-[0.65rem]">
 						{bond.target}
 					</dd>
 				</div>
@@ -102,7 +102,7 @@ export function BondCard({
 					<dt className="text-[11px] uppercase tracking-wider text-slate-500 font-bold max-w-20">
 						Created
 					</dt>
-					<dd className="mt-0.5 text-sm text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded">
+					<dd className="mt-0.5 text-xs text-slate-900/90 font-mono bg-blend-saturation backdrop:from-slate-200/35 backdrop:to-slate-300/35 w-fit rounded">
 						{formatDate(bond.createdAt)}
 					</dd>
 				</div>

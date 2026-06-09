@@ -18,6 +18,8 @@ export interface BondListItem {
 	createdAt: string;
 	status: BondStatus;
 	metadataCount: number;
+	// Included in list payload for metadata-aware search/filtering.
+	metadata: BondMetadata | null;
 }
 
 export interface BondDetailItem {

@@ -13,7 +13,10 @@ pub(crate) struct BondListItem {
     pub(crate) created_at: String,
     pub(crate) status: String,
     pub(crate) metadata_count: usize,
+    // Added so frontend can perform metadata-aware filtering without fetching detail per row.
+    pub(crate) metadata: Option<HashMap<String, String>>,
 }
+
 
 /// UI-facing detail payload for edit/detail views.
 /// Includes full metadata map for editing.
@@ -68,6 +71,7 @@ pub(crate) fn map_bond(bond: Bond) -> BondListItem {
         created_at: bond.created_at_rfc3339(),
         status: bond_status(&bond),
         metadata_count: bond.metadata().map_or(0, |m| m.len()),
+        metadata: bond.metadata().cloned(),
     }
 }
 

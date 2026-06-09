@@ -17,8 +17,42 @@ pub fn list_bonds(db_path: Option<String>) -> Result<Vec<BondListItem>, String> 
 mod tests {
     use super::load_bonds;
     use bonds_core::BondManager;
+    use std::collections::HashMap;
     use std::fs;
     use tempfile::TempDir;
+
+    #[test]
+    #[cfg_attr(windows, ignore)]
+    fn load_bonds_includes_metadata_for_filtering() {
+        let db_dir = TempDir::new().expect("temp db dir");
+        let db_path = db_dir.path().join("bonds-app-test-metadata.db");
+
+        let manager = BondManager::new(Some(db_path.clone())).expect("manager");
+        let src = TempDir::new().expect("src");
+        let tgt_dir = TempDir::new().expect("target dir");
+        let tgt = tgt_dir.path().join("meta-link");
+
+        let mut metadata = HashMap::new();
+        metadata.insert("env".to_string(), "dev".to_string());
+
+        manager
+            .create_bond_with_metadata(src.path(), &tgt, Some("meta-case".into()), Some(metadata))
+            .expect("create bond with metadata");
+
+        drop(manager);
+
+        let items = load_bonds(Some(db_path)).expect("load bonds");
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].metadata_count, 1);
+        assert_eq!(
+            items[0]
+                .metadata
+                .as_ref()
+                .and_then(|m| m.get("env"))
+                .map(String::as_str),
+            Some("dev")
+        );
+    }
 
     #[test]
     #[cfg_attr(windows, ignore)]
