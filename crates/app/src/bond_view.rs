@@ -17,7 +17,6 @@ pub(crate) struct BondListItem {
     pub(crate) metadata: Option<HashMap<String, String>>,
 }
 
-
 /// UI-facing detail payload for edit/detail views.
 /// Includes full metadata map for editing.
 #[derive(Debug, Clone, Serialize)]
