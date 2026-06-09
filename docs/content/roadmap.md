@@ -68,13 +68,13 @@ Current baseline:
 Next milestones:
 
 - `[x]` Create bonds from the UI
-- `[ ]` Edit and delete bonds from the UI
+- `[x]` Edit and delete bonds from the UI
 - `[x]` Open source and target paths from the UI
-- `[ ]` Add a bond detail panel with metadata visibility/editing
+- `[x]` Add a bond detail editor with metadata visibility/editing
 - `[ ]` Add metadata-aware search and filtering
 - `[x]` Add rollback and history / snapshots
-  - `[ ]` Add a history panel showing snapshots, changes, and restore points
-  - `[ ]` Add a one-click restore flow with confirmation and recovery safeguards
+  - `[x]` Add a history panel showing snapshots and restore points
+  - `[x]` Add a one-click restore flow with confirmation and recovery safeguards
 - `[ ]` Add a first-run empty state and create-first-bond flow
 - `[ ]` Add a dashboard view for recent bonds and health summaries
 - `[ ]` Add a file explorer view for bonded content
@@ -105,18 +105,18 @@ This phase adds the primitives needed for snapshots and rollback.
 
 ### 5A. History model and restore primitives
 
-- `[ ]` Define a durable history model for bonds, snapshots, and restore points
-- `[ ]` Give every change a stable identifier and timestamp
+- `[x]` Define a durable history model for bonds, snapshots, and restore points
+- `[x]` Give every change a stable identifier and timestamp
 - `[ ]` Add query APIs for history lookups by bond, file, time, and change type
-- `[ ]` Add manual snapshot creation primitives
-- `[ ]` Add restore / rollback primitives with safety checks
+- `[x]` Add manual snapshot creation primitives
+- `[x]` Add restore / rollback primitives with safety checks
 - `[ ]` Add per-bond and default history configuration
 
 ### 5B. Retention and storage strategy
 
-- `[ ]` Add retention policies and garbage collection
+- `[x]` Add retention policies and garbage collection
 - `[ ]` Introduce a storage abstraction for future optimization work
-- `[ ]` Start with a correct and testable local snapshot implementation
+- `[x]` Start with a correct and testable local snapshot implementation
 - `[ ]` Add compression and deduplication where it clearly improves storage use
 - `[ ]` Add delta encoding only after the history model and restore semantics are stable
 
@@ -134,9 +134,9 @@ Once the core history engine exists, expose it through the product surfaces.
 
 ### Desktop app
 
-- `[ ]` Add a history panel for each bond
+- `[x]` Add a history panel for each bond
 - `[ ]` Show snapshots, changes, timestamps, and restore targets
-- `[ ]` Allow one-click restore with confirmation and recovery safeguards
+- `[x]` Allow one-click restore with confirmation and recovery safeguards
 - `[ ]` Add scheduled snapshot configuration in settings
 - `[ ]` Add file-level filtering and preview for history browsing
 
