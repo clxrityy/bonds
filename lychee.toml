@@ -1,0 +1,4 @@
+[main]
+# Exclude the project's own docs domain – it may not be fully deployed yet
+# and causes TLS handshake failures in CI.
+exclude = ["https://bonds\\.fyi/.*"]
