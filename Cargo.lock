@@ -224,7 +224,7 @@ dependencies = [
 
 [[package]]
 name = "bonds-cli"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "bonds-core",
  "clap",
@@ -232,7 +232,7 @@ dependencies = [
 
 [[package]]
 name = "bonds-core"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "chrono",
  "rusqlite",

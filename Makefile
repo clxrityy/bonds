@@ -1,7 +1,7 @@
 # ----------------------------------------
 # Variables
 #	----------------------------------------
-VERSION ?= v0.1.7
+VERSION ?= v0.1.8
 VERSION_TARGET	?= all
 SYNC_MAKEFILE ?= false
 DOCS_PROFILE ?= strict
