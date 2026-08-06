@@ -1,4 +1,4 @@
-[general]
 # Exclude the project's own docs domain – it may not be fully deployed yet
 # and causes TLS handshake failures in CI.
+root_dir = "docs/site"
 exclude = ["https://bonds\\.fyi/.*"]
