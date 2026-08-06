@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/architecture/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/architecture/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/cli/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/cli/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/roadmap/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/roadmap/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/contributing/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/contributing/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/contributing/development/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/contributing/development/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/contributing/issues/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/contributing/issues/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/contributing/pull-requests/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/contributing/pull-requests/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/contributing/testing/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/contributing/testing/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/library/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/library/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/library/cli-api/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/library/cli-api/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/library/core-api/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/library/core-api/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/library/events/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/library/events/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/library/querying/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/library/querying/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/resources/code-of-conduct/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/resources/code-of-conduct/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/resources/license/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/resources/license/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
     <url>
-         <loc>https://bonds.fyi/versions/v0.1.8/resources/security/</loc>
+         <loc>https://bonds.fyi/versions/v0.1.7/resources/security/</loc>
          <lastmod>2026-08-06</lastmod>
     </url>
 </urlset>
