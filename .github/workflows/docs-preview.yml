@@ -60,26 +60,23 @@ jobs:
           cargo doc --workspace --no-deps
           mkdir -p docs/site/api
           cp -R target/doc/* docs/site/api/
-
-      # - name: Add API index redirect
-      #   run: |
-      #     cat > docs/site/api/index.html <<'HTML'
-      #     <!doctype html>
-      #     <html lang="en">
-      #       <head>
-      #         <meta charset="utf-8" />
-      #         <title>Bonds API Docs</title>
-      #       </head>
-      #       <body>
-      #         <h1>Bonds API Docs</h1>
-      #         <ul>
-      #           <li><a href="./bonds_core/">core</a></li>
-      #           <li><a href="./bonds_cli/">cli</a></li>
-      #           <li><a href="./bond/">bond (binary)</a></li>
-      #         </ul>
-      #       </body>
-      #     </html>
-      #     HTML
+          cat > docs/site/api/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Bonds API Docs</title>
+            </head>
+            <body>
+              <h1>Bonds API Docs</h1>
+              <ul>
+                <li><a href="./bonds_core/">core</a></li>
+                <li><a href="./bonds_cli/">cli</a></li>
+                <li><a href="./bond/">bond (binary)</a></li>
+              </ul>
+            </body>
+          </html>
+          HTML
 
       - name: Deploy preview to gh-pages
         uses: peaceiris/actions-gh-pages@v4
